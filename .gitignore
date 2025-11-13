@@ -1,0 +1,13 @@
+.DS_Store
+.vscode/
+.idea/
+*.swp
+node_modules/
+*.log
+.env
+.env.local
+dist/
+build/
+mcp-servers/*/node_modules/
+mcp-servers/*/dist/
+mcp-servers/*/.env
