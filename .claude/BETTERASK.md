@@ -111,6 +111,116 @@ If no canton specified → Federal law mode (default)
 
 ---
 
+## 💡 Hybrid Activation System (NEW in v1.0)
+
+BetterCallClaude supports **two activation methods** for maximum flexibility:
+
+### Method 1: Natural Language (Auto-Detection)
+**How it works**: Framework automatically detects legal keywords and activates personas
+
+**Advantages**:
+- ✅ Fast and intuitive - just ask your legal question
+- ✅ No need to remember commands
+- ✅ Works naturally in conversation flow
+- ✅ Seamless integration with regular Claude Code usage
+
+**Example**:
+```
+Query: "Search BGE for Art. 97 OR contractual liability cases"
+→ Auto-detects Legal Researcher persona ✅
+→ Activates Federal Law mode ✅
+→ Proceeds with BGE search
+```
+
+### Method 2: Explicit Commands (Professional Assurance)
+**How it works**: Use `/legal:` prefix commands to explicitly force framework activation
+
+**Advantages**:
+- ✅ **Professional assurance** - Clear that BetterCallClaude framework is active
+- ✅ **Audit trail** - Document shows explicit legal framework usage
+- ✅ **Mixed sessions** - Toggle between legal and general work
+- ✅ **Override ambiguity** - Force specific mode when auto-detection uncertain
+- ✅ **Client confidence** - Demonstrate framework usage in deliverables
+
+**Available Commands**:
+
+#### Persona Commands
+- `/legal:research` - Activate Legal Researcher for precedent analysis
+- `/legal:strategy` - Activate Case Strategist for litigation planning
+- `/legal:draft` - Activate Legal Drafter for document creation
+
+#### Mode Override Commands
+- `/legal:federal` - Force Federal Law Mode exclusively
+- `/legal:cantonal [ZH|BE|GE|BS|VD|TI]` - Force specific cantonal law
+
+#### Help Command
+- `/legal:help` - Show complete command reference
+
+**Example**:
+```
+Query: /legal:research Art. 97 OR contractual liability
+→ Explicitly activates Legal Researcher ✅
+→ Shows activation confirmation in response:
+   "🎭 Persona: Legal Researcher (/legal:research activated)"
+→ Proceeds with BGE search with explicit framework indicator
+```
+
+### When to Use Each Method
+
+**Use Auto-Detection (Natural Language)** when:
+- Working on personal research or internal analysis
+- Comfortable with automated persona selection
+- Speed and efficiency are priority
+- In casual legal research sessions
+
+**Use Explicit Commands (/legal:)** when:
+- Creating client deliverables or billable work
+- Need audit trail for professional file documentation
+- Working on high-stakes legal matters
+- Want absolute certainty about framework activation
+- Mixing legal and general work in same session
+- Teaching or demonstrating the framework to colleagues
+
+### Command Combinations
+
+You can combine persona commands with mode overrides:
+
+```
+# Example 1: Federal research
+/legal:federal
+/legal:research BGE on Art. 97 OR
+
+# Example 2: Zürich strategy
+/legal:cantonal ZH
+/legal:strategy Commercial litigation options
+
+# Example 3: Geneva drafting
+/legal:cantonal GE
+/legal:draft Complaint for Tribunal de première instance
+```
+
+### Activation Confirmation
+
+When using explicit commands, every response includes confirmation:
+
+```
+🎭 Persona: Legal Researcher (/legal:research activated)
+📖 Mode: Federal Law (/legal:federal activated)
+🇨🇭 Jurisdiction: Swiss Federal Law
+⚡ Activation: Explicit command override
+
+[Legal analysis with BetterCallClaude framework...]
+```
+
+### Command Documentation
+
+Complete command reference available:
+- Quick reference: Type `/legal:help` for command list
+- Full documentation: `docs/workflows/` directory
+- Command files: `.claude/commands/legal-*.md`
+
+---
+
 ## 🔧 Configuration
 
 User configuration file: `~/.betterask/config.yaml`

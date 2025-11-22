@@ -286,6 +286,126 @@ Query in French: "Quels sont les délais de prescription selon l'art. 127 CO?"
 
 ---
 
+## Using Explicit Commands (Professional Mode)
+
+### Why Use Explicit Commands?
+
+BetterCallClaude supports **two activation methods**:
+
+1. **Natural Language** (Auto-Detection) - Just ask your question naturally
+2. **Explicit Commands** (Professional Assurance) - Use `/legal:` prefix for certainty
+
+**When to use explicit `/legal:` commands:**
+- ✅ Creating client deliverables or billable work
+- ✅ Need audit trail for professional documentation
+- ✅ Want absolute certainty framework is active
+- ✅ Working on high-stakes legal matters
+- ✅ Teaching or demonstrating the framework
+
+### Available Commands
+
+#### Persona Commands
+
+**`/legal:research`** - Legal Research & Precedent Analysis
+```
+/legal:research Art. 97 OR contractual liability
+
+Response includes:
+🎭 Persona: Legal Researcher (/legal:research activated)
+📖 Mode: Federal Law
+🇨🇭 Jurisdiction: Swiss Federal Law
+```
+
+**`/legal:strategy`** - Case Strategy & Litigation Planning
+```
+/legal:strategy Breach of contract case, CHF 500,000 damages
+
+Response includes:
+🎭 Persona: Case Strategist (/legal:strategy activated)
+⚖️ Analysis Type: Strategic Assessment
+```
+
+**`/legal:draft`** - Document Creation & Drafting
+```
+/legal:draft Service agreement under Swiss OR
+
+Response includes:
+🎭 Persona: Legal Drafter (/legal:draft activated)
+📄 Document Type: Contract
+```
+
+#### Mode Override Commands
+
+**`/legal:federal`** - Force Federal Law Mode
+```
+/legal:federal
+Explain Art. 41 OR liability requirements
+```
+
+**`/legal:cantonal [CANTON]`** - Force Cantonal Law Mode
+```
+/legal:cantonal ZH
+Court fees for Zürich Commercial Court
+
+Supported cantons: ZH, BE, GE, BS, VD, TI
+```
+
+#### Help Command
+
+**`/legal:help`** - Show All Commands
+```
+/legal:help
+
+Shows complete command reference with examples
+```
+
+### Command Combinations
+
+You can combine persona and mode commands:
+
+```bash
+# Federal research
+/legal:federal
+/legal:research BGE on Art. 97 OR
+
+# Zürich strategy
+/legal:cantonal ZH
+/legal:strategy Commercial dispute options
+
+# Geneva drafting (French)
+/legal:cantonal GE
+/legal:draft Complaint for Tribunal de première instance
+```
+
+### Natural Language vs. Explicit Commands
+
+**Same Query, Two Ways:**
+
+**Natural Language (Auto-Detection):**
+```
+Query: "Search BGE for Art. 97 OR cases"
+
+Response:
+🎭 Persona: Legal Researcher
+📖 Mode: Federal Law
+[Analysis...]
+```
+
+**Explicit Command:**
+```
+Query: /legal:research Art. 97 OR
+
+Response:
+🎭 Persona: Legal Researcher (/legal:research activated)
+📖 Mode: Federal Law
+⚡ Activation: Explicit command override
+[Analysis...]
+```
+
+**Key Difference**: Explicit commands show activation confirmation and override any ambiguity.
+
+---
+
 ## Multi-Lingual Usage
 
 ### Language Detection
