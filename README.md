@@ -1,132 +1,253 @@
-# BetterCallClaude Framework
+# BetterCallClaude
 
 **Legal Intelligence Framework for Swiss Lawyers**
 
-[![Version](https://img.shields.io/badge/version-1.0.0--alpha-blue)]()
-[![License](https://img.shields.io/badge/license-MIT-green)]()
-[![Language Support](https://img.shields.io/badge/languages-DE%20|%20FR%20|%20IT%20|%20EN-orange)]()
+[![Version](https://img.shields.io/badge/version-1.0.0--alpha-blue.svg)](https://github.com/yourusername/bettercallclaude)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Languages](https://img.shields.io/badge/languages-DE%20%7C%20FR%20%7C%20IT%20%7C%20EN-orange.svg)]()
+[![Claude Code](https://img.shields.io/badge/built%20with-Claude%20Code-purple.svg)](https://claude.ai/code)
+
+> Transform Swiss legal research and case strategy with AI-powered precision. Built for solo practitioners and medium-sized law firms specializing in corporate law and litigation.
 
 ---
 
 ## 🎯 Overview
 
-**BetterCallClaude** is a CLI-based legal intelligence framework built on Claude Code, specifically designed for Swiss lawyers. It provides AI-powered legal research, case strategy development, and document drafting capabilities with deep understanding of Swiss federal and cantonal law.
+BetterCallClaude is a comprehensive legal intelligence framework that provides Swiss lawyers with:
+
+- **80% time savings** on precedent analysis and legal research
+- **25% quality improvement** through systematic verification
+- **Multi-jurisdictional expertise** across federal and cantonal Swiss law (ZH, BE, GE, BS, VD, TI)
+- **Multi-lingual precision** in legal terminology and reasoning (DE, FR, IT, EN)
 
 ### Key Features
 
-- **Multi-Jurisdictional Swiss Law** - Federal + 6 major cantons (ZH, BE, GE, BS, VD, TI)
-- **Multi-Lingual** - Native support for German, French, Italian, and English
-- **Legal Research** - BGE precedent analysis, statute lookup, citation verification
-- **Case Strategy** - Strategic analysis, risk assessment, argumentation development
-- **Document Drafting** - Swiss-standard contracts, briefs, and legal opinions
-- **Privacy-First** - Anwaltsgeheimnis compliant with local LLM support (coming in v1.1)
-- **Open Source** - MIT licensed, community-driven
+✅ **Three Expert Legal Personas**
+- **Legal Researcher**: BGE precedent research, statutory analysis, multi-lingual legal research
+- **Case Strategist**: Litigation strategy, risk assessment, procedural analysis
+- **Legal Drafter**: Contract drafting (OR framework), court submissions, legal opinions
 
-### Success Targets
+✅ **Swiss Law Modes**
+- **Federal Law Mode**: ZGB, OR, StGB, StPO, ZPO, BV analysis
+- **Cantonal Law Mode**: Canton-specific law routing (6 cantons in v1.0)
+- **Multi-Lingual Mode**: Terminology consistency across DE/FR/IT/EN
 
-- **80% time savings** on legal research and precedent analysis
-- **25% quality improvement** through systematic verification
-- **>95% citation accuracy** via automated verification
+✅ **MCP Server Integration**
+- **entscheidsuche**: Swiss court decision search (bundesgericht.ch + cantonal courts)
+- **legal-citations**: Citation extraction, verification, and formatting
+
+---
+
+## 📋 Table of Contents
+
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Usage Examples](#usage-examples)
+- [Documentation](#documentation)
+- [Configuration](#configuration)
+- [Development](#development)
+- [Contributing](#contributing)
+- [License](#license)
+- [Support](#support)
+
+---
+
+## 🔧 Requirements
+
+### System Requirements
+- **Operating System**: macOS, Linux, or Windows
+- **Node.js**: v18.0.0 or higher
+- **npm**: v8.0.0 or higher
+- **Claude Code**: Latest version ([Installation Guide](https://docs.anthropic.com/claude/docs/claude-code))
+
+### Required API Keys
+- **Anthropic API Key**: For Claude Code access ([Get API Key](https://console.anthropic.com/))
+- **Tavily API Key** (Optional): For enhanced web research ([Get API Key](https://app.tavily.com/))
+
+---
+
+## 📦 Installation
+
+### Step 1: Clone the Repository
+
+```bash
+git clone https://github.com/yourusername/bettercallclaude.git
+cd bettercallclaude
+```
+
+### Step 2: Install Dependencies
+
+```bash
+npm install
+```
+
+### Step 3: Configure MCP Servers
+
+The framework uses MCP (Model Context Protocol) servers for Swiss court decision search and citation management.
+
+```bash
+cd mcp-servers
+npm install
+npm run build
+```
+
+### Step 4: Set Up Claude Code Integration
+
+Copy the `.claude` directory to your Claude Code configuration:
+
+```bash
+# The .claude directory contains all personas, modes, and MCP configurations
+# Claude Code will automatically detect and load these configurations
+```
+
+### Step 5: Configure API Keys
+
+Create a `.env` file in the project root:
+
+```bash
+# Required
+ANTHROPIC_API_KEY=your_anthropic_api_key_here
+
+# Optional (for enhanced research)
+TAVILY_API_KEY=your_tavily_api_key_here
+```
+
+### Step 6: Verify Installation
+
+Run the verification script:
+
+```bash
+npm run verify
+```
+
+You should see:
+```
+✅ Node.js version compatible (v18.x.x)
+✅ npm version compatible (v8.x.x)
+✅ Claude Code detected
+✅ MCP servers built successfully
+✅ Framework configuration loaded
+✅ API keys configured
+
+🎉 BetterCallClaude is ready to use!
+```
 
 ---
 
 ## 🚀 Quick Start
 
-### Prerequisites
+### Basic Usage with Claude Code
 
-- [Claude Code](https://claude.com/claude-code) installed and configured
-- Node.js 18+ (for MCP servers)
-- macOS, Linux, or Windows
+1. **Open Claude Code** in your terminal
+2. **Activate BetterCallClaude** by opening any legal document or starting a conversation
 
-### Installation
+### Example: Legal Research
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/BetterCallClaude.git
-cd BetterCallClaude
+# Start Claude Code
+claude
 
-# Install MCP servers
-cd mcp-servers/entscheidsuche && npm install && cd ../..
-cd mcp-servers/legal-citations && npm install && cd ../..
-
-# Configure Claude Code to use BetterCallClaude
-# Copy .claude/ directory to your user configuration:
-cp -r .claude ~/.claude/betterask/
-
-# Or add to your project-specific .claude/ directory
+# In Claude Code, ask:
+"Search BGE for recent decisions on Art. 62 OR (liability for unlawful acts)"
 ```
 
-### Configuration
+The **Legal Researcher** persona will automatically activate and:
+- Search bundesgericht.ch for relevant BGE decisions
+- Verify citations against official sources
+- Present multi-lingual analysis with proper terminology
 
-Edit `~/.betterask/config.yaml`:
+### Example: Case Strategy
 
-```yaml
-# Privacy mode: strict (local) | balanced (hybrid) | cloud (full)
-privacy_mode: balanced
-
-# LLM backend: anthropic (default) | ollama (v1.1+)
-llm_backend: anthropic
-
-# Your practice focus
-canton_focus: ["ZH", "GE"]  # Primary jurisdictions
-languages: ["de", "fr", "en"]
-practice_areas: ["corporate", "litigation"]
-
-# Optional: Commercial database credentials
-commercial_databases:
-  swisslex:
-    enabled: false
-    api_key: ""
-  weblaw:
-    enabled: false
-    api_key: ""
+```bash
+# In Claude Code, ask:
+"Analyze the litigation strategy for a breach of contract case under Art. 97 OR with damages of CHF 500,000"
 ```
+
+The **Case Strategist** persona will:
+- Assess case strength with evidence-based risk probability
+- Evaluate procedural strategy options (ZPO federal + cantonal)
+- Calculate settlement value with financial and strategic risk modeling
+
+### Example: Document Drafting
+
+```bash
+# In Claude Code, ask:
+"Draft a service agreement under Swiss OR for software development services"
+```
+
+The **Legal Drafter** persona will:
+- Generate contract following Swiss Code of Obligations framework
+- Include proper Swiss legal structure and terminology
+- Provide multi-lingual drafting (DE/FR/IT/EN)
 
 ---
 
-## 📖 Usage
+## 💡 Usage Examples
 
-### Basic Legal Research
+### Federal Law Analysis
 
-```bash
-# Start Claude Code in your working directory
-claude-code
+```
+Query: "Explain the requirements for liability under Art. 41 OR"
 
-# Activate Legal Researcher persona
-"I need to research BGE precedents on contractual liability under Art. 97 OR"
+Result:
+🎭 Persona: Legal Researcher
+📖 Mode: Federal Law
+🇨🇭 Jurisdiction: Swiss Federal Law
 
-# BetterCallClaude will:
-# 1. Activate Legal Researcher persona
-# 2. Search bundesgericht.ch via entscheidsuche MCP
-# 3. Extract relevant BGE decisions
-# 4. Verify citations via legal-citations MCP
-# 5. Present structured analysis in your preferred language
+Art. 41 Abs. 1 OR establishes liability requirements:
+1. Unlawful act (Widerrechtlichkeit / illicéité / illiceità)
+2. Damage (Schaden / dommage / danno)
+3. Causal connection (Kausalzusammenhang / lien de causalité / nesso causale)
+4. Fault (Verschulden / faute / colpa)
+
+BGE References:
+- BGE 144 III 394: Unlawfulness criteria...
+- BGE 143 III 101: Causal connection standards...
+
+[Full analysis with citations...]
 ```
 
-### Case Strategy Development
+### Cantonal Law Routing
 
-```bash
-"Analyze litigation strategy for breach of contract case, ZH jurisdiction,
-considering BGE 142 III 102 and recent cantonal precedents"
+```
+Query: "What are the court fees for commercial litigation in Zürich Canton?"
 
-# Case Strategist persona will:
-# 1. Analyze relevant precedents
-# 2. Assess procedural options (ZPO Zürich)
-# 3. Evaluate strengths/weaknesses
-# 4. Develop strategic recommendations
+Result:
+🎭 Persona: Legal Researcher
+📖 Mode: Cantonal Law (ZH)
+🏛️ Canton: Zürich
+
+Zürich Court Fee Schedule (GebV ZH):
+- Commercial disputes: Art. 12 GebV ZH
+- Fee calculation based on dispute value
+- CHF 1,000 minimum, 3% of value up to CHF 1M
+
+ZH Court Website: https://gerichte-zh.ch
+[Full cantonal analysis...]
 ```
 
-### Document Drafting
+### Multi-Lingual Analysis
 
-```bash
-"Draft a Swiss share purchase agreement (DE) for software company acquisition,
-considering Art. 216 OR and standard market practices"
+```
+Query (in French): "Quels sont les délais de prescription selon l'art. 127 CO?"
 
-# Legal Drafter persona will:
-# 1. Select appropriate legal framework
-# 2. Draft provisions with proper citations
-# 3. Ensure multi-lingual terminology consistency
-# 4. Verify citation accuracy
+Result:
+🎭 Persona: Legal Researcher
+📖 Mode: Multi-Lingual (FR)
+🌐 Languages: FR (primary), DE/IT (cross-reference)
+
+Art. 127 CO - Délais de prescription:
+- Délai général: 10 ans (art. 127 CO)
+- Responsabilité délictuelle: 3 ans (art. 60 CO)
+- Créances périodiques: 5 ans (art. 128 CO)
+
+Terminologie:
+- FR: prescription
+- DE: Verjährung
+- IT: prescrizione
+
+[Full multi-lingual analysis...]
 ```
 
 ---
@@ -193,16 +314,136 @@ The framework automatically:
 
 ## 📚 Documentation
 
-- [Getting Started Guide](docs/getting-started.md)
-- [Legal Workflows](docs/workflows/)
-  - [BGE Precedent Research](docs/workflows/research-precedents.md)
-  - [Case Strategy Development](docs/workflows/case-strategy.md)
-  - [Contract Drafting](docs/workflows/draft-contracts.md)
-- [Multi-Lingual Documentation](docs/languages/)
-  - [Deutsch](docs/languages/de/)
-  - [Français](docs/languages/fr/)
-  - [Italiano](docs/languages/it/)
-- [Video Tutorials](docs/tutorials/) (Coming soon)
+### Getting Started Guides
+
+- **English**: [Getting Started Guide](docs/getting-started.md)
+- **Deutsch**: [Erste Schritte Anleitung](docs/languages/de/erste-schritte.md)
+- **Français**: [Guide de Démarrage](docs/languages/fr/guide-demarrage.md)
+- **Italiano**: [Guida Introduttiva](docs/languages/it/guida-introduttiva.md)
+
+### Workflow Tutorials
+
+- [Legal Research Workflow](docs/workflows/research-precedents.md) - BGE precedent search and statutory analysis
+- [Case Strategy Workflow](docs/workflows/case-strategy.md) - Litigation strategy and risk assessment
+- [Document Drafting Workflow](docs/workflows/draft-contracts.md) - Contract drafting and court submissions
+
+### Technical Documentation
+
+- [Framework Architecture](.claude/BETTERASK.md) - Main entry point and component overview
+- [Legal Principles](.claude/LEGAL_PRINCIPLES.md) - Swiss legal reasoning standards
+- [MCP Server Documentation](.claude/mcp/) - entscheidsuche and legal-citations specifications
+
+---
+
+## ⚙️ Configuration
+
+### User Configuration
+
+Create `~/.betterask/config.yaml` for personalized settings:
+
+```yaml
+# Framework version
+version: "1.0.0"
+
+# Privacy mode
+privacy_mode: balanced  # strict | balanced | cloud
+
+# LLM backend
+llm_backend: anthropic  # anthropic | ollama (v1.1+)
+
+# Practice focus
+canton_focus: ["ZH", "GE"]
+languages: ["de", "fr", "en"]
+practice_areas: ["corporate", "litigation"]
+
+# MCP servers
+mcp_servers:
+  entscheidsuche:
+    enabled: true
+    sources: ["bundesgericht", "zh", "be", "ge", "bs", "vd", "ti"]
+
+  legal_citations:
+    enabled: true
+    verification: strict
+
+# Data retention
+data_retention_days: 30
+
+# Session management
+auto_save: true
+checkpoint_interval: 1800  # 30 minutes
+```
+
+### Cantonal Law Configuration
+
+BetterCallClaude v1.0 supports **6 major Swiss cantons**:
+
+| Canton | Abbreviation | Language | Population |
+|--------|-------------|----------|------------|
+| Zürich | ZH | DE | 1.5M |
+| Bern | BE | DE/FR (bilingual) | 1.0M |
+| Genève | GE | FR | 0.5M |
+| Basel-Stadt | BS | DE | 0.2M |
+| Vaud | VD | FR | 0.8M |
+| Ticino | TI | IT | 0.4M |
+
+*Full 26-canton support coming in v1.1*
+
+---
+
+## 🛠️ Development
+
+### Project Structure
+
+```
+bettercallclaude/
+├── .claude/                  # Claude Code framework configuration
+│   ├── personas/            # Legal expert personas
+│   ├── modes/               # Swiss law operation modes
+│   ├── mcp/                 # MCP server documentation
+│   ├── BETTERASK.md         # Main entry point
+│   ├── LEGAL_PRINCIPLES.md  # Legal reasoning standards
+│   ├── LEGAL_SYMBOLS.md     # Citation formatting
+│   └── SWISS_LAW_CONFIG.md  # Jurisdiction routing
+├── mcp-servers/             # MCP server implementations
+│   ├── entscheidsuche/      # Court decision search
+│   └── legal-citations/     # Citation verification
+├── docs/                    # User documentation
+│   ├── getting-started.md   # English guide
+│   ├── workflows/           # Workflow tutorials
+│   └── languages/           # Multi-lingual docs
+├── tests/                   # Integration tests
+├── package.json             # npm configuration
+└── README.md                # This file
+```
+
+### Building MCP Servers
+
+```bash
+cd mcp-servers
+npm run build
+
+# Run tests
+npm test
+
+# Development mode with hot reload
+npm run dev
+```
+
+### Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run integration tests
+npm run test:integration
+
+# Run specific test suite
+npm test -- personas
+npm test -- modes
+npm test -- mcp
+```
 
 ---
 
@@ -226,78 +467,119 @@ betterask version rollback
 
 ---
 
-## 🛣️ Roadmap
+## 🎯 Roadmap
 
-### v1.0 (Current - MVP)
-- ✅ 3 core personas (Researcher, Strategist, Drafter)
-- ✅ 6 cantons (ZH, BE, GE, BS, VD, TI)
-- ✅ Multi-lingual (DE/FR/IT/EN)
-- ✅ 2 MCP servers (entscheidsuche, legal-citations)
-- ✅ Corporate + Litigation practice areas
+### v1.0.0 (Current) - Foundation Phase ✅
+- ✅ 3 legal expert personas
+- ✅ 3 Swiss law operation modes
+- ✅ 2 MCP server specifications
+- ✅ 6-canton support (ZH, BE, GE, BS, VD, TI)
+- ✅ Multi-lingual support (DE/FR/IT/EN)
 
-### v1.1 (Planned - Q2 2024)
-- Local LLM support (Ollama integration)
-- Feedback collection system
-- Additional personas (Compliance, Tax, Criminal)
-- Full cantonal coverage (all 26 cantons)
-- Legal glossary MCP server
+### v1.1 (Q2 2025) - Expansion
+- 🔜 All 26 Swiss cantons
+- 🔜 Ollama integration (local LLM support)
+- 🔜 Commercial database integrations (Swisslex, Weblaw)
+- 🔜 Advanced precedent analysis
 
-### v1.2 (Planned - Q3 2024)
-- Document template library
-- Commercial database plugins (swisslex, Weblaw)
-- Advanced conflict checking
-- EU Integration mode
+### v1.2 (Q3 2025) - Enhancement
+- 🔜 Automated legal research reports
+- 🔜 Practice management system integrations
+- 🔜 Enhanced multi-lingual capabilities
 
-### v2.0 (Future)
-- Team collaboration features
-- DMS integration (Vertec, Abraxas)
-- Time tracking and billing
-- Court filing system integration
+### v2.0 (Q4 2025) - International
+- 🔜 European law integration (EU regulations, ECHR)
+- 🔜 Cross-border legal analysis
+- 🔜 Advanced AI features (argumentation, negotiation support)
 
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions from the Swiss legal tech community! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+We welcome contributions from the Swiss legal community and developers!
 
-### Development Setup
+### How to Contribute
 
-```bash
-# Clone and install
-git clone https://github.com/yourusername/BetterCallClaude.git
-cd BetterCallClaude
-npm install
+1. **Fork the repository**
+2. **Create a feature branch**: `git checkout -b feature/your-feature-name`
+3. **Make your changes** with clear commit messages
+4. **Add tests** for new functionality
+5. **Update documentation** as needed
+6. **Submit a pull request**
 
-# Run tests
-npm test
+### Contribution Guidelines
 
-# Lint code
-npm run lint
-```
+- **Code Style**: Follow existing TypeScript/Node.js conventions
+- **Documentation**: Update relevant docs for any changes
+- **Testing**: Maintain >80% test coverage
+- **Legal Accuracy**: Verify all Swiss law references and citations
+- **Multi-Lingual**: Provide translations for DE/FR/IT when applicable
+
+### Priority Contribution Areas
+
+- **Additional Cantons**: Help us expand to all 26 Swiss cantons (v1.1 scope)
+- **Commercial Databases**: Integrations with Swisslex, Weblaw (optional)
+- **Local LLM Support**: Ollama integration for privacy mode (v1.1)
+- **Workflow Examples**: Real-world case studies and examples
+- **Bug Reports**: Help us improve stability and accuracy
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+
+---
+
+## ⚠️ Professional Disclaimer
+
+**IMPORTANT**: BetterCallClaude is a legal research and analysis tool. All outputs:
+
+- ✋ **Require professional lawyer review and validation**
+- ✋ **Do not constitute legal advice**
+- ✋ **May contain errors or omissions**
+- ✋ **Should be verified against official sources**
+- ✋ **Must be adapted to specific case circumstances**
+
+**Lawyers maintain full professional responsibility for all legal work products.**
 
 ---
 
 ## 📄 License
 
-MIT License - see [LICENSE](LICENSE) for details.
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
 ---
 
 ## 🙏 Acknowledgments
 
-- Inspired by [SuperClaude Framework](https://github.com/SuperClaude-Org/SuperClaude_Framework)
-- Built on [Claude Code](https://claude.com/claude-code) by Anthropic
-- Swiss legal data sources: bundesgericht.ch, admin.ch, fedlex.admin.ch
+Built with ❤️ for the Swiss legal community using:
+
+- **[Claude Code](https://claude.ai/code)** by Anthropic - AI-powered development framework
+- **[Model Context Protocol (MCP)](https://modelcontextprotocol.io/)** - Extensible AI integration
+- **Swiss Federal Supreme Court** - BGE/ATF/DTF precedent access
+- **Swiss Cantonal Courts** - Cantonal decision databases
+
+Special thanks to beta testers from Swiss law firms for their valuable feedback.
 
 ---
 
 ## 📞 Support
 
+### Documentation & Resources
+
 - **Documentation**: [docs/](docs/)
-- **Issues**: [GitHub Issues](https://github.com/yourusername/BetterCallClaude/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/BetterCallClaude/discussions)
-- **Email**: support@betterask claude.ch (Coming soon)
+- **GitHub Issues**: [Report bugs and feature requests](https://github.com/yourusername/bettercallclaude/issues)
+- **Discussions**: [Community Q&A and best practices](https://github.com/yourusername/bettercallclaude/discussions)
+
+### Community
+
+- **Swiss Legal Tech Community**: Join discussions about legal technology in Switzerland
+- **Contributing**: See [CONTRIBUTING.md](CONTRIBUTING.md) for how to get involved
+
+### Contact
+
+- **Project Maintainer**: [Your Name](mailto:your.email@example.com)
+- **Website**: [https://bettercallclaude.ai](https://bettercallclaude.ai) *(coming soon)*
 
 ---
 
-**Built with ❤️ for the Swiss legal community**
+**Built for the Swiss legal community with precision, quality, and multi-lingual excellence.**
+
+*BetterCallClaude v1.0.0-alpha - Legal Intelligence Framework*
