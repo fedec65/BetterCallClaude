@@ -8,7 +8,7 @@ This module provides the foundation for the command system, including:
 """
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
@@ -45,16 +45,14 @@ class CommandMetadata:
     category: CommandCategory
     description: str
     help_text: str
-    auto_personas: List[str] = None
-    mcp_servers: List[str] = None
+    auto_personas: List[str] = field(default_factory=list)
+    mcp_servers: List[str] = field(default_factory=list)
     requires_auth: bool = False
 
     def __post_init__(self) -> None:
         """Initialize default values for optional fields"""
-        if self.auto_personas is None:
-            self.auto_personas = []
-        if self.mcp_servers is None:
-            self.mcp_servers = []
+        # Default values are now handled by field(default_factory=list)
+        pass
 
 
 class CommandArgument:

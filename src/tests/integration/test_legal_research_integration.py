@@ -11,6 +11,7 @@ ConnectionManager to MCP adapters. Verifies:
 
 from unittest.mock import AsyncMock, MagicMock, patch
 
+from typing import Any, Dict
 import pytest
 
 from src.core.commands.legal_research import LegalResearchCommand
@@ -21,7 +22,7 @@ class TestLegalResearchIntegration:
     """Test end-to-end legal research integration"""
 
     @pytest.mark.asyncio
-    async def test_federal_jurisdiction_searches_bge_only(self):
+    async def test_federal_jurisdiction_searches_bge_only(self) -> None:
         """Test federal jurisdiction routes to BGE search only"""
         command = LegalResearchCommand()
 
@@ -74,7 +75,7 @@ class TestLegalResearchIntegration:
             assert result["sources"] == ["bge_search"]
 
     @pytest.mark.asyncio
-    async def test_cantonal_jurisdiction_searches_entscheidsuche(self):
+    async def test_cantonal_jurisdiction_searches_entscheidsuche(self) -> None:
         """Test cantonal jurisdiction routes to Entscheidsuche with court level filter"""
         command = LegalResearchCommand()
 
@@ -117,13 +118,13 @@ class TestLegalResearchIntegration:
             assert result["sources"] == ["entscheidsuche"]
 
     @pytest.mark.asyncio
-    async def test_all_jurisdiction_searches_multiple_sources(self):
+    async def test_all_jurisdiction_searches_multiple_sources(self) -> None:
         """Test 'all' jurisdiction searches both BGE and Entscheidsuche"""
         command = LegalResearchCommand()
 
         with patch.object(MCPConnectionManager, "execute", new_callable=AsyncMock) as mock_execute:
             # Mock responses from both sources
-            def execute_side_effect(*args, **kwargs):
+            def execute_side_effect(*args: Any, **kwargs: Any) -> Dict[str, Any]:
                 server_id = kwargs.get("server_id")
                 if server_id == "bge_search":
                     return {
@@ -155,6 +156,8 @@ class TestLegalResearchIntegration:
                             ]
                         },
                     }
+                else:
+                    return {"success": False, "error": f"Unknown server_id: {server_id}"}
 
             mock_execute.side_effect = execute_side_effect
 
@@ -175,7 +178,7 @@ class TestLegalResearchIntegration:
             assert "entscheidsuche" in result["sources"]
 
     @pytest.mark.asyncio
-    async def test_date_filters_passed_to_mcp_servers(self):
+    async def test_date_filters_passed_to_mcp_servers(self) -> None:
         """Test date filters are correctly passed to MCP servers"""
         command = LegalResearchCommand()
 
@@ -201,7 +204,7 @@ class TestLegalResearchIntegration:
             assert call_args[1]["params"]["date_to"] == "2023-12-31"
 
     @pytest.mark.asyncio
-    async def test_limit_parameter_passed_correctly(self):
+    async def test_limit_parameter_passed_correctly(self) -> None:
         """Test limit parameter controls result count"""
         command = LegalResearchCommand()
 
@@ -225,13 +228,13 @@ class TestErrorHandlingAndRecovery:
     """Test error handling and partial failure recovery"""
 
     @pytest.mark.asyncio
-    async def test_bge_failure_continues_with_entscheidsuche(self):
+    async def test_bge_failure_continues_with_entscheidsuche(self) -> None:
         """Test that if BGE fails, Entscheidsuche still executes"""
         command = LegalResearchCommand()
 
         with patch.object(MCPConnectionManager, "execute", new_callable=AsyncMock) as mock_execute:
 
-            def execute_with_bge_error(*args, **kwargs):
+            def execute_with_bge_error(*args: Any, **kwargs: Any) -> Dict[str, Any]:
                 server_id = kwargs.get("server_id")
                 if server_id == "bge_search":
                     raise Exception("BGE server unavailable")
@@ -250,6 +253,8 @@ class TestErrorHandlingAndRecovery:
                             ]
                         },
                     }
+                else:
+                    return {"success": False, "error": f"Unknown server_id: {server_id}"}
 
             mock_execute.side_effect = execute_with_bge_error
 
@@ -262,7 +267,7 @@ class TestErrorHandlingAndRecovery:
             assert "bge_search (error:" in result["sources"][0]
 
     @pytest.mark.asyncio
-    async def test_all_sources_fail_returns_empty_results(self):
+    async def test_all_sources_fail_returns_empty_results(self) -> None:
         """Test that if all sources fail, returns success with empty results"""
         command = LegalResearchCommand()
 
@@ -277,7 +282,7 @@ class TestErrorHandlingAndRecovery:
             assert all("error:" in source for source in result["sources"])
 
     @pytest.mark.asyncio
-    async def test_connection_manager_shutdown_always_called(self):
+    async def test_connection_manager_shutdown_always_called(self) -> None:
         """Test ConnectionManager.shutdown() always called even on errors"""
         command = LegalResearchCommand()
 
@@ -298,7 +303,7 @@ class TestResultFormatting:
     """Test result formatting and metadata"""
 
     @pytest.mark.asyncio
-    async def test_result_includes_execution_time(self):
+    async def test_result_includes_execution_time(self) -> None:
         """Test result includes execution time in metadata"""
         command = LegalResearchCommand()
 
@@ -318,7 +323,7 @@ class TestResultFormatting:
             assert result["metadata"]["execution_time_ms"] >= 0
 
     @pytest.mark.asyncio
-    async def test_result_includes_search_parameters(self):
+    async def test_result_includes_search_parameters(self) -> None:
         """Test result metadata includes all search parameters"""
         command = LegalResearchCommand()
 
@@ -347,7 +352,7 @@ class TestResultFormatting:
             assert metadata["limit"] == 15
 
     @pytest.mark.asyncio
-    async def test_result_includes_total_results_count(self):
+    async def test_result_includes_total_results_count(self) -> None:
         """Test result metadata includes total results before limit"""
         command = LegalResearchCommand()
 
@@ -372,7 +377,7 @@ class TestConnectionManagerIntegration:
     """Test ConnectionManager integration with adapters"""
 
     @pytest.mark.asyncio
-    async def test_connection_manager_registers_servers(self):
+    async def test_connection_manager_registers_servers(self) -> None:
         """Test ConnectionManager properly registers MCP servers"""
         manager = MCPConnectionManager()
 
@@ -395,7 +400,7 @@ class TestConnectionManagerIntegration:
         assert manager._servers["bge_search"].name == "BGE Search"
 
     @pytest.mark.asyncio
-    async def test_connection_manager_health_check(self):
+    async def test_connection_manager_health_check(self) -> None:
         """Test ConnectionManager tracks health status"""
         manager = MCPConnectionManager()
 
@@ -413,7 +418,7 @@ class TestConnectionManagerIntegration:
         assert health.status == ServerStatus.UNKNOWN  # Before first check
 
     @pytest.mark.asyncio
-    async def test_connection_manager_adapter_reuse(self):
+    async def test_connection_manager_adapter_reuse(self) -> None:
         """Test ConnectionManager reuses adapters for same server"""
         manager = MCPConnectionManager()
 

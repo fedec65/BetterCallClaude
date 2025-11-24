@@ -10,7 +10,7 @@ import json
 import sqlite3
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 
 
 class CitationCache:
@@ -91,7 +91,7 @@ class CitationCache:
         Returns:
             SHA-256 hash of query + filters
         """
-        key_data = {"query": query}
+        key_data: Dict[str, Any] = {"query": query}
         if filters:
             key_data["filters"] = filters
 
@@ -147,7 +147,7 @@ class CitationCache:
             )
             conn.commit()
 
-            return json.loads(data_json)
+            return cast(Dict[str, Any], json.loads(data_json))
 
     def set(
         self,

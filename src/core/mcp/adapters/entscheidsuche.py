@@ -6,7 +6,7 @@ federal and cantonal courts through MCP server integration.
 """
 
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
@@ -29,7 +29,7 @@ class CourtDecision:
     summary: str  # Decision summary
     legal_areas: List[str]  # Legal area classifications
     reference_number: str  # Court's own reference number
-    related_decisions: List[str] = None  # Related decision IDs
+    related_decisions: List[str] = field(default_factory=list)  # Related decision IDs
     full_text_url: Optional[str] = None  # Link to full text
 
 
@@ -244,11 +244,11 @@ class EntscheidausucheAdapter:
             full_text_url=data.get("fullTextUrl"),
         )
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> "EntscheidausucheAdapter":
         """Async context manager entry"""
         await self.connect()
         return self
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
         """Async context manager exit"""
         await self.disconnect()

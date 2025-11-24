@@ -529,7 +529,7 @@ class MCPConnectionManager:
     def _start_health_check(self, server_id: str) -> None:
         """Start periodic health check task for server"""
 
-        async def health_check_loop():
+        async def health_check_loop() -> None:
             config = self._servers[server_id]
             while True:
                 await asyncio.sleep(config.health_check_interval)

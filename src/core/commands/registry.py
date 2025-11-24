@@ -12,7 +12,7 @@ import importlib
 import inspect
 import pkgutil
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from .base import BaseCommand, CommandCategory
 
@@ -43,7 +43,7 @@ class CommandRegistry:
         self._commands: Dict[str, BaseCommand] = {}
         self._aliases: Dict[str, str] = {}
 
-    def register(self, command: BaseCommand, aliases: List[str] = None) -> None:
+    def register(self, command: BaseCommand, aliases: Optional[List[str]] = None) -> None:
         """
         Register a command instance
 
@@ -109,7 +109,8 @@ class CommandRegistry:
                         and not inspect.isabstract(obj)
                     ):
                         # Instantiate and register command
-                        command_instance = obj()
+                        # Each concrete command implements __init__() with no args
+                        command_instance = obj()  # type: ignore[call-arg]
                         self.register(command_instance)
                         discovered_count += 1
 
@@ -120,7 +121,7 @@ class CommandRegistry:
 
         return discovered_count
 
-    async def execute(self, command_name: str, args: Dict[str, any] = None) -> Dict[str, any]:
+    async def execute(self, command_name: str, args: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
         Execute a registered command
 

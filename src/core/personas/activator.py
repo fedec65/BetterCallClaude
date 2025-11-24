@@ -9,7 +9,7 @@ import logging
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set
 
 logger = logging.getLogger(__name__)
 
@@ -341,7 +341,7 @@ class PersonaActivator:
         logger.info("Loaded 2 default personas")
         return 2
 
-    def get_persona_stats(self) -> Dict[str, any]:
+    def get_persona_stats(self) -> Dict[str, Any]:
         """
         Get statistics about registered and active personas
 

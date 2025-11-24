@@ -14,6 +14,7 @@ import asyncio
 import json
 from unittest.mock import MagicMock, patch
 
+from typing import Any, Callable
 import pytest
 
 from src.core.mcp.protocol import MCPClient, MCPInvocationError, MCPProtocolError, MCPServerInfo
@@ -23,7 +24,7 @@ class TestMCPClientConnection:
     """Test MCP client connection lifecycle"""
 
     @pytest.mark.asyncio
-    async def test_connect_starts_process(self):
+    async def test_connect_starts_process(self) -> None:
         """Test that connect() starts MCP server process"""
         client = MCPClient(command=["node", "test-server.js"], server_id="test_server", timeout=5)
 
@@ -43,7 +44,7 @@ class TestMCPClientConnection:
             assert call_args[0][0] == ["node", "test-server.js"]
 
     @pytest.mark.asyncio
-    async def test_disconnect_terminates_process(self):
+    async def test_disconnect_terminates_process(self) -> None:
         """Test that disconnect() properly terminates MCP server process"""
         client = MCPClient(command=["node", "test-server.js"], server_id="test_server", timeout=5)
 
@@ -62,7 +63,7 @@ class TestMCPClientConnection:
             mock_process.terminate.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_is_connected_reflects_state(self):
+    async def test_is_connected_reflects_state(self) -> None:
         """Test that is_connected() accurately reflects connection state"""
         client = MCPClient(command=["node", "test-server.js"], server_id="test_server", timeout=5)
 
@@ -92,7 +93,7 @@ class TestMCPClientInitialization:
     """Test MCP client initialization handshake"""
 
     @pytest.mark.asyncio
-    async def test_initialize_handshake(self):
+    async def test_initialize_handshake(self) -> None:
         """Test successful initialize handshake with MCP server"""
         client = MCPClient(command=["node", "test-server.js"], server_id="test_server", timeout=5)
 
@@ -132,7 +133,7 @@ class TestMCPClientInitialization:
             await client.connect()
 
             # Create async function that returns the response
-            async def mock_read(func):
+            async def mock_read(func: Any) -> Any:
                 return mock_stdout.readline()
 
             with patch("asyncio.to_thread", side_effect=mock_read):
@@ -156,7 +157,7 @@ class TestMCPClientInitialization:
                 assert server_info.capabilities[0].name == "test_tool"
 
     @pytest.mark.asyncio
-    async def test_initialize_timeout(self):
+    async def test_initialize_timeout(self) -> None:
         """Test that initialize times out if server doesn't respond"""
         client = MCPClient(command=["node", "test-server.js"], server_id="test_server", timeout=1)
 
@@ -166,7 +167,7 @@ class TestMCPClientInitialization:
             mock_stdout = MagicMock()
 
             # Mock timeout - readline never returns
-            async def slow_readline(func):
+            async def slow_readline(func: Any) -> str:
                 await asyncio.sleep(10)
                 return ""
 
@@ -189,7 +190,7 @@ class TestMCPClientToolInvocation:
     """Test MCP client tool invocation"""
 
     @pytest.mark.asyncio
-    async def test_invoke_tool_success(self):
+    async def test_invoke_tool_success(self) -> None:
         """Test successful tool invocation"""
         client = MCPClient(command=["node", "test-server.js"], server_id="test_server", timeout=5)
 
@@ -215,7 +216,7 @@ class TestMCPClientToolInvocation:
             await client.connect()
 
             # Create async function that returns the response
-            async def mock_read(func):
+            async def mock_read(func: Any) -> Any:
                 return mock_stdout.readline()
 
             with patch("asyncio.to_thread", side_effect=mock_read):
@@ -237,7 +238,7 @@ class TestMCPClientToolInvocation:
                 assert result["data"]["result"] == "test result"
 
     @pytest.mark.asyncio
-    async def test_invoke_tool_error(self):
+    async def test_invoke_tool_error(self) -> None:
         """Test tool invocation error handling"""
         client = MCPClient(command=["node", "test-server.js"], server_id="test_server", timeout=5)
 
@@ -263,7 +264,7 @@ class TestMCPClientToolInvocation:
             await client.connect()
 
             # Create async function that returns the response
-            async def mock_read(func):
+            async def mock_read(func: Any) -> Any:
                 return mock_stdout.readline()
 
             with patch("asyncio.to_thread", side_effect=mock_read):
@@ -277,7 +278,7 @@ class TestMCPClientResourceManagement:
     """Test MCP client resource management"""
 
     @pytest.mark.asyncio
-    async def test_context_manager(self):
+    async def test_context_manager(self) -> None:
         """Test async context manager automatically connects and disconnects"""
         client = MCPClient(command=["node", "test-server.js"], server_id="test_server", timeout=5)
 
@@ -303,7 +304,7 @@ class TestMCPClientResourceManagement:
             mock_process.stdout.readline.return_value = json.dumps(init_response) + "\n"
 
             # Create async function that returns the response
-            async def mock_read(func):
+            async def mock_read(func: Any) -> Any:
                 return mock_process.stdout.readline()
 
             with patch("asyncio.to_thread", side_effect=mock_read):
@@ -314,7 +315,7 @@ class TestMCPClientResourceManagement:
                 mock_process.terminate.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_multiple_requests_reuse_connection(self):
+    async def test_multiple_requests_reuse_connection(self) -> None:
         """Test that multiple tool invocations reuse the same connection"""
         client = MCPClient(command=["node", "test-server.js"], server_id="test_server", timeout=5)
 
@@ -342,7 +343,7 @@ class TestMCPClientResourceManagement:
             # Create async function that yields responses in sequence
             call_count = 0
 
-            async def mock_read(func):
+            async def mock_read(func: Any) -> Any:
                 nonlocal call_count
                 result = responses[call_count]
                 call_count += 1

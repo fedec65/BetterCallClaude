@@ -17,7 +17,7 @@ import logging
 import subprocess
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, cast
 
 logger = logging.getLogger(__name__)
 
@@ -253,7 +253,7 @@ class MCPClient:
                     f"Tool invocation failed: {error.get('message', 'Unknown error')}"
                 )
 
-            return response.get("result", {})
+            return cast(Dict[str, Any], response.get("result", {}))
 
         except Exception as e:
             raise MCPInvocationError(f"Failed to invoke tool {tool_name}: {e}") from e
@@ -281,6 +281,9 @@ class MCPClient:
             self._process.stdin.flush()
 
             # Read response with timeout
+            if self._process.stdout is None:
+                raise MCPProtocolError("Server stdout not available")
+
             response_line = await asyncio.wait_for(
                 asyncio.to_thread(self._process.stdout.readline), timeout=self.timeout
             )
@@ -288,7 +291,7 @@ class MCPClient:
             if not response_line:
                 raise MCPProtocolError("Server closed connection")
 
-            response = json.loads(response_line)
+            response = cast(Dict[str, Any], json.loads(response_line))
 
             # Validate response
             if response.get("id") != request.get("id"):
@@ -335,14 +338,16 @@ class MCPClient:
 
     def is_connected(self) -> bool:
         """Check if client is connected to server"""
-        return self._connected and self._process and self._process.poll() is None
+        if not self._connected or not self._process:
+            return False
+        return self._process.poll() is None
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> "MCPClient":
         """Async context manager entry"""
         await self.connect()
         await self.initialize()
         return self
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
         """Async context manager exit"""
         await self.disconnect()

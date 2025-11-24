@@ -36,7 +36,7 @@ class TestBGESearchAdapter:
     """Test BGE Search adapter functionality"""
 
     @pytest.mark.asyncio
-    async def test_search_builds_correct_parameters(self):
+    async def test_search_builds_correct_parameters(self) -> None:
         """Test that search() builds correct MCP tool parameters"""
         adapter = BGESearchAdapter(command=["node", "bge-server.js"], timeout=5)
 
@@ -76,7 +76,7 @@ class TestBGESearchAdapter:
         )
 
     @pytest.mark.asyncio
-    async def test_search_parses_decisions(self):
+    async def test_search_parses_decisions(self) -> None:
         """Test that search() correctly parses BGE decisions"""
         adapter = BGESearchAdapter(command=["node", "bge-server.js"], timeout=5)
 
@@ -124,7 +124,7 @@ class TestBGESearchAdapter:
         assert decision.summary == "Decision about disability insurance"
 
     @pytest.mark.asyncio
-    async def test_get_decision(self):
+    async def test_get_decision(self) -> None:
         """Test get_decision() retrieves specific BGE decision"""
         adapter = BGESearchAdapter(command=["node", "bge-server.js"], timeout=5)
 
@@ -157,7 +157,7 @@ class TestBGESearchAdapter:
         assert decision.citation == "BGE 147 V 321"
 
     @pytest.mark.asyncio
-    async def test_get_decision_not_found(self):
+    async def test_get_decision_not_found(self) -> None:
         """Test get_decision() returns None when decision not found"""
         adapter = BGESearchAdapter(command=["node", "bge-server.js"], timeout=5)
 
@@ -170,7 +170,7 @@ class TestBGESearchAdapter:
         assert decision is None
 
     @pytest.mark.asyncio
-    async def test_validate_citation(self):
+    async def test_validate_citation(self) -> None:
         """Test validate_citation() validates BGE citation format"""
         adapter = BGESearchAdapter(command=["node", "bge-server.js"], timeout=5)
 
@@ -197,7 +197,7 @@ class TestEntscheidausucheAdapter:
     """Test Entscheidsuche adapter functionality"""
 
     @pytest.mark.asyncio
-    async def test_search_with_court_level_filter(self):
+    async def test_search_with_court_level_filter(self) -> None:
         """Test search() with court level filtering"""
         adapter = EntscheidausucheAdapter(command=["node", "entscheid-server.js"], timeout=5)
 
@@ -223,7 +223,7 @@ class TestEntscheidausucheAdapter:
         assert call_args[0][1]["language"] == "DE"
 
     @pytest.mark.asyncio
-    async def test_search_parses_court_decisions(self):
+    async def test_search_parses_court_decisions(self) -> None:
         """Test search() parses court decisions correctly"""
         adapter = EntscheidausucheAdapter(command=["node", "entscheid-server.js"], timeout=5)
 
@@ -264,7 +264,7 @@ class TestEntscheidausucheAdapter:
         assert decision.canton == "ZH"
 
     @pytest.mark.asyncio
-    async def test_get_related_decisions(self):
+    async def test_get_related_decisions(self) -> None:
         """Test get_related_decisions() retrieves related decisions"""
         adapter = EntscheidausucheAdapter(command=["node", "entscheid-server.js"], timeout=5)
 
@@ -303,7 +303,7 @@ class TestCantonalCourtsAdapter:
     """Test Cantonal Courts adapter functionality"""
 
     @pytest.mark.asyncio
-    async def test_search_validates_canton_codes(self):
+    async def test_search_validates_canton_codes(self) -> None:
         """Test search() validates Swiss canton codes"""
         adapter = CantonalCourtsAdapter(command=["node", "cantonal-server.js"], timeout=5)
 
@@ -314,7 +314,7 @@ class TestCantonalCourtsAdapter:
         assert "Invalid canton codes: ['INVALID']" in str(exc_info.value)
 
     @pytest.mark.asyncio
-    async def test_search_all_cantons(self):
+    async def test_search_all_cantons(self) -> None:
         """Test search() searches all 26 cantons when no filter"""
         adapter = CantonalCourtsAdapter(command=["node", "cantonal-server.js"], timeout=5)
 
@@ -336,7 +336,7 @@ class TestCantonalCourtsAdapter:
         assert len(call_args[0][1]["cantons"]) == 26
 
     @pytest.mark.asyncio
-    async def test_search_specific_cantons(self):
+    async def test_search_specific_cantons(self) -> None:
         """Test search() filters by specific cantons"""
         adapter = CantonalCourtsAdapter(command=["node", "cantonal-server.js"], timeout=5)
 
@@ -357,7 +357,7 @@ class TestCantonalCourtsAdapter:
         assert call_args[0][1]["cantons"] == ["ZH", "GE"]
 
     @pytest.mark.asyncio
-    async def test_search_parses_cantonal_decisions(self):
+    async def test_search_parses_cantonal_decisions(self) -> None:
         """Test search() parses cantonal decisions with court info"""
         adapter = CantonalCourtsAdapter(command=["node", "cantonal-server.js"], timeout=5)
 
@@ -405,7 +405,7 @@ class TestCantonalCourtsAdapter:
         assert decision.court.court_type == "supreme"
 
     @pytest.mark.asyncio
-    async def test_list_courts(self):
+    async def test_list_courts(self) -> None:
         """Test list_courts() retrieves cantonal court information"""
         adapter = CantonalCourtsAdapter(command=["node", "cantonal-server.js"], timeout=5)
 
@@ -441,7 +441,7 @@ class TestCantonalCourtsAdapter:
         assert courts[0].court_type == "supreme"
 
     @pytest.mark.asyncio
-    async def test_list_courts_invalid_canton(self):
+    async def test_list_courts_invalid_canton(self) -> None:
         """Test list_courts() rejects invalid canton code"""
         adapter = CantonalCourtsAdapter(command=["node", "cantonal-server.js"], timeout=5)
 
@@ -455,7 +455,7 @@ class TestAdapterConnectionLifecycle:
     """Test adapter connection lifecycle management"""
 
     @pytest.mark.asyncio
-    async def test_adapter_context_manager(self):
+    async def test_adapter_context_manager(self) -> None:
         """Test adapters work as async context managers"""
         adapter = BGESearchAdapter(command=["node", "bge-server.js"], timeout=5)
 
@@ -475,7 +475,7 @@ class TestAdapterConnectionLifecycle:
         mock_client.disconnect.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_multiple_searches_reuse_connection(self):
+    async def test_multiple_searches_reuse_connection(self) -> None:
         """Test multiple searches reuse the same adapter connection"""
         adapter = BGESearchAdapter(command=["node", "bge-server.js"], timeout=5)
 
