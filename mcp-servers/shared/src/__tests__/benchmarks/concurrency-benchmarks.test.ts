@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Performance Benchmarks: Concurrent Operations
  *
@@ -63,7 +64,7 @@ describe('Concurrency Performance Benchmarks', () => {
 
       const startTime = performance.now();
 
-      const tasks = Array.from({ length: connections }, async (_, connIndex) => {
+      const tasks = Array.from({ length: connections }, async () => {
         const client = new DatabaseClient(config);
         await client.connect();
         const repo = new BGERepository(client);
@@ -82,10 +83,15 @@ describe('Concurrency Performance Benchmarks', () => {
       const totalReads = connections * readsPerConnection;
       const perRead = duration / totalReads;
 
+      // eslint-disable-next-line no-console
       console.log(`\n📊 Concurrent Reads (${connections} connections, ${readsPerConnection} reads each):`);
+      // eslint-disable-next-line no-console
       console.log(`   Total Time: ${duration.toFixed(2)}ms`);
+      // eslint-disable-next-line no-console
       console.log(`   Total Reads: ${totalReads}`);
+      // eslint-disable-next-line no-console
       console.log(`   Per Read: ${perRead.toFixed(2)}ms`);
+      // eslint-disable-next-line no-console
       console.log(`   Throughput: ${(1000 / perRead).toFixed(0)} reads/second`);
 
       expect(duration).toBeLessThan(10000); // 10 seconds for concurrent reads
@@ -122,7 +128,7 @@ describe('Concurrency Performance Benchmarks', () => {
 
       const tasks = [
         // Connection 1: Citation lookups
-        (async () => {
+        (async (): Promise<void> => {
           const client = new DatabaseClient(config);
           await client.connect();
           const repo = new BGERepository(client);
@@ -135,7 +141,7 @@ describe('Concurrency Performance Benchmarks', () => {
         })(),
 
         // Connection 2: Search queries
-        (async () => {
+        (async (): Promise<void> => {
           const client = new DatabaseClient(config);
           await client.connect();
           const repo = new BGERepository(client);
@@ -148,7 +154,7 @@ describe('Concurrency Performance Benchmarks', () => {
         })(),
 
         // Connection 3: Aggregations
-        (async () => {
+        (async (): Promise<void> => {
           const client = new DatabaseClient(config);
           await client.connect();
           const repo = new BGERepository(client);
@@ -167,10 +173,15 @@ describe('Concurrency Performance Benchmarks', () => {
       const endTime = performance.now();
       const duration = endTime - startTime;
 
+      // eslint-disable-next-line no-console
       console.log(`\n📊 Mixed Concurrent Operations (3 connections):`);
+      // eslint-disable-next-line no-console
       console.log(`   Total Time: ${duration.toFixed(2)}ms`);
+      // eslint-disable-next-line no-console
       console.log(`   Conn 1: 50 citation lookups`);
+      // eslint-disable-next-line no-console
       console.log(`   Conn 2: 20 search queries`);
+      // eslint-disable-next-line no-console
       console.log(`   Conn 3: 30 counts + 30 chamber queries`);
 
       expect(duration).toBeLessThan(15000);

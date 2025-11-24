@@ -3,7 +3,7 @@
  * Foundation for all court decision API clients with rate limiting and retry logic
  */
 
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import Bottleneck from 'bottleneck';
 import pRetry, { Options as PRetryOptions } from 'p-retry';
 import { APIConfig } from '../config/config';
@@ -14,7 +14,6 @@ import {
   APITimeoutError,
   APIAuthenticationError,
   APINotFoundError,
-  isRetryableError,
 } from '../errors/errors';
 
 export interface APIClientOptions {

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Performance Benchmarks: Insertion Operations
  *
@@ -8,8 +9,8 @@
  */
 
 import { DatabaseClient, DatabaseConfig } from '../../../../database/client';
-import { BGERepository, BGEDecision } from '../../database/repositories/bge-repository';
-import { CantonalRepository, CantonalDecision } from '../../database/repositories/cantonal-repository';
+import { BGERepository } from '../../database/repositories/bge-repository';
+import { CantonalRepository } from '../../database/repositories/cantonal-repository';
 import { CacheRepository } from '../../database/repositories/cache-repository';
 import { randomUUID } from 'crypto';
 import * as os from 'os';

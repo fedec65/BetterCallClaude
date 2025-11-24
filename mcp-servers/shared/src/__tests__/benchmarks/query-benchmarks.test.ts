@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Performance Benchmarks: Query Operations
  *
@@ -9,7 +10,7 @@
  */
 
 import { DatabaseClient, DatabaseConfig } from '../../../../database/client';
-import { BGERepository, BGEDecision } from '../../database/repositories/bge-repository';
+import { BGERepository } from '../../database/repositories/bge-repository';
 import { CantonalRepository } from '../../database/repositories/cantonal-repository';
 import { CacheRepository } from '../../database/repositories/cache-repository';
 import { SearchRepository } from '../../database/repositories/search-repository';

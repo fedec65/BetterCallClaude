@@ -3,7 +3,7 @@
  * Database operations for court decisions
  */
 
-import { DataSource, Repository, FindOptionsWhere, Like, In, Between } from 'typeorm';
+import { DataSource, Repository, FindOptionsWhere } from 'typeorm';
 import { Decision, CourtLevel, Language } from '../entities/Decision';
 import { DatabaseQueryError } from '../../errors/errors';
 

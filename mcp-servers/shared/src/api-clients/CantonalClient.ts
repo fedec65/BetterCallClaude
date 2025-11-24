@@ -303,7 +303,8 @@ export class CantonalClientFactory {
 
     const results = await Promise.allSettled(
       targetCantons.map(canton => {
-        const { canton: _, ...searchFilters } = filters;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { canton: _canton, ...searchFilters } = filters;
         return clients[canton]?.searchDecisions(searchFilters);
       })
     );

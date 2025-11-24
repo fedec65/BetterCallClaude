@@ -4,7 +4,6 @@
 
 import { DatabaseClient, DatabaseConfig } from '../../../../database/client';
 import { CacheRepository } from '../../../database/repositories/cache-repository';
-import { randomUUID } from 'crypto';
 
 describe('CacheRepository', () => {
   let client: DatabaseClient;
