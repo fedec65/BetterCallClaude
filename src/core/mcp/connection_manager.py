@@ -261,9 +261,7 @@ class MCPConnectionManager:
                         response_time_ms=None,
                         error_message=str(e),
                     )
-                    raise ConnectionError(
-                        f"Request to {server_id}.{method} failed: {e}"
-                    ) from e
+                    raise ConnectionError(f"Request to {server_id}.{method} failed: {e}") from e
 
                 # Exponential backoff
                 wait_time = 2**attempt
@@ -306,9 +304,7 @@ class MCPConnectionManager:
             if server_id == "bge_search":
                 result = await self._execute_bge_method(adapter, method, params or {})
             elif server_id == "entscheidsuche":
-                result = await self._execute_entscheidsuche_method(
-                    adapter, method, params or {}
-                )
+                result = await self._execute_entscheidsuche_method(adapter, method, params or {})
             elif server_id == "cantonal_courts":
                 result = await self._execute_cantonal_method(adapter, method, params or {})
             else:

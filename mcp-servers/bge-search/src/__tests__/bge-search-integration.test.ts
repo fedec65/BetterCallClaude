@@ -102,7 +102,7 @@ describe('BGE-Search MCP Server Integration', () => {
       // 3. Only call API on cache miss
       // 4. Store API results in cache
 
-      const cacheFirst = async (cacheKey: string) => {
+      const cacheFirst = async (_cacheKey: string): Promise<{ fromCache: boolean; data?: string }> => {
         // Simulated cache-first logic
         const cached = null; // Would check cacheRepo
         if (cached) return { fromCache: true };

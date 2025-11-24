@@ -7,8 +7,8 @@ including BGE precedents, federal statutes, and cantonal law.
 
 from typing import Any, Dict
 
-from .base import BaseCommand, CommandCategory, CommandMetadata
 from ..mcp.connection_manager import MCPConnectionManager
+from .base import BaseCommand, CommandCategory, CommandMetadata
 
 
 class LegalResearchCommand(BaseCommand):

@@ -256,9 +256,7 @@ class CommandRegistry:
 
     def __contains__(self, command_name: str) -> bool:
         """Check if command is registered"""
-        return (
-            command_name in self._commands or command_name in self._aliases
-        )
+        return command_name in self._commands or command_name in self._aliases
 
     def __repr__(self) -> str:
         """String representation of registry"""

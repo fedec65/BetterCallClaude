@@ -142,9 +142,7 @@ class MCPClient:
 
             if self._process.poll() is not None:
                 stderr = self._process.stderr.read() if self._process.stderr else ""
-                raise MCPConnectionError(
-                    f"MCP server {self.server_id} failed to start: {stderr}"
-                )
+                raise MCPConnectionError(f"MCP server {self.server_id} failed to start: {stderr}")
 
             self._connected = True
             logger.info(f"Connected to MCP server: {self.server_id}")
@@ -218,9 +216,7 @@ class MCPClient:
 
         return self._server_info
 
-    async def invoke_tool(
-        self, tool_name: str, arguments: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    async def invoke_tool(self, tool_name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
         """
         Invoke a tool on the MCP server
 
@@ -304,17 +300,13 @@ class MCPClient:
             return response
 
         except asyncio.TimeoutError as timeout_err:
-            raise MCPProtocolError(
-                f"Request timeout after {self.timeout}s"
-            ) from timeout_err
+            raise MCPProtocolError(f"Request timeout after {self.timeout}s") from timeout_err
         except json.JSONDecodeError as json_err:
             raise MCPProtocolError(f"Invalid JSON response: {json_err}") from json_err
         except Exception as e:
             raise MCPProtocolError(f"Communication error: {e}") from e
 
-    def _parse_capabilities(
-        self, capabilities_data: Dict[str, Any]
-    ) -> List[MCPCapability]:
+    def _parse_capabilities(self, capabilities_data: Dict[str, Any]) -> List[MCPCapability]:
         """Parse capabilities from server initialization response"""
         capabilities = []
 

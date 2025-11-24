@@ -180,9 +180,7 @@ class EntscheidausucheAdapter:
             MCPInvocationError: If retrieval fails
         """
         try:
-            result = await self.client.invoke_tool(
-                "get_decision", {"decisionId": decision_id}
-            )
+            result = await self.client.invoke_tool("get_decision", {"decisionId": decision_id})
 
             if result.get("found"):
                 return self._parse_decision(result.get("decision", {}))
@@ -192,9 +190,7 @@ class EntscheidausucheAdapter:
             logger.error(f"Decision retrieval failed: {e}")
             raise
 
-    async def get_related_decisions(
-        self, decision_id: str, limit: int = 5
-    ) -> List[CourtDecision]:
+    async def get_related_decisions(self, decision_id: str, limit: int = 5) -> List[CourtDecision]:
         """
         Find related decisions (cited, citing, similar)
 

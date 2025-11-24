@@ -17,9 +17,32 @@ logger = logging.getLogger(__name__)
 
 # Swiss canton codes
 SWISS_CANTONS = [
-    "AG", "AI", "AR", "BE", "BL", "BS", "FR", "GE", "GL", "GR", "JU",
-    "LU", "NE", "NW", "OW", "SG", "SH", "SO", "SZ", "TG", "TI", "UR",
-    "VD", "VS", "ZG", "ZH"
+    "AG",
+    "AI",
+    "AR",
+    "BE",
+    "BL",
+    "BS",
+    "FR",
+    "GE",
+    "GL",
+    "GR",
+    "JU",
+    "LU",
+    "NE",
+    "NW",
+    "OW",
+    "SG",
+    "SH",
+    "SO",
+    "SZ",
+    "TG",
+    "TI",
+    "UR",
+    "VD",
+    "VS",
+    "ZG",
+    "ZH",
 ]
 
 
@@ -205,9 +228,7 @@ class CantonalCourtsAdapter:
             logger.error(f"Cantonal courts search failed: {e}")
             raise
 
-    async def get_decision(
-        self, decision_id: str, canton: str
-    ) -> Optional[CantonalDecision]:
+    async def get_decision(self, decision_id: str, canton: str) -> Optional[CantonalDecision]:
         """
         Retrieve specific cantonal decision
 

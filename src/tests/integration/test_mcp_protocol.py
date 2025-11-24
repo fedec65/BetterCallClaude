@@ -349,9 +349,9 @@ class TestMCPClientResourceManagement:
                 return result
 
             with patch("asyncio.to_thread", side_effect=mock_read):
-                result1 = await client.invoke_tool("tool1", {})
-                result2 = await client.invoke_tool("tool2", {})
-                result3 = await client.invoke_tool("tool3", {})
+                _result1 = await client.invoke_tool("tool1", {})
+                _result2 = await client.invoke_tool("tool2", {})
+                _result3 = await client.invoke_tool("tool3", {})
 
                 # Verify only one process was started
                 assert mock_popen.call_count == 1

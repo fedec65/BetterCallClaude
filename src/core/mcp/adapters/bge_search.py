@@ -82,9 +82,7 @@ class BGESearchAdapter:
             env: Optional environment variables
             timeout: Request timeout in seconds
         """
-        self.client = MCPClient(
-            command=command, server_id="bge_search", env=env, timeout=timeout
-        )
+        self.client = MCPClient(command=command, server_id="bge_search", env=env, timeout=timeout)
 
     async def connect(self) -> None:
         """Connect to BGE search MCP server"""
@@ -204,9 +202,7 @@ class BGESearchAdapter:
             }
         """
         try:
-            result = await self.client.invoke_tool(
-                "validate_bge_citation", {"citation": citation}
-            )
+            result = await self.client.invoke_tool("validate_bge_citation", {"citation": citation})
             return result
 
         except MCPInvocationError as e:
