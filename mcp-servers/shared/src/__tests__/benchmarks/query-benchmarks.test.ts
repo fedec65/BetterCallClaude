@@ -58,7 +58,7 @@ describe('Query Performance Benchmarks', () => {
     }
   });
 
-  async function seedDatabase() {
+  async function seedDatabase(): Promise<void> {
     // Insert 1000 BGE decisions
     for (let i = 1; i <= 1000; i++) {
       await bgeRepo.create({

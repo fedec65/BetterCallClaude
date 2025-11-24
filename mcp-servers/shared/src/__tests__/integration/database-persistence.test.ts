@@ -563,7 +563,7 @@ describe('Database Persistence Integration Tests', () => {
       const repo1 = new BGERepository(client1);
 
       // Start a long-running operation
-      const longOperation = (async () => {
+      const longOperation = (async (): Promise<void> => {
         for (let i = 1; i <= 50; i++) {
           await repo1.create({
             id: randomUUID(),

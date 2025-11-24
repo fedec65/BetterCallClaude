@@ -146,8 +146,8 @@ describe('DatabaseClient', () => {
           );
           throw new Error('Intentional error');
         });
-      } catch (error: any) {
-        expect(error.message).toBe('Intentional error');
+      } catch (error: unknown) {
+        expect((error as Error).message).toBe('Intentional error');
       }
 
       const accounts = await client.query(`SELECT * FROM test_accounts`);

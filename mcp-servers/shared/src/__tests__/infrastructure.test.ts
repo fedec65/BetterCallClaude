@@ -95,7 +95,7 @@ describe('Sprint 3 Phase 2: MCP Integration Patterns', () => {
   describe('Cache-First Strategy', () => {
     it('should implement cache-first pattern logic', () => {
       // Simulated cache-first implementation
-      const cacheFirstStrategy = async (cacheKey: string, fetchFn: () => Promise<any>) => {
+      const cacheFirstStrategy = async (cacheKey: string, fetchFn: () => Promise<unknown>): Promise<{ data: unknown; fromCache: boolean }> => {
         const cached = null; // Would check cache here
         if (cached) return { data: cached, fromCache: true };
 

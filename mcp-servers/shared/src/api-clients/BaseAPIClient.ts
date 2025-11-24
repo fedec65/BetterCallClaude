@@ -192,15 +192,17 @@ export abstract class BaseAPIClient {
   /**
    * Handle axios errors and convert to custom errors
    */
-  private handleAxiosError(error: any): void {
-    const endpoint = error.config?.url || 'unknown';
+  private handleAxiosError(error: unknown): void {
+    // Type guard for axios errors
+    const axiosError = error as { config?: { url?: string }; response?: { status: number; headers: Record<string, string>; data?: { message?: string } }; request?: unknown; message?: string };
+    const endpoint = axiosError.config?.url || 'unknown';
 
-    if (error.response) {
+    if (axiosError.response) {
       // Server responded with error status
-      const status = error.response.status;
+      const status = axiosError.response.status;
 
       if (status === 429) {
-        const retryAfter = error.response.headers['retry-after'];
+        const retryAfter = axiosError.response.headers['retry-after'];
         throw new APIRateLimitError(
           this.serviceName,
           retryAfter ? parseInt(retryAfter, 10) : undefined
@@ -216,19 +218,20 @@ export abstract class BaseAPIClient {
       }
 
       throw new APIError(
-        error.response.data?.message || error.message,
+        axiosError.response.data?.message || axiosError.message || 'Unknown error',
         this.serviceName,
         endpoint,
         status
       );
-    } else if (error.request) {
+    } else if (axiosError.request) {
       // Request made but no response
-      if (error.code === 'ECONNABORTED') {
+      const errorWithCode = axiosError as { code?: string; message?: string };
+      if (errorWithCode.code === 'ECONNABORTED') {
         throw new APITimeoutError(this.serviceName, endpoint);
       }
 
       throw new APIError(
-        `No response from ${this.serviceName}: ${error.message}`,
+        `No response from ${this.serviceName}: ${axiosError.message || 'Unknown error'}`,
         this.serviceName,
         endpoint,
         503
@@ -236,7 +239,7 @@ export abstract class BaseAPIClient {
     } else {
       // Error setting up request
       throw new APIError(
-        `Request setup error: ${error.message}`,
+        `Request setup error: ${axiosError.message || 'Unknown error'}`,
         this.serviceName,
         endpoint,
         500

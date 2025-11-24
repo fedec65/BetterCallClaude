@@ -6,7 +6,7 @@
 // Mock p-retry to avoid ESM import issues
 jest.mock('p-retry', () => ({
   __esModule: true,
-  default: async (fn: () => Promise<any>) => await fn(),
+  default: async (fn: () => Promise<unknown>): Promise<unknown> => await fn(),
 }));
 
 import { BundesgerichtClient } from '../api-clients/BundesgerichtClient';
