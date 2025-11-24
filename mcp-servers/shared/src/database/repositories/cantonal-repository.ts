@@ -3,7 +3,7 @@
  * CRUD operations for cantonal court decisions from 26 Swiss cantons
  */
 
-import { DatabaseClient } from '../../../database/client';
+import { DatabaseClient } from '../client';
 
 export interface CantonalDecision {
   id: string;

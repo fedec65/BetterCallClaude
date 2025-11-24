@@ -3,7 +3,7 @@
  * Tests for unified PostgreSQL and SQLite database client
  */
 
-import { DatabaseClient, createDatabaseClient, DatabaseConfig } from '../../../database/client';
+import { DatabaseClient, createDatabaseClient, DatabaseConfig } from '../../database/client';
 import { randomUUID } from 'crypto';
 import { unlinkSync, existsSync } from 'fs';
 import { join } from 'path';

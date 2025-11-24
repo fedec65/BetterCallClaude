@@ -4,6 +4,7 @@
   "description": "MCP servers for BetterCallClaude v2.0 - Swiss legal intelligence",
   "private": true,
   "workspaces": [
+    "shared",
     "bge-search",
     "entscheidsuche",
     "cantonal-courts",

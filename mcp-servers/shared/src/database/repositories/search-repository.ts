@@ -3,7 +3,7 @@
  * Query logging and analytics for search operations
  */
 
-import { DatabaseClient } from '../../../database/client';
+import { DatabaseClient } from '../client';
 
 export interface SearchQuery {
   id: string;

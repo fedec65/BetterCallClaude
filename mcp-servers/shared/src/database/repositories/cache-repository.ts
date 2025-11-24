@@ -3,7 +3,7 @@
  * Manages API response caching with TTL and hit tracking
  */
 
-import { DatabaseClient } from '../../../database/client';
+import { DatabaseClient } from '../client';
 
 export interface CacheEntry {
   id: string;

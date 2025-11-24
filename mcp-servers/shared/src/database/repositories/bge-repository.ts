@@ -3,7 +3,7 @@
  * CRUD operations for Swiss Federal Supreme Court decisions
  */
 
-import { DatabaseClient } from '../../../database/client';
+import { DatabaseClient } from '../client';
 
 export interface BGEDecision {
   id: string;
