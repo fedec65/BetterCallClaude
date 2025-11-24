@@ -1,0 +1,27 @@
+{
+  "name": "@bettercallclaude/root",
+  "version": "1.0.0",
+  "private": true,
+  "description": "BetterCallClaude - Swiss Legal Research MCP Servers",
+  "workspaces": [
+    "mcp-servers/shared",
+    "mcp-servers/bge-search",
+    "mcp-servers/entscheidsuche"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "build:shared": "npm run build --workspace=@bettercallclaude/shared",
+    "build:bge": "npm run build --workspace=@bettercallclaude/bge-search",
+    "build:entscheidsuche": "npm run build --workspace=@bettercallclaude/entscheidsuche",
+    "clean": "npm run clean --workspaces",
+    "test": "npm run test --workspaces"
+  },
+  "keywords": [
+    "mcp",
+    "swiss-law",
+    "legal-research",
+    "bundesgericht"
+  ],
+  "author": "BetterCallClaude Team",
+  "license": "MIT"
+}

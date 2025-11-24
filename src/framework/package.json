@@ -1,0 +1,24 @@
+{
+  "name": "@bettercallclaude/framework",
+  "version": "2.0.0",
+  "description": "BetterCallClaude Framework - Persona, Command, and Auto-Detection System",
+  "type": "module",
+  "exports": {
+    "./commands": "./commands/legal-commands.js",
+    "./detection": "./detection/auto-detector.js",
+    "./personas": "./personas/persona-activator.js",
+    "./types": "./types/command-types.js"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build": "tsc",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^2.1.0"
+  }
+}
