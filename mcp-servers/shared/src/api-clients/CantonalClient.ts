@@ -165,7 +165,7 @@ export class CantonalClient extends BaseAPIClient {
 
       return decision;
     } catch (error) {
-      if ((error as any).statusCode === 404) {
+      if ((error as { statusCode?: number }).statusCode === 404) {
         this.logger.info('Decision not found', {
           canton: this.canton,
           decisionId,
@@ -273,7 +273,7 @@ export class CantonalClientFactory {
    */
   static createClients(
     configs: Record<Canton, APIClientOptions>,
-    logger: any
+    logger: Logger
   ): Record<Canton, CantonalClient> {
     const clients: Partial<Record<Canton, CantonalClient>> = {};
 

@@ -147,7 +147,7 @@ export class BGERepository {
    */
   async update(id: string, updates: Partial<BGEDecision>): Promise<void> {
     const fields: string[] = [];
-    const values: any[] = [];
+    const values: unknown[] = [];
 
     // Build dynamic UPDATE query based on provided fields
     if (updates.title !== undefined) {

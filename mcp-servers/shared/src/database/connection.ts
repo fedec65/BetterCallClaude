@@ -50,11 +50,11 @@ export function createDataSource(config: DatabaseConfig): DataSource {
       ...baseOptions,
       type: 'better-sqlite3',
       database: config.database,
-      prepareDatabase: (db: any) => {
+      prepareDatabase: (db: unknown) => {
         // Enable WAL mode for better concurrency
-        db.pragma('journal_mode = WAL');
+        (db as { pragma: (sql: string) => void }).pragma('journal_mode = WAL');
         // Enable foreign keys
-        db.pragma('foreign_keys = ON');
+        (db as { pragma: (sql: string) => void }).pragma('foreign_keys = ON');
       },
     } as DataSourceOptions;
   } else {

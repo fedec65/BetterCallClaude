@@ -177,7 +177,7 @@ export class BundesgerichtClient extends BaseAPIClient {
 
       return response.data;
     } catch (error) {
-      if ((error as any).statusCode === 404) {
+      if ((error as { statusCode?: number }).statusCode === 404) {
         this.logger.info('Decision not found', { citation });
         return null;
       }
@@ -211,7 +211,7 @@ export class BundesgerichtClient extends BaseAPIClient {
 
       return response.data;
     } catch (error) {
-      if ((error as any).statusCode === 404) {
+      if ((error as { statusCode?: number }).statusCode === 404) {
         this.logger.info('Decision not found', { decisionId });
         return null;
       }

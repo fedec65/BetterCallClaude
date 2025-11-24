@@ -34,7 +34,7 @@ export interface DatabaseConfig {
 }
 
 export interface QueryOptions {
-  values?: any[];
+  values?: unknown[];
   timeout?: number;
 }
 
@@ -114,7 +114,7 @@ export class DatabaseClient {
   /**
    * Execute a query
    */
-  async query<T = any>(sql: string, options?: QueryOptions): Promise<T[]> {
+  async query<T = unknown>(sql: string, options?: QueryOptions): Promise<T[]> {
     if (this.type === 'postgres') {
       return this.queryPostgres<T>(sql, options);
     } else {
@@ -163,7 +163,7 @@ export class DatabaseClient {
   /**
    * Execute a single query and return first result
    */
-  async queryOne<T = any>(sql: string, options?: QueryOptions): Promise<T | null> {
+  async queryOne<T = unknown>(sql: string, options?: QueryOptions): Promise<T | null> {
     const results = await this.query<T>(sql, options);
     return results.length > 0 ? results[0] : null;
   }
@@ -298,7 +298,7 @@ export class DatabaseClient {
   /**
    * Get connection pool stats (PostgreSQL only)
    */
-  getPoolStats() {
+  getPoolStats(): { total: number; idle: number; waiting: number } | null {
     if (this.type === 'postgres' && this.pgPool) {
       return {
         total: this.pgPool.totalCount,
