@@ -134,7 +134,7 @@ describe('Entscheidsuche MCP Server Integration', () => {
     });
 
     it('should search both when courtLevel is all', () => {
-      const courtLevel = 'all';
+      const courtLevel: string = 'all';
       const shouldSearchFederal = courtLevel === 'federal' || courtLevel === 'all';
       const shouldSearchCantonal = courtLevel === 'cantonal' || courtLevel === 'all';
 

@@ -244,6 +244,157 @@ class EntscheidausucheAdapter:
             full_text_url=data.get("fullTextUrl"),
         )
 
+    async def analyze_precedent_success_rate(
+        self,
+        legal_area: str,
+        claim_type: Optional[str] = None,
+        court_level: Optional[str] = None,
+        canton: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """
+        Analyze precedent success rates for a legal area
+
+        Args:
+            legal_area: Legal area to analyze (e.g., "arbeitsrecht", "mietrecht")
+            claim_type: Type of legal claim (optional)
+            court_level: Court level filter (federal, cantonal, all)
+            canton: Canton filter for cantonal decisions
+
+        Returns:
+            Dict with success rate analysis including:
+            - overall_success_rate: Overall success percentage
+            - sample_size: Number of decisions analyzed
+            - breakdown_by_court_level: Success rates by court level
+            - breakdown_by_canton: Success rates by canton (if cantonal data)
+            - breakdown_by_year: Success rates by year
+            - key_factors: Factors influencing success
+            - recommendations: Strategic recommendations
+
+        Raises:
+            MCPInvocationError: If analysis fails
+        """
+        params: Dict[str, Any] = {"legalArea": legal_area}
+
+        if claim_type:
+            params["claimType"] = claim_type
+        if court_level:
+            params["courtLevel"] = court_level
+        if canton:
+            params["canton"] = canton.upper()
+
+        try:
+            result = await self.client.invoke_tool("analyze_precedent_success_rate", params)
+            return result
+
+        except MCPInvocationError as e:
+            logger.error(f"Precedent success rate analysis failed: {e}")
+            raise
+
+    async def find_similar_cases(
+        self,
+        decision_id: Optional[str] = None,
+        fact_pattern: Optional[str] = None,
+        legal_area: Optional[str] = None,
+        limit: int = 10,
+    ) -> Dict[str, Any]:
+        """
+        Find similar cases based on decision ID or fact pattern
+
+        Args:
+            decision_id: Base decision ID to find similar cases for
+            fact_pattern: Text description of facts to match
+            legal_area: Filter by legal area
+            limit: Maximum number of similar cases to return
+
+        Returns:
+            Dict with similar cases including:
+            - similar_cases: List of similar decisions with similarity scores
+            - total_found: Total number of similar cases found
+            - base_decision: The base decision (if decision_id provided)
+
+            Each similar case includes:
+            - decision: CourtDecision data
+            - similarity_score: 0-100 score
+            - matching_factors: What makes it similar
+
+        Raises:
+            MCPInvocationError: If search fails
+            ValueError: If neither decision_id nor fact_pattern provided
+        """
+        if not decision_id and not fact_pattern:
+            raise ValueError("Either decision_id or fact_pattern must be provided")
+
+        params: Dict[str, Any] = {"limit": limit}
+
+        if decision_id:
+            params["decisionId"] = decision_id
+        if fact_pattern:
+            params["factPattern"] = fact_pattern
+        if legal_area:
+            params["legalArea"] = legal_area
+
+        try:
+            result = await self.client.invoke_tool("find_similar_cases", params)
+            return result
+
+        except MCPInvocationError as e:
+            logger.error(f"Similar case search failed: {e}")
+            raise
+
+    async def get_legal_provision_interpretation(
+        self,
+        statute: str,
+        article: str,
+        paragraph: Optional[str] = None,
+        language: Optional[str] = None,
+        limit: int = 10,
+    ) -> Dict[str, Any]:
+        """
+        Get court interpretations of a statutory provision
+
+        Args:
+            statute: Statute abbreviation (ZGB, OR, StGB, etc.)
+            article: Article number
+            paragraph: Paragraph/Absatz number (optional)
+            language: Filter by language (DE, FR, IT)
+            limit: Maximum interpretations to return
+
+        Returns:
+            Dict with interpretation data including:
+            - provision: The statutory provision reference
+            - interpretations: List of court interpretations
+            - total_found: Total interpretations found
+
+            Each interpretation includes:
+            - decision_id: Court decision ID
+            - court_name: Name of the court
+            - date: Decision date
+            - interpretation_text: Relevant text from decision
+            - context: Surrounding context
+            - binding_level: How binding the interpretation is
+
+        Raises:
+            MCPInvocationError: If retrieval fails
+        """
+        params: Dict[str, Any] = {
+            "statute": statute.upper(),
+            "article": article,
+            "limit": limit,
+        }
+
+        if paragraph:
+            params["paragraph"] = paragraph
+        if language:
+            params["language"] = language.upper()
+
+        try:
+            result = await self.client.invoke_tool("get_legal_provision_interpretation", params)
+            return result
+
+        except MCPInvocationError as e:
+            logger.error(f"Legal provision interpretation retrieval failed: {e}")
+            raise
+
     async def __aenter__(self) -> "EntscheidausucheAdapter":
         """Async context manager entry"""
         await self.connect()

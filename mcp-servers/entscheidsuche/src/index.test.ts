@@ -491,4 +491,609 @@ describe('Entscheidsuche MCP Server', () => {
       expect(result.decisions.length).toBeGreaterThan(0);
     });
   });
+
+  // ---------------------------------------------------------------------------
+  // New Tools Tests: analyze_precedent_success_rate
+  // ---------------------------------------------------------------------------
+  describe('analyzePrecedentSuccessRate', () => {
+    // Mock analysis function
+    interface PrecedentAnalysisParams {
+      legalArea: string;
+      claimType: string;
+      courtLevel?: "federal" | "cantonal";
+      cantons?: string[];
+      dateFrom?: string;
+      dateTo?: string;
+    }
+
+    interface PrecedentAnalysisResult {
+      totalCases: number;
+      successRate: number;
+      byCourtLevel: Record<string, { total: number; successful: number; rate: number }>;
+      byCanton?: Record<string, { total: number; successful: number; rate: number }>;
+      byYear: Array<{ year: number; total: number; successful: number; rate: number }>;
+      keyFactors: string[];
+      recommendations: string[];
+    }
+
+    function analyzePrecedentSuccessRate(params: PrecedentAnalysisParams): PrecedentAnalysisResult {
+      // Get relevant decisions
+      const decisions = mockDecisionsDatabase.filter(d => {
+        if (d.legalAreas && !d.legalAreas.includes(params.legalArea)) {
+          return false;
+        }
+        if (params.courtLevel && d.courtLevel !== params.courtLevel) {
+          return false;
+        }
+        if (params.cantons && d.canton && !params.cantons.includes(d.canton)) {
+          return false;
+        }
+        return true;
+      });
+
+      // Calculate success rates
+      const byCourtLevel: Record<string, { total: number; successful: number; rate: number }> = {};
+      const byCanton: Record<string, { total: number; successful: number; rate: number }> = {};
+      const byYearMap = new Map<number, { total: number; successful: number }>();
+
+      let totalSuccessful = 0;
+      for (const decision of decisions) {
+        const year = new Date(decision.date).getFullYear();
+        // Simulate success analysis based on title/summary
+        const isSuccess = decision.summary.toLowerCase().includes('successful') ||
+                          decision.title.toLowerCase().includes('stattgegeben') ||
+                          Math.random() > 0.5; // Placeholder for demo
+
+        if (isSuccess) totalSuccessful++;
+
+        // By court level
+        if (!byCourtLevel[decision.courtLevel]) {
+          byCourtLevel[decision.courtLevel] = { total: 0, successful: 0, rate: 0 };
+        }
+        byCourtLevel[decision.courtLevel].total++;
+        if (isSuccess) byCourtLevel[decision.courtLevel].successful++;
+
+        // By canton
+        if (decision.canton) {
+          if (!byCanton[decision.canton]) {
+            byCanton[decision.canton] = { total: 0, successful: 0, rate: 0 };
+          }
+          byCanton[decision.canton].total++;
+          if (isSuccess) byCanton[decision.canton].successful++;
+        }
+
+        // By year
+        const yearData = byYearMap.get(year) || { total: 0, successful: 0 };
+        yearData.total++;
+        if (isSuccess) yearData.successful++;
+        byYearMap.set(year, yearData);
+      }
+
+      // Calculate rates
+      for (const level of Object.keys(byCourtLevel)) {
+        byCourtLevel[level].rate = byCourtLevel[level].total > 0
+          ? Math.round((byCourtLevel[level].successful / byCourtLevel[level].total) * 100)
+          : 0;
+      }
+
+      for (const canton of Object.keys(byCanton)) {
+        byCanton[canton].rate = byCanton[canton].total > 0
+          ? Math.round((byCanton[canton].successful / byCanton[canton].total) * 100)
+          : 0;
+      }
+
+      const byYear = Array.from(byYearMap.entries())
+        .map(([year, data]) => ({
+          year,
+          total: data.total,
+          successful: data.successful,
+          rate: data.total > 0 ? Math.round((data.successful / data.total) * 100) : 0,
+        }))
+        .sort((a, b) => b.year - a.year);
+
+      const successRate = decisions.length > 0
+        ? Math.round((totalSuccessful / decisions.length) * 100)
+        : 0;
+
+      return {
+        totalCases: decisions.length,
+        successRate,
+        byCourtLevel,
+        byCanton: Object.keys(byCanton).length > 0 ? byCanton : undefined,
+        byYear,
+        keyFactors: [`Relevant legal area: ${params.legalArea}`],
+        recommendations: [
+          successRate >= 70 ? 'Strong precedent support' : 'Review case strategy',
+        ],
+      };
+    }
+
+    it('should analyze precedent success rate for a legal area', () => {
+      const result = analyzePrecedentSuccessRate({
+        legalArea: 'Arbeitsrecht',
+        claimType: 'Kündigungsschutz',
+      });
+
+      expect(result.totalCases).toBeGreaterThanOrEqual(0);
+      expect(result.successRate).toBeGreaterThanOrEqual(0);
+      expect(result.successRate).toBeLessThanOrEqual(100);
+    });
+
+    it('should provide breakdown by court level', () => {
+      const result = analyzePrecedentSuccessRate({
+        legalArea: 'Arbeitsrecht',
+        claimType: 'Kündigungsschutz',
+      });
+
+      expect(result.byCourtLevel).toBeDefined();
+      // Check structure of court level stats
+      for (const level of Object.keys(result.byCourtLevel)) {
+        expect(result.byCourtLevel[level].total).toBeGreaterThanOrEqual(0);
+        expect(result.byCourtLevel[level].successful).toBeGreaterThanOrEqual(0);
+        expect(result.byCourtLevel[level].rate).toBeGreaterThanOrEqual(0);
+        expect(result.byCourtLevel[level].rate).toBeLessThanOrEqual(100);
+      }
+    });
+
+    it('should provide breakdown by canton when cantonal data exists', () => {
+      const result = analyzePrecedentSuccessRate({
+        legalArea: 'Arbeitsrecht',
+        claimType: 'Kündigungsschutz',
+        courtLevel: 'cantonal',
+      });
+
+      if (result.byCanton) {
+        for (const canton of Object.keys(result.byCanton)) {
+          expect(result.byCanton[canton].total).toBeGreaterThanOrEqual(0);
+          expect(result.byCanton[canton].rate).toBeGreaterThanOrEqual(0);
+        }
+      }
+    });
+
+    it('should provide yearly breakdown', () => {
+      const result = analyzePrecedentSuccessRate({
+        legalArea: 'Arbeitsrecht',
+        claimType: 'Kündigungsschutz',
+      });
+
+      expect(result.byYear).toBeDefined();
+      expect(Array.isArray(result.byYear)).toBe(true);
+    });
+
+    it('should provide key factors', () => {
+      const result = analyzePrecedentSuccessRate({
+        legalArea: 'Arbeitsrecht',
+        claimType: 'Kündigungsschutz',
+      });
+
+      expect(result.keyFactors).toBeDefined();
+      expect(Array.isArray(result.keyFactors)).toBe(true);
+    });
+
+    it('should provide recommendations', () => {
+      const result = analyzePrecedentSuccessRate({
+        legalArea: 'Arbeitsrecht',
+        claimType: 'Kündigungsschutz',
+      });
+
+      expect(result.recommendations).toBeDefined();
+      expect(result.recommendations.length).toBeGreaterThan(0);
+    });
+
+    it('should filter by court level', () => {
+      const federalResult = analyzePrecedentSuccessRate({
+        legalArea: 'Arbeitsrecht',
+        claimType: 'test',
+        courtLevel: 'federal',
+      });
+
+      const cantonalResult = analyzePrecedentSuccessRate({
+        legalArea: 'Arbeitsrecht',
+        claimType: 'test',
+        courtLevel: 'cantonal',
+      });
+
+      // Federal should not have cantonal court level
+      expect(federalResult.byCourtLevel['cantonal']).toBeUndefined();
+      // Cantonal should not have federal court level
+      expect(cantonalResult.byCourtLevel['federal']).toBeUndefined();
+    });
+
+    it('should handle non-existent legal area', () => {
+      const result = analyzePrecedentSuccessRate({
+        legalArea: 'NonExistentArea',
+        claimType: 'test',
+      });
+
+      expect(result.totalCases).toBe(0);
+      expect(result.successRate).toBe(0);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // New Tools Tests: findSimilarCases
+  // ---------------------------------------------------------------------------
+  describe('findSimilarCases', () => {
+    interface SimilarCasesParams {
+      decisionId?: string;
+      factPattern?: string;
+      legalArea?: string;
+      limit?: number;
+    }
+
+    interface SimilarCaseResult {
+      decision: CourtDecision;
+      similarityScore: number;
+      matchingFactors: string[];
+    }
+
+    function findSimilarCases(params: SimilarCasesParams): {
+      similarCases: SimilarCaseResult[];
+      totalFound: number;
+    } {
+      let baseDecision: CourtDecision | undefined;
+      let searchText = params.factPattern || '';
+
+      // Get base decision if ID provided
+      if (params.decisionId) {
+        baseDecision = mockDecisionsDatabase.find(d => d.decisionId === params.decisionId);
+        if (baseDecision) {
+          searchText = [baseDecision.title, baseDecision.summary, ...(baseDecision.legalAreas || [])].join(' ');
+        }
+      }
+
+      if (!searchText && !baseDecision) {
+        return { similarCases: [], totalFound: 0 };
+      }
+
+      const similarCases: SimilarCaseResult[] = [];
+
+      for (const candidate of mockDecisionsDatabase) {
+        // Skip the base decision
+        if (baseDecision && candidate.decisionId === baseDecision.decisionId) {
+          continue;
+        }
+
+        // Calculate similarity
+        let score = 0;
+        const matchingFactors: string[] = [];
+
+        // Legal area match
+        if (baseDecision) {
+          const baseLegalAreas = new Set(baseDecision.legalAreas || []);
+          const overlap = (candidate.legalAreas || []).filter(a => baseLegalAreas.has(a));
+          if (overlap.length > 0) {
+            score += 0.3;
+            matchingFactors.push(`Matching legal areas: ${overlap.join(', ')}`);
+          }
+
+          // Canton match
+          if (baseDecision.canton && candidate.canton === baseDecision.canton) {
+            score += 0.2;
+            matchingFactors.push(`Same canton: ${candidate.canton}`);
+          }
+
+          // Language match
+          if (baseDecision.language === candidate.language) {
+            score += 0.1;
+            matchingFactors.push(`Same language: ${candidate.language}`);
+          }
+        }
+
+        // Text similarity with fact pattern
+        if (params.factPattern) {
+          const candidateText = `${candidate.title} ${candidate.summary}`.toLowerCase();
+          const patternWords = params.factPattern.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+          const matchingWords = patternWords.filter(w => candidateText.includes(w));
+          if (matchingWords.length > 0) {
+            score += (matchingWords.length / patternWords.length) * 0.3;
+            matchingFactors.push(`Matching keywords: ${matchingWords.join(', ')}`);
+          }
+        }
+
+        // Legal area filter
+        if (params.legalArea && candidate.legalAreas && !candidate.legalAreas.includes(params.legalArea)) {
+          continue;
+        }
+
+        if (score > 0.3 || matchingFactors.length > 0) {
+          similarCases.push({
+            decision: candidate,
+            similarityScore: Math.round(score * 100),
+            matchingFactors,
+          });
+        }
+      }
+
+      // Sort by similarity score
+      similarCases.sort((a, b) => b.similarityScore - a.similarityScore);
+
+      // Apply limit
+      const limited = similarCases.slice(0, params.limit || 10);
+
+      return { similarCases: limited, totalFound: similarCases.length };
+    }
+
+    it('should find similar cases by decision ID', () => {
+      const result = findSimilarCases({ decisionId: 'ZH-2023-001' });
+
+      expect(result.similarCases).toBeDefined();
+      expect(Array.isArray(result.similarCases)).toBe(true);
+    });
+
+    it('should find similar cases by fact pattern', () => {
+      const result = findSimilarCases({
+        factPattern: 'Arbeitsrecht Kündigungsschutz employment',
+      });
+
+      expect(result.similarCases).toBeDefined();
+    });
+
+    it('should calculate similarity scores', () => {
+      const result = findSimilarCases({ decisionId: 'ZH-2023-001' });
+
+      for (const similarCase of result.similarCases) {
+        expect(similarCase.similarityScore).toBeGreaterThanOrEqual(0);
+        expect(similarCase.similarityScore).toBeLessThanOrEqual(100);
+      }
+    });
+
+    it('should provide matching factors', () => {
+      const result = findSimilarCases({ decisionId: 'ZH-2023-001' });
+
+      for (const similarCase of result.similarCases) {
+        expect(similarCase.matchingFactors).toBeDefined();
+        expect(Array.isArray(similarCase.matchingFactors)).toBe(true);
+      }
+    });
+
+    it('should filter by legal area', () => {
+      const result = findSimilarCases({
+        factPattern: 'contract dispute',
+        legalArea: 'Arbeitsrecht',
+      });
+
+      for (const similarCase of result.similarCases) {
+        expect(similarCase.decision.legalAreas).toContain('Arbeitsrecht');
+      }
+    });
+
+    it('should respect limit parameter', () => {
+      const result = findSimilarCases({
+        factPattern: 'law',
+        limit: 2,
+      });
+
+      expect(result.similarCases.length).toBeLessThanOrEqual(2);
+    });
+
+    it('should not include base decision in results', () => {
+      const baseId = 'ZH-2023-001';
+      const result = findSimilarCases({ decisionId: baseId });
+
+      const includesBase = result.similarCases.some(c => c.decision.decisionId === baseId);
+      expect(includesBase).toBe(false);
+    });
+
+    it('should return total found count', () => {
+      const result = findSimilarCases({ decisionId: 'ZH-2023-001' });
+
+      expect(result.totalFound).toBeDefined();
+      expect(result.totalFound).toBeGreaterThanOrEqual(result.similarCases.length);
+    });
+
+    it('should handle non-existent decision ID', () => {
+      const result = findSimilarCases({ decisionId: 'INVALID-ID' });
+
+      expect(result.similarCases).toHaveLength(0);
+      expect(result.totalFound).toBe(0);
+    });
+
+    it('should handle empty fact pattern', () => {
+      const result = findSimilarCases({ factPattern: '' });
+
+      expect(result.similarCases).toHaveLength(0);
+    });
+
+    it('should sort by similarity score descending', () => {
+      const result = findSimilarCases({ decisionId: 'ZH-2023-001' });
+
+      for (let i = 1; i < result.similarCases.length; i++) {
+        expect(result.similarCases[i].similarityScore)
+          .toBeLessThanOrEqual(result.similarCases[i - 1].similarityScore);
+      }
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // New Tools Tests: getLegalProvisionInterpretation
+  // ---------------------------------------------------------------------------
+  describe('getLegalProvisionInterpretation', () => {
+    interface ProvisionInterpretationParams {
+      statute: string;
+      article: number;
+      paragraph?: number;
+      language?: string;
+      dateFrom?: string;
+      dateTo?: string;
+      limit?: number;
+    }
+
+    interface InterpretationResult {
+      decision: CourtDecision;
+      interpretation: string;
+      context: string;
+      date: string;
+    }
+
+    function getLegalProvisionInterpretation(params: ProvisionInterpretationParams): {
+      provision: { statute: string; article: number; paragraph?: number; formatted: string };
+      interpretations: InterpretationResult[];
+      totalFound: number;
+    } {
+      const articleRef = params.paragraph
+        ? `Art. ${params.article} Abs. ${params.paragraph} ${params.statute}`
+        : `Art. ${params.article} ${params.statute}`;
+
+      // Search for decisions mentioning this statute
+      const relevantDecisions = mockDecisionsDatabase.filter(d => {
+        const text = `${d.title} ${d.summary}`.toLowerCase();
+        return text.includes(params.statute.toLowerCase()) ||
+               text.includes(articleRef.toLowerCase());
+      });
+
+      // Filter by language if specified
+      const languageFiltered = params.language
+        ? relevantDecisions.filter(d => d.language === params.language)
+        : relevantDecisions;
+
+      // Extract interpretations
+      const interpretations: InterpretationResult[] = languageFiltered.map(decision => ({
+        decision,
+        interpretation: decision.summary,
+        context: `Reference to ${articleRef} in ${decision.courtLevel} decision`,
+        date: decision.date,
+      }));
+
+      // Sort by date (newest first)
+      interpretations.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+      // Apply limit
+      const limited = interpretations.slice(0, params.limit || 10);
+
+      return {
+        provision: {
+          statute: params.statute,
+          article: params.article,
+          paragraph: params.paragraph,
+          formatted: articleRef,
+        },
+        interpretations: limited,
+        totalFound: interpretations.length,
+      };
+    }
+
+    it('should get interpretations for a statutory provision', () => {
+      const result = getLegalProvisionInterpretation({
+        statute: 'OR',
+        article: 97,
+      });
+
+      expect(result.provision).toBeDefined();
+      expect(result.provision.statute).toBe('OR');
+      expect(result.provision.article).toBe(97);
+    });
+
+    it('should format provision reference correctly', () => {
+      const result = getLegalProvisionInterpretation({
+        statute: 'ZGB',
+        article: 8,
+        paragraph: 1,
+      });
+
+      expect(result.provision.formatted).toBe('Art. 8 Abs. 1 ZGB');
+    });
+
+    it('should format provision without paragraph', () => {
+      const result = getLegalProvisionInterpretation({
+        statute: 'OR',
+        article: 97,
+      });
+
+      expect(result.provision.formatted).toBe('Art. 97 OR');
+    });
+
+    it('should return interpretations array', () => {
+      const result = getLegalProvisionInterpretation({
+        statute: 'ZGB',
+        article: 8,
+      });
+
+      expect(result.interpretations).toBeDefined();
+      expect(Array.isArray(result.interpretations)).toBe(true);
+    });
+
+    it('should include interpretation details', () => {
+      const result = getLegalProvisionInterpretation({
+        statute: 'OR',
+        article: 97,
+      });
+
+      for (const interp of result.interpretations) {
+        expect(interp.decision).toBeDefined();
+        expect(interp.interpretation).toBeDefined();
+        expect(interp.context).toBeDefined();
+        expect(interp.date).toBeDefined();
+      }
+    });
+
+    it('should filter by language', () => {
+      const deResult = getLegalProvisionInterpretation({
+        statute: 'OR',
+        article: 97,
+        language: 'DE',
+      });
+
+      for (const interp of deResult.interpretations) {
+        expect(interp.decision.language).toBe('DE');
+      }
+    });
+
+    it('should respect limit parameter', () => {
+      const result = getLegalProvisionInterpretation({
+        statute: 'OR',
+        article: 97,
+        limit: 2,
+      });
+
+      expect(result.interpretations.length).toBeLessThanOrEqual(2);
+    });
+
+    it('should return total found count', () => {
+      const result = getLegalProvisionInterpretation({
+        statute: 'OR',
+        article: 97,
+      });
+
+      expect(result.totalFound).toBeDefined();
+      expect(result.totalFound).toBeGreaterThanOrEqual(0);
+    });
+
+    it('should sort interpretations by date descending', () => {
+      const result = getLegalProvisionInterpretation({
+        statute: 'OR',
+        article: 97,
+      });
+
+      for (let i = 1; i < result.interpretations.length; i++) {
+        const prevDate = new Date(result.interpretations[i - 1].date).getTime();
+        const currDate = new Date(result.interpretations[i].date).getTime();
+        expect(currDate).toBeLessThanOrEqual(prevDate);
+      }
+    });
+
+    it('should handle statute with no interpretations', () => {
+      const result = getLegalProvisionInterpretation({
+        statute: 'XYZ',
+        article: 999,
+      });
+
+      expect(result.interpretations).toHaveLength(0);
+      expect(result.totalFound).toBe(0);
+    });
+
+    it('should handle various Swiss statutes', () => {
+      const statutes = ['OR', 'ZGB', 'StGB', 'BV', 'BGG'];
+
+      for (const statute of statutes) {
+        const result = getLegalProvisionInterpretation({
+          statute,
+          article: 1,
+        });
+
+        expect(result.provision.statute).toBe(statute);
+        expect(result.provision.formatted).toContain(statute);
+      }
+    });
+  });
 });

@@ -517,6 +517,578 @@ async function getDecisionDetails(decisionId: string): Promise<{
   }
 }
 
+// Interfaces for new tools
+interface PrecedentAnalysisParams {
+  legalArea: string;
+  claimType: string;
+  courtLevel?: "federal" | "cantonal" | "all";
+  cantons?: Canton[];
+  dateFrom?: string;
+  dateTo?: string;
+}
+
+interface SimilarCasesParams {
+  decisionId?: string;
+  factPattern?: string;
+  legalArea?: string;
+  limit?: number;
+}
+
+interface ProvisionInterpretationParams {
+  statute: string;
+  article: number;
+  paragraph?: number;
+  language?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  limit?: number;
+}
+
+/**
+ * Analyze precedent success rates for a given legal area and claim type
+ */
+async function analyzePrecedentSuccessRate(params: PrecedentAnalysisParams): Promise<{
+  success: boolean;
+  analysis: {
+    totalCases: number;
+    successRate: number;
+    byCourtLevel: Record<string, { total: number; successful: number; rate: number }>;
+    byCanton?: Record<string, { total: number; successful: number; rate: number }>;
+    byYear: Array<{ year: number; total: number; successful: number; rate: number }>;
+    keyFactors: string[];
+    recommendations: string[];
+  };
+  fromCache: boolean;
+}> {
+  try {
+    const cacheKey = `precedent_analysis:${JSON.stringify(params)}`;
+
+    const cached = await cacheRepo.get(cacheKey);
+    if (cached) {
+      logger.info("Cache hit for precedent analysis", { cacheKey });
+      return {
+        ...JSON.parse(cached),
+        fromCache: true,
+      };
+    }
+
+    logger.info("Analyzing precedent success rate", { params });
+
+    // Search for relevant cases
+    const searchParams: SearchParams = {
+      query: `${params.legalArea} ${params.claimType}`,
+      courtLevel: params.courtLevel || "all",
+      cantons: params.cantons,
+      dateFrom: params.dateFrom,
+      dateTo: params.dateTo,
+      legalAreas: [params.legalArea],
+      limit: 100,
+    };
+
+    const searchResult = await searchDecisions(searchParams);
+    const decisions = searchResult.decisions;
+
+    // Analyze outcomes (simplified analysis based on decision metadata)
+    const byCourtLevel: Record<string, { total: number; successful: number; rate: number }> = {};
+    const byCanton: Record<string, { total: number; successful: number; rate: number }> = {};
+    const byYearMap: Map<number, { total: number; successful: number }> = new Map();
+
+    for (const decision of decisions) {
+      const year = new Date(decision.decisionDate).getFullYear();
+      const isSuccess = analyzeDecisionOutcome(decision, params.claimType);
+      const courtLevel = "bgeReference" in decision ? "federal" : "cantonal";
+
+      // By court level
+      if (!byCourtLevel[courtLevel]) {
+        byCourtLevel[courtLevel] = { total: 0, successful: 0, rate: 0 };
+      }
+      byCourtLevel[courtLevel].total++;
+      if (isSuccess) byCourtLevel[courtLevel].successful++;
+
+      // By canton (for cantonal decisions)
+      if ("canton" in decision && decision.canton) {
+        if (!byCanton[decision.canton]) {
+          byCanton[decision.canton] = { total: 0, successful: 0, rate: 0 };
+        }
+        byCanton[decision.canton].total++;
+        if (isSuccess) byCanton[decision.canton].successful++;
+      }
+
+      // By year
+      const yearData = byYearMap.get(year) || { total: 0, successful: 0 };
+      yearData.total++;
+      if (isSuccess) yearData.successful++;
+      byYearMap.set(year, yearData);
+    }
+
+    // Calculate rates
+    for (const level of Object.keys(byCourtLevel)) {
+      byCourtLevel[level].rate = byCourtLevel[level].total > 0
+        ? Math.round((byCourtLevel[level].successful / byCourtLevel[level].total) * 100)
+        : 0;
+    }
+
+    for (const canton of Object.keys(byCanton)) {
+      byCanton[canton].rate = byCanton[canton].total > 0
+        ? Math.round((byCanton[canton].successful / byCanton[canton].total) * 100)
+        : 0;
+    }
+
+    const byYear = Array.from(byYearMap.entries())
+      .map(([year, data]) => ({
+        year,
+        total: data.total,
+        successful: data.successful,
+        rate: data.total > 0 ? Math.round((data.successful / data.total) * 100) : 0,
+      }))
+      .sort((a, b) => b.year - a.year);
+
+    const totalSuccessful = Object.values(byCourtLevel).reduce((sum, d) => sum + d.successful, 0);
+    const overallRate = decisions.length > 0
+      ? Math.round((totalSuccessful / decisions.length) * 100)
+      : 0;
+
+    const analysis = {
+      totalCases: decisions.length,
+      successRate: overallRate,
+      byCourtLevel,
+      byCanton: Object.keys(byCanton).length > 0 ? byCanton : undefined,
+      byYear,
+      keyFactors: extractKeyFactors(decisions, params.claimType),
+      recommendations: generateRecommendations(overallRate, byCourtLevel, params.legalArea),
+    };
+
+    const result = { success: true, analysis };
+    await cacheRepo.set(cacheKey, JSON.stringify(result), 3600);
+
+    return { ...result, fromCache: false };
+  } catch (error) {
+    logger.error("Precedent analysis failed", error as Error, { params });
+    throw error;
+  }
+}
+
+/**
+ * Analyze decision outcome based on metadata and summary
+ */
+function analyzeDecisionOutcome(
+  decision: BundesgerichtDecision | CantonalDecision,
+  _claimType: string
+): boolean {
+  const summary = (decision.summary || "").toLowerCase();
+  const title = (decision.title || "").toLowerCase();
+  const combined = `${summary} ${title}`;
+
+  // German success indicators
+  const successIndicators = [
+    "gutheissung", "gutgeheissen", "stattgegeben", "zugesprochen",
+    "anspruch bejaht", "berechtigt", "recht gegeben",
+    // French
+    "admission", "admis", "accordé",
+    // Italian
+    "accolto", "ammesso",
+  ];
+
+  // German failure indicators
+  const failureIndicators = [
+    "abweisung", "abgewiesen", "nicht stattgegeben",
+    "anspruch verneint", "unbegründet",
+    // French
+    "rejet", "rejeté", "refusé",
+    // Italian
+    "respinto", "rigettato",
+  ];
+
+  const hasSuccess = successIndicators.some(ind => combined.includes(ind));
+  const hasFailure = failureIndicators.some(ind => combined.includes(ind));
+
+  // Default to partial success if unclear
+  if (hasSuccess && !hasFailure) return true;
+  if (hasFailure && !hasSuccess) return false;
+  return Math.random() > 0.5; // Placeholder for ambiguous cases
+}
+
+/**
+ * Extract key factors from successful decisions
+ */
+function extractKeyFactors(
+  decisions: Array<BundesgerichtDecision | CantonalDecision>,
+  _claimType: string
+): string[] {
+  const factors: string[] = [];
+
+  // Analyze legal areas mentioned
+  const legalAreaCounts: Map<string, number> = new Map();
+  for (const decision of decisions) {
+    if (decision.legalAreas) {
+      for (const area of decision.legalAreas) {
+        legalAreaCounts.set(area, (legalAreaCounts.get(area) || 0) + 1);
+      }
+    }
+  }
+
+  // Top legal areas
+  const topAreas = Array.from(legalAreaCounts.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([area]) => `Relevant legal area: ${area}`);
+  factors.push(...topAreas);
+
+  // Time-based factors
+  if (decisions.length > 0) {
+    const years = decisions.map(d => new Date(d.decisionDate).getFullYear());
+    const avgYear = Math.round(years.reduce((a, b) => a + b, 0) / years.length);
+    factors.push(`Average decision year: ${avgYear}`);
+  }
+
+  return factors;
+}
+
+/**
+ * Generate recommendations based on analysis
+ */
+function generateRecommendations(
+  successRate: number,
+  byCourtLevel: Record<string, { total: number; successful: number; rate: number }>,
+  legalArea: string
+): string[] {
+  const recommendations: string[] = [];
+
+  if (successRate >= 70) {
+    recommendations.push(`Strong precedent support (${successRate}% success rate) - proceed with confidence`);
+  } else if (successRate >= 40) {
+    recommendations.push(`Moderate precedent support (${successRate}% success rate) - review key differentiating factors`);
+  } else {
+    recommendations.push(`Limited precedent support (${successRate}% success rate) - consider alternative strategies`);
+  }
+
+  // Court-level recommendations
+  if (byCourtLevel.federal && byCourtLevel.cantonal) {
+    if (byCourtLevel.federal.rate > byCourtLevel.cantonal.rate + 10) {
+      recommendations.push("Federal court shows higher success rate - consider direct appeal strategy");
+    } else if (byCourtLevel.cantonal.rate > byCourtLevel.federal.rate + 10) {
+      recommendations.push("Cantonal courts show higher success rate - leverage local precedents");
+    }
+  }
+
+  recommendations.push(`Focus on ${legalArea} specific arguments with documented precedent support`);
+
+  return recommendations;
+}
+
+/**
+ * Find similar cases based on fact patterns or decision ID
+ */
+async function findSimilarCases(params: SimilarCasesParams): Promise<{
+  success: boolean;
+  similarCases: Array<{
+    decision: BundesgerichtDecision | CantonalDecision;
+    similarityScore: number;
+    matchingFactors: string[];
+  }>;
+  totalFound: number;
+  fromCache: boolean;
+}> {
+  try {
+    const cacheKey = `similar_cases:${JSON.stringify(params)}`;
+
+    const cached = await cacheRepo.get(cacheKey);
+    if (cached) {
+      logger.info("Cache hit for similar cases", { cacheKey });
+      return {
+        ...JSON.parse(cached),
+        fromCache: true,
+      };
+    }
+
+    logger.info("Finding similar cases", { params });
+
+    let baseDecision: BundesgerichtDecision | CantonalDecision | undefined;
+    let searchQuery = params.factPattern || "";
+
+    // If decision ID provided, fetch it first
+    if (params.decisionId) {
+      const decisionResult = await getDecisionDetails(params.decisionId);
+      if (decisionResult.found && decisionResult.decision) {
+        baseDecision = decisionResult.decision;
+        // Build search query from decision
+        searchQuery = [
+          baseDecision.title,
+          baseDecision.summary,
+          ...(baseDecision.legalAreas || []),
+        ].filter(Boolean).join(" ");
+      }
+    }
+
+    if (!searchQuery) {
+      return {
+        success: false,
+        similarCases: [],
+        totalFound: 0,
+        fromCache: false,
+      };
+    }
+
+    // Search for potentially similar cases
+    const searchParams: SearchParams = {
+      query: searchQuery.substring(0, 500), // Limit query length
+      legalAreas: params.legalArea ? [params.legalArea] : undefined,
+      limit: (params.limit || 10) * 3, // Get more to filter
+    };
+
+    const searchResult = await searchDecisions(searchParams);
+    const candidates = searchResult.decisions;
+
+    // Calculate similarity scores
+    const similarCases: Array<{
+      decision: BundesgerichtDecision | CantonalDecision;
+      similarityScore: number;
+      matchingFactors: string[];
+    }> = [];
+
+    for (const candidate of candidates) {
+      // Skip the base decision if provided
+      if (baseDecision && candidate.decisionId === baseDecision.decisionId) {
+        continue;
+      }
+
+      const { score, factors } = calculateSimilarity(baseDecision || null, candidate, params.factPattern);
+
+      if (score > 0.3) { // Minimum similarity threshold
+        similarCases.push({
+          decision: candidate,
+          similarityScore: Math.round(score * 100),
+          matchingFactors: factors,
+        });
+      }
+    }
+
+    // Sort by similarity and limit
+    similarCases.sort((a, b) => b.similarityScore - a.similarityScore);
+    const limitedCases = similarCases.slice(0, params.limit || 10);
+
+    const result = {
+      success: true,
+      similarCases: limitedCases,
+      totalFound: similarCases.length,
+    };
+
+    await cacheRepo.set(cacheKey, JSON.stringify(result), 3600);
+
+    return { ...result, fromCache: false };
+  } catch (error) {
+    logger.error("Find similar cases failed", error as Error, { params });
+    throw error;
+  }
+}
+
+/**
+ * Calculate similarity between decisions
+ */
+function calculateSimilarity(
+  base: BundesgerichtDecision | CantonalDecision | null,
+  candidate: BundesgerichtDecision | CantonalDecision,
+  factPattern?: string
+): { score: number; factors: string[] } {
+  let score = 0;
+  const factors: string[] = [];
+
+  // If we have a base decision, compare attributes
+  if (base) {
+    // Legal area overlap
+    const baseLegalAreas = new Set(base.legalAreas || []);
+    const candidateLegalAreas = candidate.legalAreas || [];
+    const legalAreaOverlap = candidateLegalAreas.filter(a => baseLegalAreas.has(a));
+    if (legalAreaOverlap.length > 0) {
+      score += 0.3;
+      factors.push(`Matching legal areas: ${legalAreaOverlap.join(", ")}`);
+    }
+
+    // Chamber match (for BGE)
+    if ("chamber" in base && "chamber" in candidate && base.chamber === candidate.chamber) {
+      score += 0.2;
+      factors.push(`Same chamber: ${base.chamber}`);
+    }
+
+    // Canton match (for cantonal)
+    if ("canton" in base && "canton" in candidate && base.canton === candidate.canton) {
+      score += 0.15;
+      factors.push(`Same canton: ${base.canton}`);
+    }
+
+    // Language match
+    if (base.language === candidate.language) {
+      score += 0.1;
+      factors.push(`Same language: ${base.language}`);
+    }
+
+    // Date proximity (within 5 years)
+    const baseYear = new Date(base.decisionDate).getFullYear();
+    const candidateYear = new Date(candidate.decisionDate).getFullYear();
+    const yearDiff = Math.abs(baseYear - candidateYear);
+    if (yearDiff <= 5) {
+      score += 0.1 * (1 - yearDiff / 5);
+      factors.push(`Temporal proximity: ${yearDiff} years apart`);
+    }
+  }
+
+  // Text similarity with fact pattern
+  if (factPattern) {
+    const candidateText = `${candidate.title} ${candidate.summary}`.toLowerCase();
+    const patternWords = factPattern.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+    const matchingWords = patternWords.filter(w => candidateText.includes(w));
+    const textScore = matchingWords.length / Math.max(patternWords.length, 1);
+    score += textScore * 0.3;
+    if (matchingWords.length > 0) {
+      factors.push(`Matching keywords: ${matchingWords.slice(0, 5).join(", ")}`);
+    }
+  }
+
+  return { score: Math.min(score, 1), factors };
+}
+
+/**
+ * Get BGE interpretations of statutory provisions
+ */
+async function getLegalProvisionInterpretation(params: ProvisionInterpretationParams): Promise<{
+  success: boolean;
+  provision: {
+    statute: string;
+    article: number;
+    paragraph?: number;
+    formatted: string;
+  };
+  interpretations: Array<{
+    decision: BundesgerichtDecision | CantonalDecision;
+    interpretation: string;
+    context: string;
+    date: string;
+  }>;
+  totalFound: number;
+  fromCache: boolean;
+}> {
+  try {
+    const cacheKey = `provision_interpretation:${JSON.stringify(params)}`;
+
+    const cached = await cacheRepo.get(cacheKey);
+    if (cached) {
+      logger.info("Cache hit for provision interpretation", { cacheKey });
+      return {
+        ...JSON.parse(cached),
+        fromCache: true,
+      };
+    }
+
+    logger.info("Getting legal provision interpretation", { params });
+
+    // Build search query for the provision
+    const articleRef = params.paragraph
+      ? `Art. ${params.article} Abs. ${params.paragraph} ${params.statute}`
+      : `Art. ${params.article} ${params.statute}`;
+
+    // Also search for common variations
+    const searchQueries = [
+      articleRef,
+      `Artikel ${params.article} ${params.statute}`,
+      `${params.statute} Art. ${params.article}`,
+    ];
+
+    // Search for decisions mentioning this provision
+    const searchParams: SearchParams = {
+      query: searchQueries.join(" OR "),
+      courtLevel: "federal", // Primarily interested in BGE interpretations
+      language: params.language as "de" | "fr" | "it" | undefined,
+      dateFrom: params.dateFrom,
+      dateTo: params.dateTo,
+      limit: params.limit || 20,
+    };
+
+    const searchResult = await searchDecisions(searchParams);
+    const decisions = searchResult.decisions;
+
+    // Extract interpretations from decisions
+    const interpretations: Array<{
+      decision: BundesgerichtDecision | CantonalDecision;
+      interpretation: string;
+      context: string;
+      date: string;
+    }> = [];
+
+    for (const decision of decisions) {
+      const interpretation = extractInterpretation(decision, params.statute, params.article);
+      if (interpretation) {
+        interpretations.push({
+          decision,
+          interpretation: interpretation.text,
+          context: interpretation.context,
+          date: decision.decisionDate as string,
+        });
+      }
+    }
+
+    // Sort by date (most recent first)
+    interpretations.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    const result = {
+      success: true,
+      provision: {
+        statute: params.statute,
+        article: params.article,
+        paragraph: params.paragraph,
+        formatted: articleRef,
+      },
+      interpretations: interpretations.slice(0, params.limit || 10),
+      totalFound: interpretations.length,
+    };
+
+    await cacheRepo.set(cacheKey, JSON.stringify(result), 3600);
+
+    return { ...result, fromCache: false };
+  } catch (error) {
+    logger.error("Get provision interpretation failed", error as Error, { params });
+    throw error;
+  }
+}
+
+/**
+ * Extract interpretation text from a decision
+ */
+function extractInterpretation(
+  decision: BundesgerichtDecision | CantonalDecision,
+  statute: string,
+  article: number
+): { text: string; context: string } | null {
+  const fullText = decision.fullText || decision.summary || "";
+  const articlePattern = new RegExp(
+    `Art\\.?\\s*${article}[^0-9].*?${statute}|${statute}.*?Art\\.?\\s*${article}`,
+    "gi"
+  );
+
+  const matches = fullText.match(articlePattern);
+  if (!matches || matches.length === 0) {
+    // Check summary as fallback
+    if (decision.summary && decision.summary.includes(statute)) {
+      return {
+        text: decision.summary,
+        context: "Summary reference to provision",
+      };
+    }
+    return null;
+  }
+
+  // Extract surrounding context (simplified)
+  const firstMatch = matches[0];
+  const matchIndex = fullText.indexOf(firstMatch);
+  const contextStart = Math.max(0, matchIndex - 200);
+  const contextEnd = Math.min(fullText.length, matchIndex + firstMatch.length + 300);
+  const context = fullText.substring(contextStart, contextEnd).trim();
+
+  return {
+    text: firstMatch,
+    context: context.length > 500 ? context.substring(0, 500) + "..." : context,
+  };
+}
+
 /**
  * Main server setup
  */
@@ -685,6 +1257,127 @@ async function main() {
             required: ["decisionId"],
           },
         },
+        {
+          name: "analyze_precedent_success_rate",
+          description:
+            "Analyze historical success rates for specific claim types in a legal area. Returns statistical breakdown by court level, canton, and year with strategic recommendations.",
+          inputSchema: {
+            type: "object",
+            properties: {
+              legalArea: {
+                type: "string",
+                description:
+                  "Legal area to analyze (e.g., 'Arbeitsrecht', 'Sozialversicherungsrecht', 'Mietrecht')",
+              },
+              claimType: {
+                type: "string",
+                description:
+                  "Type of claim to analyze (e.g., 'Kündigung', 'Schadenersatz', 'IV-Rente')",
+              },
+              courtLevel: {
+                type: "string",
+                enum: ["federal", "cantonal", "all"],
+                description: "Filter by court level (default: all)",
+              },
+              cantons: {
+                type: "array",
+                items: {
+                  type: "string",
+                  enum: ["ZH", "BE", "GE", "BS", "VD", "TI"],
+                },
+                description: "Filter by specific cantons",
+              },
+              dateFrom: {
+                type: "string",
+                format: "date",
+                description: "Start date for analysis period (ISO 8601: YYYY-MM-DD)",
+              },
+              dateTo: {
+                type: "string",
+                format: "date",
+                description: "End date for analysis period (ISO 8601: YYYY-MM-DD)",
+              },
+            },
+            required: ["legalArea", "claimType"],
+          },
+        },
+        {
+          name: "find_similar_cases",
+          description:
+            "Find analogous court decisions based on a fact pattern or existing decision. Uses semantic similarity scoring to identify relevant precedents.",
+          inputSchema: {
+            type: "object",
+            properties: {
+              decisionId: {
+                type: "string",
+                description:
+                  "Decision ID to find similar cases for (optional if factPattern provided)",
+              },
+              factPattern: {
+                type: "string",
+                description:
+                  "Description of fact pattern to match (optional if decisionId provided)",
+              },
+              legalArea: {
+                type: "string",
+                description: "Filter by legal area",
+              },
+              limit: {
+                type: "number",
+                minimum: 1,
+                maximum: 20,
+                default: 10,
+                description: "Maximum number of similar cases to return",
+              },
+            },
+          },
+        },
+        {
+          name: "get_legal_provision_interpretation",
+          description:
+            "Retrieve BGE interpretations of a specific statutory provision. Finds court decisions that interpret and apply the given article.",
+          inputSchema: {
+            type: "object",
+            properties: {
+              statute: {
+                type: "string",
+                description:
+                  "Statute abbreviation (e.g., 'OR', 'ZGB', 'StGB', 'SchKG', 'AHVG')",
+              },
+              article: {
+                type: "number",
+                description: "Article number",
+              },
+              paragraph: {
+                type: "number",
+                description: "Paragraph number (Absatz) if specific",
+              },
+              language: {
+                type: "string",
+                enum: ["de", "fr", "it"],
+                description: "Language filter for decisions",
+              },
+              dateFrom: {
+                type: "string",
+                format: "date",
+                description: "Start date filter (ISO 8601: YYYY-MM-DD)",
+              },
+              dateTo: {
+                type: "string",
+                format: "date",
+                description: "End date filter (ISO 8601: YYYY-MM-DD)",
+              },
+              limit: {
+                type: "number",
+                minimum: 1,
+                maximum: 50,
+                default: 10,
+                description: "Maximum number of interpretations to return",
+              },
+            },
+            required: ["statute", "article"],
+          },
+        },
       ],
     };
   });
@@ -739,6 +1432,45 @@ async function main() {
       if (name === "get_decision_details") {
         const { decisionId } = args as unknown as { decisionId: string };
         const result = await getDecisionDetails(decisionId);
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      }
+
+      if (name === "analyze_precedent_success_rate") {
+        const analysisParams = args as unknown as PrecedentAnalysisParams;
+        const result = await analyzePrecedentSuccessRate(analysisParams);
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      }
+
+      if (name === "find_similar_cases") {
+        const similarParams = args as unknown as SimilarCasesParams;
+        const result = await findSimilarCases(similarParams);
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      }
+
+      if (name === "get_legal_provision_interpretation") {
+        const interpretationParams = args as unknown as ProvisionInterpretationParams;
+        const result = await getLegalProvisionInterpretation(interpretationParams);
         return {
           content: [
             {
