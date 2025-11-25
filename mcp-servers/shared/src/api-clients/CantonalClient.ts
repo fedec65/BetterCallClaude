@@ -5,6 +5,7 @@
 
 import { BaseAPIClient, APIClientOptions } from './BaseAPIClient';
 import { APIError } from '../errors/errors';
+import { Logger } from '../logging/logger';
 
 /**
  * Supported Swiss cantons
