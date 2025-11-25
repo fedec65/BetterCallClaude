@@ -9,7 +9,7 @@ export interface CacheEntry {
   id: string;
   cache_key: string;
   cache_type: string;
-  data: any; // Stored as JSON string in database
+  data: unknown; // Stored as JSON string in database
   created_at?: string;
   expires_at: string;
   hit_count?: number;
@@ -22,7 +22,7 @@ export class CacheRepository {
   /**
    * Set a cache entry with TTL (time-to-live in seconds)
    */
-  async set(key: string, data: any, ttl: number, type: string = 'generic'): Promise<void> {
+  async set(key: string, data: unknown, ttl: number, type: string = 'generic'): Promise<void> {
     const id = this.db.generateId();
     const expiresAt = new Date(Date.now() + ttl * 1000).toISOString();
 
@@ -41,7 +41,7 @@ export class CacheRepository {
    * Returns null if not found or expired
    * Increments hit_count and updates last_accessed_at
    */
-  async get(key: string): Promise<any | null> {
+  async get(key: string): Promise<unknown | null> {
     const entry = await this.db.queryOne<CacheEntry>(
       `SELECT * FROM api_cache WHERE cache_key = ?`,
       { values: [key] }
@@ -197,7 +197,7 @@ export class CacheRepository {
   /**
    * Parse cache entry from database (convert JSON strings to objects)
    */
-  private parseEntry(row: any): CacheEntry {
+  private parseEntry(row: Record<string, unknown>): CacheEntry {
     return {
       ...row,
       data: row.data ? JSON.parse(row.data) : undefined

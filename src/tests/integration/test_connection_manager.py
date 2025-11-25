@@ -53,7 +53,7 @@ class TestConnectionManagerServerManagement:
         assert config.description == "Test description"
         assert config.endpoint == "mcp://test"
         assert config.max_retries == 5
-        assert config.timeout_seconds==45
+        assert config.timeout_seconds == 45
         assert config.health_check_interval == 120
         assert config.enabled is True
 
@@ -290,9 +290,7 @@ class TestConnectionManagerAdapterCreation:
         )
 
         # Mock adapter creation and execution
-        with patch(
-            "src.core.mcp.connection_manager.BGESearchAdapter"
-        ) as mock_adapter_class:
+        with patch("src.core.mcp.connection_manager.BGESearchAdapter") as mock_adapter_class:
             mock_adapter = AsyncMock()
             mock_adapter.client.is_connected.return_value = False
             mock_adapter.search.return_value = MagicMock(
@@ -489,9 +487,7 @@ class TestConnectionManagerRetryLogic:
             max_retries=2,
         )
 
-        with patch.object(
-            manager, "_execute_request", new_callable=AsyncMock
-        ) as mock_execute:
+        with patch.object(manager, "_execute_request", new_callable=AsyncMock) as mock_execute:
             # First two calls timeout, third succeeds
             mock_execute.side_effect = [
                 asyncio.TimeoutError(),
@@ -522,9 +518,7 @@ class TestConnectionManagerRetryLogic:
             max_retries=2,
         )
 
-        with patch.object(
-            manager, "_execute_request", new_callable=AsyncMock
-        ) as mock_execute:
+        with patch.object(manager, "_execute_request", new_callable=AsyncMock) as mock_execute:
             # All calls timeout
             mock_execute.side_effect = asyncio.TimeoutError()
 
@@ -551,9 +545,7 @@ class TestConnectionManagerRetryLogic:
             max_retries=2,
         )
 
-        with patch.object(
-            manager, "_execute_request", new_callable=AsyncMock
-        ) as mock_execute:
+        with patch.object(manager, "_execute_request", new_callable=AsyncMock) as mock_execute:
             # First two calls fail, third succeeds
             mock_execute.side_effect = [
                 Exception("Connection failed"),
@@ -584,9 +576,7 @@ class TestConnectionManagerRetryLogic:
             max_retries=2,
         )
 
-        with patch.object(
-            manager, "_execute_request", new_callable=AsyncMock
-        ) as mock_execute:
+        with patch.object(manager, "_execute_request", new_callable=AsyncMock) as mock_execute:
             # All calls fail
             mock_execute.side_effect = Exception("Connection failed")
 
@@ -613,9 +603,7 @@ class TestConnectionManagerRetryLogic:
             max_retries=3,
         )
 
-        with patch.object(
-            manager, "_execute_request", new_callable=AsyncMock
-        ) as mock_execute:
+        with patch.object(manager, "_execute_request", new_callable=AsyncMock) as mock_execute:
             mock_execute.side_effect = Exception("Connection failed")
 
             with patch("asyncio.sleep", new_callable=AsyncMock) as mock_sleep:
@@ -641,9 +629,7 @@ class TestConnectionManagerRetryLogic:
             enabled=True,
         )
 
-        with patch.object(
-            manager, "_execute_request", new_callable=AsyncMock
-        ) as mock_execute:
+        with patch.object(manager, "_execute_request", new_callable=AsyncMock) as mock_execute:
             mock_execute.return_value = {"success": True, "result": {}}
 
             await manager.execute(
@@ -668,9 +654,7 @@ class TestConnectionManagerRetryLogic:
             max_retries=1,
         )
 
-        with patch.object(
-            manager, "_execute_request", new_callable=AsyncMock
-        ) as mock_execute:
+        with patch.object(manager, "_execute_request", new_callable=AsyncMock) as mock_execute:
             mock_execute.side_effect = Exception("Connection failed")
 
             with patch("asyncio.sleep", new_callable=AsyncMock):
@@ -701,9 +685,7 @@ class TestConnectionManagerConcurrentOperations:
             enabled=True,
         )
 
-        with patch.object(
-            manager, "_execute_request", new_callable=AsyncMock
-        ) as mock_execute:
+        with patch.object(manager, "_execute_request", new_callable=AsyncMock) as mock_execute:
             mock_execute.return_value = {"success": True, "result": {}}
 
             # Execute 5 concurrent requests
@@ -741,9 +723,7 @@ class TestConnectionManagerConcurrentOperations:
             enabled=True,
         )
 
-        with patch.object(
-            manager, "_execute_request", new_callable=AsyncMock
-        ) as mock_execute:
+        with patch.object(manager, "_execute_request", new_callable=AsyncMock) as mock_execute:
             mock_execute.return_value = {"success": True, "result": {}}
 
             # Execute concurrent requests to different servers

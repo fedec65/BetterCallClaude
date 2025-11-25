@@ -9,7 +9,7 @@ export interface SearchQuery {
   id: string;
   query_text: string;
   query_type?: string;
-  filters?: Record<string, any>; // Stored as JSON in database
+  filters?: Record<string, unknown>; // Stored as JSON in database
   result_count?: number;
   execution_time_ms?: number;
   user_id?: string;
@@ -218,7 +218,7 @@ export class SearchRepository {
   /**
    * Parse query from database (convert JSON strings to objects)
    */
-  private parseQuery(row: any): SearchQuery {
+  private parseQuery(row: Record<string, unknown>): SearchQuery {
     return {
       ...row,
       filters: row.filters ? JSON.parse(row.filters) : undefined

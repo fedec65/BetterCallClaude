@@ -219,7 +219,7 @@ export class BGERepository {
   /**
    * Parse decision from database (convert JSON strings to objects)
    */
-  private parseDecision(row: any): BGEDecision {
+  private parseDecision(row: Record<string, unknown>): BGEDecision {
     return {
       ...row,
       legal_areas: row.legal_areas ? JSON.parse(row.legal_areas) : undefined

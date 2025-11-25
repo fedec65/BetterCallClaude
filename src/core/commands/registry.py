@@ -121,7 +121,9 @@ class CommandRegistry:
 
         return discovered_count
 
-    async def execute(self, command_name: str, args: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    async def execute(
+        self, command_name: str, args: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
         """
         Execute a registered command
 

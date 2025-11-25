@@ -136,7 +136,7 @@ export class CantonalRepository {
     `;
 
     const searchPattern = `%${query}%`;
-    const values: any[] = [searchPattern, searchPattern, searchPattern];
+    const values: unknown[] = [searchPattern, searchPattern, searchPattern];
 
     if (canton) {
       sql += ` AND canton = ?`;
@@ -154,7 +154,7 @@ export class CantonalRepository {
    */
   async update(id: string, updates: Partial<CantonalDecision>): Promise<void> {
     const fields: string[] = [];
-    const values: any[] = [];
+    const values: unknown[] = [];
 
     if (updates.title !== undefined) {
       fields.push('title = ?');
@@ -232,7 +232,7 @@ export class CantonalRepository {
   /**
    * Parse decision from database (convert JSON strings to objects)
    */
-  private parseDecision(row: any): CantonalDecision {
+  private parseDecision(row: Record<string, unknown>): CantonalDecision {
     return {
       ...row,
       legal_areas: row.legal_areas ? JSON.parse(row.legal_areas) : undefined

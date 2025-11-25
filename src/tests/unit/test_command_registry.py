@@ -262,7 +262,7 @@ class TestCommandRegistry:
                     name="test:another",
                     category=CommandCategory.SYSTEM,
                     description="Another mock command",
-                    help_text="/test:another"
+                    help_text="/test:another",
                 )
                 super().__init__(metadata)
 
@@ -287,13 +287,14 @@ class TestCommandRegistry:
     @pytest.mark.asyncio
     async def test_execute_command_exception_handling(self) -> None:
         """Test execute handles command execution exceptions"""
+
         class FailingCommand(BaseCommand):
             def __init__(self) -> None:
                 metadata = CommandMetadata(
                     name="test:failing",
                     category=CommandCategory.SYSTEM,
                     description="Failing command",
-                    help_text="/test:failing"
+                    help_text="/test:failing",
                 )
                 super().__init__(metadata)
 
