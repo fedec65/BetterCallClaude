@@ -6,7 +6,9 @@
   "workspaces": [
     "mcp-servers/shared",
     "mcp-servers/bge-search",
-    "mcp-servers/entscheidsuche"
+    "mcp-servers/entscheidsuche",
+    "mcp-servers/legal-citations",
+    "packages/agents"
   ],
   "scripts": {
     "build": "npm run build --workspaces",
