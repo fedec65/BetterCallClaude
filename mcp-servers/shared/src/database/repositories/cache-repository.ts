@@ -67,8 +67,8 @@ export class CacheRepository {
       { values: [key] }
     );
 
-    // Parse and return data
-    return JSON.parse(entry.data);
+    // Parse and return data (stored as JSON string in database)
+    return typeof entry.data === 'string' ? JSON.parse(entry.data) : entry.data;
   }
 
   /**
@@ -196,11 +196,14 @@ export class CacheRepository {
 
   /**
    * Parse cache entry from database (convert JSON strings to objects)
+   * Note: data is stored as JSON string in SQLite, needs parsing
    */
-  private parseEntry(row: Record<string, unknown>): CacheEntry {
+  private parseEntry(row: CacheEntry): CacheEntry {
     return {
       ...row,
-      data: row.data ? JSON.parse(row.data) : undefined
+      data: typeof row.data === 'string'
+        ? JSON.parse(row.data)
+        : row.data,
     };
   }
 }

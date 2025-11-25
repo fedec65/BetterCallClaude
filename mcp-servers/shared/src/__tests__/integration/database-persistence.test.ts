@@ -8,7 +8,7 @@
  * - Database recovery
  */
 
-import { DatabaseClient, DatabaseConfig } from '../../../../database/client';
+import { DatabaseClient, DatabaseConfig } from '../../database/client';
 import { BGERepository, BGEDecision } from '../../database/repositories/bge-repository';
 import { CacheRepository } from '../../database/repositories/cache-repository';
 import { randomUUID } from 'crypto';

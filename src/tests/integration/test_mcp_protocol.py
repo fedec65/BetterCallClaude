@@ -12,9 +12,9 @@ These tests verify that the MCPClient can:
 
 import asyncio
 import json
+from typing import Any
 from unittest.mock import MagicMock, patch
 
-from typing import Any, Callable
 import pytest
 
 from src.core.mcp.protocol import MCPClient, MCPInvocationError, MCPProtocolError, MCPServerInfo

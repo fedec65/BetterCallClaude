@@ -2,7 +2,7 @@
  * BGE Repository Tests
  */
 
-import { DatabaseClient, DatabaseConfig } from '../../../../database/client';
+import { DatabaseClient, DatabaseConfig } from '../../../database/client';
 import { BGERepository, BGEDecision } from '../../../database/repositories/bge-repository';
 import { randomUUID } from 'crypto';
 

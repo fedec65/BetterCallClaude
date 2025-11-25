@@ -6,6 +6,7 @@ Tests the CommandRegistry, BaseCommand, and command discovery functionality.
 
 
 from typing import Any, Dict
+
 import pytest
 
 from src.core.commands import (
@@ -335,6 +336,7 @@ class TestCommandRegistry:
     def test_discover_commands_skips_special_modules(self) -> None:
         """Test discover_commands skips base and registry modules"""
         from pathlib import Path
+
         from src.core.commands import registry as reg_module
 
         registry = CommandRegistry()
@@ -350,9 +352,8 @@ class TestCommandRegistry:
 
     def test_discover_commands_handles_import_errors(self) -> None:
         """Test discover_commands handles module import failures gracefully"""
-        from pathlib import Path
         import tempfile
-        import os
+        from pathlib import Path
 
         # Create temporary directory with invalid Python file
         with tempfile.TemporaryDirectory() as tmpdir:

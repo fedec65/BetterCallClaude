@@ -231,11 +231,14 @@ export class CantonalRepository {
 
   /**
    * Parse decision from database (convert JSON strings to objects)
+   * Note: legal_areas is stored as JSON string in SQLite, needs parsing
    */
-  private parseDecision(row: Record<string, unknown>): CantonalDecision {
+  private parseDecision(row: CantonalDecision): CantonalDecision {
     return {
       ...row,
-      legal_areas: row.legal_areas ? JSON.parse(row.legal_areas) : undefined
+      legal_areas: typeof row.legal_areas === 'string'
+        ? JSON.parse(row.legal_areas) as string[]
+        : row.legal_areas,
     };
   }
 }

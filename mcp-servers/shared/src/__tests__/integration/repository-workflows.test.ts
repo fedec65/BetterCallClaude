@@ -4,7 +4,7 @@
  * Tests complete CRUD cycles, cross-repository operations, and real-world scenarios
  */
 
-import { DatabaseClient, DatabaseConfig } from '../../../../database/client';
+import { DatabaseClient, DatabaseConfig } from '../../database/client';
 import { BGERepository, BGEDecision } from '../../database/repositories/bge-repository';
 import { CantonalRepository, CantonalDecision } from '../../database/repositories/cantonal-repository';
 import { CacheRepository } from '../../database/repositories/cache-repository';

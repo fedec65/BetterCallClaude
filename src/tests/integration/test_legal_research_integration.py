@@ -9,9 +9,9 @@ ConnectionManager to MCP adapters. Verifies:
 - Result formatting and metadata
 """
 
+from typing import Any, Dict
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from typing import Any, Dict
 import pytest
 
 from src.core.commands.legal_research import LegalResearchCommand

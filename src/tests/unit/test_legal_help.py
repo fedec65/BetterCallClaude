@@ -9,7 +9,6 @@ Tests the LegalHelpCommand functionality including:
 - Verbose mode
 """
 
-from typing import Any, Dict
 import pytest
 
 from src.core.commands.legal_help import LegalHelpCommand

@@ -2,7 +2,7 @@
  * Cache Repository Tests
  */
 
-import { DatabaseClient, DatabaseConfig } from '../../../../database/client';
+import { DatabaseClient, DatabaseConfig } from '../../../database/client';
 import { CacheRepository } from '../../../database/repositories/cache-repository';
 
 describe('CacheRepository', () => {

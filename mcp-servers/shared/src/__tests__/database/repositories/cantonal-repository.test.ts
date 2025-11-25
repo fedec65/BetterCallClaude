@@ -2,7 +2,7 @@
  * Cantonal Repository Tests
  */
 
-import { DatabaseClient, DatabaseConfig } from '../../../../database/client';
+import { DatabaseClient, DatabaseConfig } from '../../../database/client';
 import { CantonalRepository, CantonalDecision } from '../../../database/repositories/cantonal-repository';
 import { randomUUID } from 'crypto';
 

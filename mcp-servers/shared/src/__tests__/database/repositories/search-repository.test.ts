@@ -2,7 +2,7 @@
  * Search Repository Tests
  */
 
-import { DatabaseClient, DatabaseConfig } from '../../../../database/client';
+import { DatabaseClient, DatabaseConfig } from '../../../database/client';
 import { SearchRepository, SearchQuery } from '../../../database/repositories/search-repository';
 import { randomUUID } from 'crypto';
 

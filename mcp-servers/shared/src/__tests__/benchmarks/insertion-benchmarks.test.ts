@@ -8,7 +8,7 @@
  * - Cache write performance
  */
 
-import { DatabaseClient, DatabaseConfig } from '../../../../database/client';
+import { DatabaseClient, DatabaseConfig } from '../../database/client';
 import { BGERepository } from '../../database/repositories/bge-repository';
 import { CantonalRepository } from '../../database/repositories/cantonal-repository';
 import { CacheRepository } from '../../database/repositories/cache-repository';

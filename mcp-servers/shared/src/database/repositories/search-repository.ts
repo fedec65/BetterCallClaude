@@ -217,11 +217,14 @@ export class SearchRepository {
 
   /**
    * Parse query from database (convert JSON strings to objects)
+   * Note: filters is stored as JSON string in SQLite, needs parsing
    */
-  private parseQuery(row: Record<string, unknown>): SearchQuery {
+  private parseQuery(row: SearchQuery): SearchQuery {
     return {
       ...row,
-      filters: row.filters ? JSON.parse(row.filters) : undefined
+      filters: typeof row.filters === 'string'
+        ? JSON.parse(row.filters) as Record<string, unknown>
+        : row.filters,
     };
   }
 }

@@ -7,8 +7,8 @@ Tests the SQLite-based citation caching functionality.
 import os
 import tempfile
 from pathlib import Path
-
 from typing import Generator
+
 import pytest
 
 from src.core.cache import CitationCache

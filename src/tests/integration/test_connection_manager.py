@@ -12,15 +12,12 @@ Tests the MCP connection manager functionality including:
 
 import asyncio
 from datetime import datetime
-from pathlib import Path
-from typing import Any, Dict
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
 from src.core.mcp.connection_manager import (
     MCPConnectionManager,
-    ServerConfig,
     ServerHealth,
     ServerStatus,
 )
@@ -172,7 +169,7 @@ class TestConnectionManagerServerManagement:
 
         assert result is True
         assert "test_server" not in manager._health_check_tasks
-        assert task.cancel.called
+        assert task.cancel.called  # type: ignore[attr-defined]
 
     def test_unregister_nonexistent_server_returns_false(self) -> None:
         """Test unregistering non-existent server returns False"""
