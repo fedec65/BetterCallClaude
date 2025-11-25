@@ -36,6 +36,12 @@ BetterCallClaude is a comprehensive legal intelligence framework that provides S
 - **entscheidsuche**: Swiss court decision search (bundesgericht.ch + cantonal courts)
 - **legal-citations**: Citation extraction, verification, and formatting
 
+✅ **Agent Framework** (NEW in v1.0)
+- **ResearcherAgent**: Autonomous Swiss legal research with MCP integration
+- **CaseManager**: Complete case lifecycle management with findings tracking
+- **IntegratedResearchSystem**: Case-bound research orchestration
+- **Graceful Error Handling**: Resilient research even when sources are unavailable
+
 ---
 
 ## 📋 Table of Contents
@@ -283,6 +289,68 @@ Search across Swiss legal sources including BGE precedents, federal statutes, an
 
 ---
 
+#### `/agent:researcher` - Autonomous Legal Research Agent
+
+Execute autonomous research using the ResearcherAgent with MCP server integration.
+
+**Syntax:**
+```
+/agent:researcher <query> [--depth=<level>] [--focus=<area>] [--canton=<code>] [--language=<lang>]
+```
+
+**Arguments:**
+- `query` (required): Research question or legal topic
+- `--depth` (optional): Research depth level
+  - `quick` - Fast overview (1-2 sources)
+  - `standard` - Balanced research (default, 3-5 sources)
+  - `deep` - Comprehensive analysis (all sources)
+- `--focus` (optional): Focus area
+  - `case_law` - Court decisions and precedents
+  - `legislation` - Statutes and regulations
+  - `doctrine` - Legal commentary and scholarship
+  - `all` - All sources (default)
+- `--canton` (optional): Canton filter (ZH, BE, GE, BS, VD, TI)
+- `--language` (optional): Output language (DE, FR, IT, EN)
+
+**Examples:**
+```bash
+# Quick research on contract liability
+/agent:researcher "Art. 97 OR liability requirements" --depth=quick
+
+# Deep cantonal research
+/agent:researcher "rental law eviction" --canton=ZH --depth=deep
+
+# Case law focus with language preference
+/agent:researcher "BGE on product liability" --focus=case_law --language=DE
+
+# Comprehensive multi-source research
+/agent:researcher "prescription periods for contractual claims" --depth=deep --focus=all
+```
+
+**Agent Features:**
+- ✅ **Autonomous Execution** - Agent manages full research workflow
+- ✅ **MCP Integration** - Queries entscheidsuche + legal-citations servers
+- ✅ **Graceful Error Handling** - Continues with available sources if some fail
+- ✅ **Confidence Scoring** - Each finding includes confidence level
+- ✅ **Citation Extraction** - Automatic BGE/ATF reference extraction
+- ✅ **Research Memo** - Structured output with findings and recommendations
+
+**Output Structure:**
+```
+📋 Research Memo
+├── Query: [original research question]
+├── Depth: [quick|standard|deep]
+├── Sources Consulted: [list of MCP servers used]
+├── Findings:
+│   ├── Finding 1: [issue, conclusion, confidence, citations]
+│   ├── Finding 2: [issue, conclusion, confidence, citations]
+│   └── ...
+├── Recommendations: [actionable next steps]
+└── Execution Time: [duration in ms]
+```
+
+---
+
 ## 💡 Usage Examples
 
 ### Federal Law Analysis
@@ -365,7 +433,19 @@ BetterCallClaude/
 │   ├── SWISS_LAW_CONFIG.md    # Jurisdiction routing
 │   ├── personas/              # Legal expert personas
 │   ├── modes/                 # Swiss law operation modes
-│   └── mcp/                   # MCP server documentation
+│   ├── mcp/                   # MCP server documentation
+│   └── commands/              # Slash commands
+│       └── agent-researcher.md # /agent:researcher command
+│
+├── packages/                   # TypeScript packages
+│   └── agents/                # Agent Framework (NEW)
+│       ├── src/
+│       │   ├── base.ts        # AgentBase with checkpoints
+│       │   ├── researcher.ts  # ResearcherAgent
+│       │   ├── case-manager.ts # CaseManager
+│       │   ├── mcp-adapter.ts # MCP integration
+│       │   └── integration.ts # IntegratedResearchSystem
+│       └── __tests__/         # 139 tests
 │
 ├── mcp-servers/               # Custom MCP implementations
 │   ├── entscheidsuche/       # Court decision search
@@ -374,6 +454,8 @@ BetterCallClaude/
 │
 ├── version-manager/           # Version control system
 └── docs/                      # Documentation
+    ├── AGENT_ARCHITECTURE.md  # Agent framework design
+    └── AGENT_RESEARCHER_SPEC.md # ResearcherAgent specification
 ```
 
 ### Core Components
@@ -391,6 +473,13 @@ BetterCallClaude/
 **MCP Servers**:
 - **entscheidsuche** - Swiss court decision search
 - **legal-citations** - Citation extraction and verification
+
+**Agent Framework** (`@bettercallclaude/agents`):
+- **AgentBase** - Checkpoint management, audit logging, autonomy modes
+- **ResearcherAgent** - Autonomous Swiss law research with MCP integration
+- **CaseManager** - Case lifecycle (create, open, close, archive)
+- **MCPAdapter** - Unified interface to MCP servers
+- **IntegratedResearchSystem** - Case-bound research orchestration
 
 ---
 
