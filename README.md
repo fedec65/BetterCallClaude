@@ -183,6 +183,106 @@ The **Legal Drafter** persona will:
 
 ---
 
+## 🔧 Command Reference
+
+BetterCallClaude provides specialized `/legal` commands for direct access to Swiss legal intelligence features.
+
+### Available Commands
+
+#### `/legal:help` - Display Command Help
+
+Show available commands and usage information with optional filtering by category.
+
+**Syntax:**
+```
+/legal:help [--category=<cat>] [--command=<name>] [--verbose]
+```
+
+**Arguments:**
+- `--category` (optional): Filter by command category
+  - `research` - Legal research commands
+  - `drafting` - Document drafting commands
+  - `analysis` - Legal analysis commands
+  - `case_strategy` - Case strategy commands
+  - `compliance` - Compliance-related commands
+  - `document` - Document management commands
+  - `swiss_law` - Swiss law specific commands
+  - `system` - System and utility commands
+- `--command` (optional): Show detailed help for specific command
+- `--verbose` (optional): Display extended help information
+
+**Examples:**
+```bash
+# Show all available commands
+/legal:help
+
+# Show only research commands
+/legal:help --category=research
+
+# Show detailed help for specific command
+/legal:help --command=legal:research
+
+# Show verbose help for all commands
+/legal:help --verbose
+```
+
+---
+
+#### `/legal:research` - Search Swiss Legal Sources
+
+Search across Swiss legal sources including BGE precedents, federal statutes, and cantonal law.
+
+**Syntax:**
+```
+/legal:research <query> [--jurisdiction=<jur>] [--date-from=<YYYY-MM-DD>] [--date-to=<YYYY-MM-DD>] [--limit=<n>]
+```
+
+**Arguments:**
+- `query` (required): Search query (legal topic, citation, or keywords)
+- `--jurisdiction` (optional): Jurisdiction filter
+  - `federal` - Federal law and BGE decisions only
+  - `all` - All jurisdictions (default)
+  - Canton codes: `ZH`, `BE`, `GE`, `BS`, `VD`, `TI`
+- `--date-from` (optional): Start date filter (YYYY-MM-DD format)
+- `--date-to` (optional): End date filter (YYYY-MM-DD format)
+- `--limit` (optional): Maximum number of results (default: 10)
+
+**Data Sources:**
+- **BGE** (Bundesgerichtsentscheide) - Federal Supreme Court decisions
+- **Federal Statutes** (SR - Systematische Rechtssammlung)
+- **Cantonal Law** - Canton-specific regulations and decisions
+- **Lower Court Decisions** - Cantonal and district court rulings
+
+**Examples:**
+```bash
+# Basic research query
+/legal:research "liability for defective products"
+
+# Search for specific BGE citation
+/legal:research "BGE 147 V 321" --jurisdiction=federal
+
+# Search cantonal law with date filter
+/legal:research "rental law" --jurisdiction=ZH --date-from=2020-01-01
+
+# Comprehensive search with all filters
+/legal:research "contract liability" --jurisdiction=all --date-from=2018-01-01 --date-to=2024-12-31 --limit=20
+
+# Multi-lingual research (German)
+/legal:research "Verjährung von Forderungen"
+
+# Multi-lingual research (French)
+/legal:research "prescription des créances"
+```
+
+**Activated Features:**
+- ✅ **Legal Researcher Persona** - Automatic activation for precedent analysis
+- ✅ **Swiss Law Expert Persona** - Jurisdiction-specific expertise
+- ✅ **MCP Servers** - BGE Search, Entscheidsuche, Cantonal Courts integration
+- ✅ **Multi-Lingual Processing** - DE/FR/IT/EN support with terminology precision
+- ✅ **Citation Verification** - Automatic verification of legal references
+
+---
+
 ## 💡 Usage Examples
 
 ### Federal Law Analysis
@@ -565,8 +665,8 @@ Special thanks to beta testers from Swiss law firms for their valuable feedback.
 ### Documentation & Resources
 
 - **Documentation**: [docs/](docs/)
-- **GitHub Issues**: [Report bugs and feature requests](https://github.com/yourusername/bettercallclaude/issues)
-- **Discussions**: [Community Q&A and best practices](https://github.com/yourusername/bettercallclaude/discussions)
+- **GitHub Issues**: [Report bugs and feature requests](mailto:federico@cesconi.com)
+- **Discussions**: Community Q&A and best practices *(coming soon)*
 
 ### Community
 
@@ -575,8 +675,8 @@ Special thanks to beta testers from Swiss law firms for their valuable feedback.
 
 ### Contact
 
-- **Project Maintainer**: [Your Name](mailto:your.email@example.com)
-- **Website**: [https://bettercallclaude.ai](https://bettercallclaude.ai) *(coming soon)*
+- **Project Maintainer**: Federico Cesconi
+- **Website**: [https://cesconi.com](https://cesconi.com)
 
 ---
 
