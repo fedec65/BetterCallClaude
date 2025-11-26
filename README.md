@@ -2,7 +2,7 @@
 
 **Legal Intelligence Framework for Swiss Lawyers**
 
-[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/fedec65/bettercallclaude)
+[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](https://github.com/fedec65/bettercallclaude)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Languages](https://img.shields.io/badge/languages-DE%20%7C%20FR%20%7C%20IT%20%7C%20EN-orange.svg)]()
 [![Claude Code](https://img.shields.io/badge/built%20with-Claude%20Code-purple.svg)](https://claude.ai/code)
@@ -22,19 +22,19 @@ BetterCallClaude is a comprehensive legal intelligence framework that provides S
 - **Multi-jurisdictional expertise** across federal and cantonal Swiss law (ZH, BE, GE, BS, VD, TI)
 - **Multi-lingual precision** in legal terminology and reasoning (DE, FR, IT, EN)
 
-### What's New in v1.1.0
+### What's New in v1.2.0
 
-🆕 **Agent Framework** - Autonomous legal research with intelligent orchestration
+🆕 **StrategistAgent** - Litigation strategy development with risk assessment and settlement analysis
 
-🆕 **Case Manager** - Complete case lifecycle management with findings tracking
+🆕 **DrafterAgent** - Document generation with Swiss legal standards and multi-lingual support
 
-🆕 **Database Layer** - SQLite-based persistence for BGE decisions and caching
+🆕 **AgentOrchestrator** - Multi-agent pipeline coordination with checkpoint management
 
-🆕 **MCP Integration** - Production-ready MCP servers for Swiss legal sources
+🆕 **Multi-Lingual Utilities** - Language detection and legal terminology mapping for DE/FR/IT/EN
 
-🆕 **Dual-Language Support** - Python and TypeScript implementations
+🆕 **Enhanced Type Safety** - Full mypy strict compliance across all agents
 
-🆕 **Comprehensive Testing** - 267+ tests with >73% coverage
+🆕 **93+ Agent Tests** - Comprehensive test coverage for the agent framework
 
 ---
 
@@ -75,15 +75,16 @@ BetterCallClaude is a comprehensive legal intelligence framework that provides S
 | **Cantonal Law** | ZH, BE, GE, BS, VD, TI | Canton-specific routing, local regulations |
 | **Multi-Lingual** | DE, FR, IT, EN | Terminology consistency, citation format adaptation |
 
-### Agent Framework (NEW)
+### Agent Framework
 
 | Agent | Purpose | Status |
 |-------|---------|--------|
 | **ResearcherAgent** | Autonomous Swiss legal research with MCP integration | ✅ Implemented |
+| **StrategistAgent** | Litigation strategy with risk assessment and settlement analysis | ✅ Implemented |
+| **DrafterAgent** | Document generation with Swiss legal standards | ✅ Implemented |
+| **AgentOrchestrator** | Multi-agent pipeline coordination with checkpoints | ✅ Implemented |
 | **CaseManager** | Case lifecycle management with findings tracking | ✅ Implemented |
 | **IntegratedResearchSystem** | Case-bound research orchestration | ✅ Implemented |
-| **StrategistAgent** | Litigation strategy development | 🔜 Planned |
-| **DrafterAgent** | Document generation | 🔜 Planned |
 
 ### MCP Servers
 
@@ -493,7 +494,14 @@ BetterCallClaude/
 ├── src/                        # Python source code
 │   ├── agents/                # Agent Framework
 │   │   ├── base.py           # AgentBase with checkpoints
-│   │   └── researcher.py     # ResearcherAgent
+│   │   ├── researcher.py     # ResearcherAgent
+│   │   ├── strategist.py     # StrategistAgent with risk assessment
+│   │   ├── drafter.py        # DrafterAgent for document generation
+│   │   ├── orchestrator.py   # AgentOrchestrator for multi-agent pipelines
+│   │   ├── models/           # Shared data models
+│   │   │   └── shared.py     # Language, CaseFacts, Strategy models
+│   │   └── utils/            # Agent utilities
+│   │       └── language.py   # Language detection and terminology
 │   ├── core/                  # Core framework components
 │   ├── framework/             # Framework utilities
 │   ├── tests/                 # Python tests
@@ -536,9 +544,9 @@ BetterCallClaude/
 │  GRANULAR COMMANDS              DELEGATION AGENTS               │
 │  ─────────────────              ─────────────────               │
 │  /legal:search-bge              /agent:researcher               │
-│  /legal:cite-check              /agent:strategist (planned)     │
-│  /legal:translate               /agent:drafter (planned)        │
-│  /legal:format                  /agent:litigator (planned)      │
+│  /legal:cite-check              /agent:strategist               │
+│  /legal:translate               /agent:drafter                  │
+│  /legal:format                  /agent:orchestrator             │
 │                                                                 │
 │  → Single action                → Multi-step workflow           │
 │  → Immediate result             → Progress updates              │
@@ -604,7 +612,7 @@ Create `~/.betterask/config.yaml` for personalized settings:
 
 ```yaml
 # Framework version
-version: "1.1.0"
+version: "1.2.0"
 
 # Privacy mode
 privacy_mode: balanced  # strict | balanced | cloud
@@ -761,7 +769,16 @@ python -m build
 
 ## 🎯 Roadmap
 
-### v1.1.0 (Current) - Agent Framework ✅
+### v1.2.0 (Current) - Agent Expansion ✅
+
+- ✅ StrategistAgent with risk assessment and settlement analysis
+- ✅ DrafterAgent with Swiss legal document generation
+- ✅ AgentOrchestrator for multi-agent pipeline coordination
+- ✅ Multi-lingual utilities (language detection, terminology mapping)
+- ✅ Enhanced type safety with mypy strict compliance
+- ✅ 93+ agent framework tests
+
+### v1.1.0 - Agent Framework ✅
 
 - ✅ Agent base class with checkpoints and audit logging
 - ✅ ResearcherAgent with MCP integration
@@ -770,22 +787,16 @@ python -m build
 - ✅ 267+ tests with >73% coverage
 - ✅ Python 3.11/3.12 support
 
-### v1.2 (Q1 2025) - Expansion
+### v1.3 (Q1 2025) - Enhancement
 
 - 🔜 All 26 Swiss cantons
-- 🔜 StrategistAgent implementation
-- 🔜 DrafterAgent implementation
 - 🔜 Ollama integration (local LLM support)
 - 🔜 Commercial database integrations (Swisslex, Weblaw)
-
-### v1.3 (Q2 2025) - Enhancement
-
 - 🔜 Automated legal research reports
 - 🔜 Practice management integrations
-- 🔜 Enhanced multi-lingual capabilities
 - 🔜 Citation network analysis
 
-### v2.0 (Q3 2025) - International
+### v2.0 (Q2 2025) - International
 
 - 🔜 European law integration (EU regulations, ECHR)
 - 🔜 Cross-border legal analysis
@@ -817,10 +828,10 @@ We welcome contributions from the Swiss legal community and developers!
 ### Priority Areas
 
 - **Additional Cantons**: Expand to all 26 Swiss cantons
-- **Agent Development**: StrategistAgent and DrafterAgent
 - **Commercial Databases**: Swisslex, Weblaw integrations
 - **Local LLM**: Ollama integration for privacy mode
 - **Workflow Examples**: Real-world case studies
+- **Agent Enhancements**: Pipeline improvements and new agent types
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
@@ -876,4 +887,4 @@ Special thanks to beta testers from Swiss law firms for their valuable feedback.
 
 **Built for the Swiss legal community with precision, quality, and multi-lingual excellence.**
 
-*BetterCallClaude v1.1.0 - Legal Intelligence Framework*
+*BetterCallClaude v1.2.0 - Legal Intelligence Framework*
