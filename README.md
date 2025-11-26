@@ -57,7 +57,7 @@ BetterCallClaude is a comprehensive legal intelligence framework that provides S
 
 ---
 
-## ✨ Features
+## Features
 
 ### Three Expert Legal Personas
 
@@ -96,7 +96,7 @@ BetterCallClaude is a comprehensive legal intelligence framework that provides S
 
 ---
 
-## 🔧 Requirements
+## Requirements
 
 ### System Requirements
 
@@ -117,7 +117,7 @@ BetterCallClaude is a comprehensive legal intelligence framework that provides S
 
 ---
 
-## 📦 Installation
+## Installation
 
 ### Step 1: Clone the Repository
 
@@ -189,7 +189,7 @@ You should see:
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Method 1: Natural Language (Auto-Detection)
 
@@ -234,7 +234,7 @@ Use `/agent:` commands for autonomous research workflows.
 
 ---
 
-## 🔧 Command Reference
+## Command Reference
 
 ### Legal Commands
 
@@ -284,7 +284,7 @@ Use `/agent:` commands for autonomous research workflows.
 
 ---
 
-## 🤖 Agent Framework
+## Agent Framework
 
 The Agent Framework provides autonomous legal research capabilities with intelligent orchestration.
 
@@ -396,7 +396,7 @@ case_export = case_manager.export_case(case.case_id)
 
 ---
 
-## 🔌 MCP Servers
+## MCP Servers
 
 ### Overview
 
@@ -470,7 +470,7 @@ The shared database layer provides:
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ### Project Structure
 
@@ -557,7 +557,7 @@ BetterCallClaude/
 
 ---
 
-## 🌍 Multi-Lingual Support
+## Multi-Lingual Support
 
 BetterCallClaude natively supports all Swiss official languages plus English.
 
@@ -596,7 +596,7 @@ BetterCallClaude natively supports all Swiss official languages plus English.
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
 ### User Configuration
 
@@ -662,7 +662,7 @@ checkpoint_interval: 1800  # 30 minutes
 
 ---
 
-## 🛠️ Development
+## Development
 
 ### Setting Up Development Environment
 
@@ -728,7 +728,7 @@ python -m build
 
 ---
 
-## 📚 Documentation
+## Documentation
 
 ### Getting Started Guides
 
@@ -793,7 +793,7 @@ python -m build
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions from the Swiss legal community and developers!
 
@@ -840,7 +840,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
 
