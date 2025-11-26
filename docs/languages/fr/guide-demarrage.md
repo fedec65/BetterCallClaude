@@ -84,13 +84,19 @@ cd legal-citations && npm install && npm run build && cd ..
 cd bge-search && npm install && npm run build && cd ..
 ```
 
-### Étape 4: Configurer les clés API
+### Étape 4: Configurer les clés API (Optionnel)
 
-Créez un fichier `.env` à la racine du projet:
+> **Note**: Lors de l'utilisation de BetterCallClaude via Claude Code CLI, aucune clé API n'est requise pour les fonctionnalités de base. Claude Code gère l'authentification automatiquement. Les clés optionnelles ci-dessous activent des fonctionnalités avancées.
+
+Créez un fichier `.env` à la racine du projet uniquement si vous avez besoin des fonctionnalités optionnelles:
 
 ```bash
+# Optionnel - Pour les capacités de recherche web améliorées
+TAVILY_API_KEY=votre_cle_tavily
+
+# Optionnel - Pour une utilisation avancée/autonome
+# Nécessaire uniquement si vous exécutez des composants Python en dehors de Claude Code
 ANTHROPIC_API_KEY=votre_cle_api
-TAVILY_API_KEY=votre_cle_tavily  # Optionnel pour la recherche web
 ```
 
 ### Étape 5: Vérifier l'installation

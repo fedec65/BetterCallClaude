@@ -152,16 +152,21 @@ npm run build
 cd ..
 ```
 
-### Step 5: Configure API Keys
+### Step 5: Configure API Keys (Optional)
 
-Create a `.env` file in the project root:
+> **Note**: When using BetterCallClaude through Claude Code CLI, no API keys are required for basic functionality. Claude Code handles authentication automatically. The optional keys below enable advanced features.
+
+Create a `.env` file in the project root only if you need the optional features:
 
 ```bash
-# Required
-ANTHROPIC_API_KEY=your_anthropic_api_key_here
-
-# Optional (for enhanced research)
+# Optional - For enhanced web research capabilities
+# Required only if using Tavily-powered research features
 TAVILY_API_KEY=your_tavily_api_key_here
+
+# Optional - For advanced/standalone usage
+# Only needed if running Python components outside of Claude Code
+# or for future extensibility features
+ANTHROPIC_API_KEY=your_anthropic_api_key_here
 ```
 
 ### Step 6: Verify Installation
