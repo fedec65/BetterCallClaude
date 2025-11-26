@@ -10,7 +10,7 @@
     "watch": "tsc --watch",
     "dev": "tsx watch src/index.ts",
     "lint": "echo 'No linting configured for legal-citations'",
-    "test": "vitest",
+    "test": "vitest --run",
     "test:coverage": "vitest --coverage"
   },
   "keywords": [
