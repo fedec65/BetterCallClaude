@@ -6,34 +6,30 @@ for StrategistAgent, DrafterAgent, and Orchestrator testing.
 """
 
 import pytest
-from datetime import datetime
-from typing import Dict, Any
 
-from src.agents.models.shared import (
-    Language,
-    Jurisdiction,
-    RiskLevel,
-    LegalParty,
-    CaseFacts,
-)
-from src.agents.models.strategist import (
-    StrategyType,
-    SuccessProbability,
-    RiskAssessment,
-    CostEstimate,
-    OpponentProfile,
-    StrategyRecommendation,
-)
+from src.agents.base import AutonomyMode, CaseContext
 from src.agents.models.drafter import (
-    DocumentType,
-    DocumentSectionType,
+    Citation,
     DocumentMetadata,
     DocumentSection,
-    Citation,
+    DocumentType,
     LegalDocument,
 )
-from src.agents.base import AutonomyMode, CaseContext
-
+from src.agents.models.shared import (
+    CaseFacts,
+    Jurisdiction,
+    Language,
+    LegalParty,
+    RiskLevel,
+)
+from src.agents.models.strategist import (
+    CostEstimate,
+    OpponentProfile,
+    RiskAssessment,
+    StrategyRecommendation,
+    StrategyType,
+    SuccessProbability,
+)
 
 # =============================================================================
 # Language Fixtures

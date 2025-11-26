@@ -5,18 +5,16 @@ Tests DocumentType, DocumentSectionType, DocumentMetadata, DocumentSection,
 Citation, and LegalDocument classes.
 """
 
-import pytest
-from datetime import datetime
 
-from src.agents.models.shared import Language, Jurisdiction, LegalParty
 from src.agents.models.drafter import (
-    DocumentType,
-    DocumentSectionType,
+    Citation,
     DocumentMetadata,
     DocumentSection,
-    Citation,
+    DocumentSectionType,
+    DocumentType,
     LegalDocument,
 )
+from src.agents.models.shared import Jurisdiction, Language
 
 
 class TestDocumentType:

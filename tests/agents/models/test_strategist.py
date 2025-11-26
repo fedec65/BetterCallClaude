@@ -6,16 +6,15 @@ OpponentProfile, and StrategyRecommendation classes.
 """
 
 import pytest
-from datetime import datetime
 
-from src.agents.models.shared import Language, Jurisdiction, RiskLevel
+from src.agents.models.shared import Language, RiskLevel
 from src.agents.models.strategist import (
-    StrategyType,
-    SuccessProbability,
-    RiskAssessment,
     CostEstimate,
     OpponentProfile,
+    RiskAssessment,
     StrategyRecommendation,
+    StrategyType,
+    SuccessProbability,
 )
 
 
@@ -271,9 +270,7 @@ class TestStrategyRecommendation:
         assert len(rec.recommended_actions) > 0
         assert len(rec.alternative_strategies) > 0
 
-    def test_requires_checkpoint_aggressive(
-        self, sample_risk_assessment, sample_cost_estimate
-    ):
+    def test_requires_checkpoint_aggressive(self, sample_risk_assessment, sample_cost_estimate):
         """Test checkpoint requirement for aggressive strategy."""
         rec = StrategyRecommendation(
             strategy_type=StrategyType.AGGRESSIVE,

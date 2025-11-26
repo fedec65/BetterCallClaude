@@ -5,14 +5,13 @@ Tests Language, RiskLevel, Jurisdiction, LegalParty, and CaseFacts classes.
 """
 
 import pytest
-from datetime import datetime
 
 from src.agents.models.shared import (
-    Language,
-    RiskLevel,
-    Jurisdiction,
-    LegalParty,
     CaseFacts,
+    Jurisdiction,
+    Language,
+    LegalParty,
+    RiskLevel,
 )
 
 
