@@ -25,10 +25,15 @@ BetterCallClaude is a comprehensive legal intelligence framework that provides S
 ### What's New in v1.1.0
 
 🆕 **Agent Framework** - Autonomous legal research with intelligent orchestration
+
 🆕 **Case Manager** - Complete case lifecycle management with findings tracking
+
 🆕 **Database Layer** - SQLite-based persistence for BGE decisions and caching
+
 🆕 **MCP Integration** - Production-ready MCP servers for Swiss legal sources
+
 🆕 **Dual-Language Support** - Python and TypeScript implementations
+
 🆕 **Comprehensive Testing** - 267+ tests with >73% coverage
 
 ---
