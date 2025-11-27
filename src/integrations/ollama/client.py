@@ -38,26 +38,26 @@ class OllamaModel(Enum):
     @property
     def recommended_for(self) -> str:
         """Get recommended use case for this model."""
-        recommendations = {
-            self.LLAMA3_70B: "Complex legal analysis, document review, strategic reasoning",
-            self.LLAMA3_8B: "General tasks, quick responses, Swiss German processing",
-            self.MIXTRAL: "Balanced quality/speed, multilingual support",
-            self.PHI3: "Simple tasks, fast responses, low resource usage",
-            self.LLAMA3_2_3B: "Mobile/edge deployment, basic queries",
-            self.CODELLAMA: "Code generation, technical documentation",
+        recommendations: dict["OllamaModel", str] = {
+            OllamaModel.LLAMA3_70B: "Complex legal analysis, document review, strategic reasoning",
+            OllamaModel.LLAMA3_8B: "General tasks, quick responses, Swiss German processing",
+            OllamaModel.MIXTRAL: "Balanced quality/speed, multilingual support",
+            OllamaModel.PHI3: "Simple tasks, fast responses, low resource usage",
+            OllamaModel.LLAMA3_2_3B: "Mobile/edge deployment, basic queries",
+            OllamaModel.CODELLAMA: "Code generation, technical documentation",
         }
         return recommendations.get(self, "General purpose")
 
     @property
     def context_length(self) -> int:
         """Return approximate context window size."""
-        context_sizes = {
-            self.LLAMA3_70B: 128000,
-            self.LLAMA3_8B: 128000,
-            self.MIXTRAL: 32000,
-            self.PHI3: 4096,
-            self.LLAMA3_2_3B: 128000,
-            self.CODELLAMA: 16000,
+        context_sizes: dict["OllamaModel", int] = {
+            OllamaModel.LLAMA3_70B: 128000,
+            OllamaModel.LLAMA3_8B: 128000,
+            OllamaModel.MIXTRAL: 32000,
+            OllamaModel.PHI3: 4096,
+            OllamaModel.LLAMA3_2_3B: 128000,
+            OllamaModel.CODELLAMA: 16000,
         }
         return context_sizes.get(self, 4096)
 
@@ -498,8 +498,9 @@ class OllamaClient:
                 f"Ollama API error: {response.status_code} - {response.text}"
             )
 
-        data = response.json()
-        return data.get("embedding", [])
+        data: dict[str, Any] = response.json()
+        embedding: List[float] = data.get("embedding", [])
+        return embedding
 
     def select_model_for_task(
         self,
