@@ -665,18 +665,61 @@ auto_save: true
 checkpoint_interval: 1800  # 30 minutes
 ```
 
-### Supported Cantons
+### Supported Cantons (All 26)
 
-| Code | Canton | Language | Court System |
-|------|--------|----------|--------------|
-| ZH | Zürich | DE | Commercial law hub |
-| BE | Bern | DE/FR | Bilingual, capital |
-| GE | Genève | FR | International law |
-| BS | Basel-Stadt | DE | Pharmaceutical law |
-| VD | Vaud | FR | Western Switzerland |
-| TI | Ticino | IT | Southern Switzerland |
+All Swiss cantons are fully supported with their official languages and court systems.
 
-*Full 26-canton support coming in v1.2*
+#### German-Speaking Cantons (Deutschschweiz)
+
+| Code | Canton | Language | Highest Court |
+|------|--------|----------|---------------|
+| ZH | Zürich | DE | Obergericht des Kantons Zürich |
+| LU | Luzern | DE | Kantonsgericht Luzern |
+| UR | Uri | DE | Obergericht des Kantons Uri |
+| SZ | Schwyz | DE | Kantonsgericht Schwyz |
+| OW | Obwalden | DE | Obergericht des Kantons Obwalden |
+| NW | Nidwalden | DE | Obergericht des Kantons Nidwalden |
+| GL | Glarus | DE | Obergericht des Kantons Glarus |
+| ZG | Zug | DE | Obergericht des Kantons Zug |
+| SO | Solothurn | DE | Obergericht des Kantons Solothurn |
+| BS | Basel-Stadt | DE | Appellationsgericht Basel-Stadt |
+| BL | Basel-Landschaft | DE | Kantonsgericht Basel-Landschaft |
+| SH | Schaffhausen | DE | Obergericht des Kantons Schaffhausen |
+| AR | Appenzell A.Rh. | DE | Obergericht Appenzell Ausserrhoden |
+| AI | Appenzell I.Rh. | DE | Kantonsgericht Appenzell Innerrhoden |
+| SG | St. Gallen | DE | Kantonsgericht St. Gallen |
+| AG | Aargau | DE | Obergericht des Kantons Aargau |
+| TG | Thurgau | DE | Obergericht des Kantons Thurgau |
+
+#### Bilingual/Trilingual Cantons
+
+| Code | Canton | Languages | Highest Court |
+|------|--------|-----------|---------------|
+| BE | Bern | DE/FR | Obergericht des Kantons Bern |
+| FR | Fribourg | DE/FR | Tribunal cantonal de Fribourg |
+| VS | Valais | DE/FR | Tribunal cantonal du Valais |
+| GR | Graubünden | DE/IT/RM | Kantonsgericht Graubünden |
+
+#### French-Speaking Cantons (Romandie)
+
+| Code | Canton | Language | Highest Court |
+|------|--------|----------|---------------|
+| VD | Vaud | FR | Tribunal cantonal vaudois |
+| NE | Neuchâtel | FR | Tribunal cantonal de Neuchâtel |
+| GE | Genève | FR | Cour de justice de Genève |
+| JU | Jura | FR | Tribunal cantonal du Jura |
+
+#### Italian-Speaking Canton (Svizzera italiana)
+
+| Code | Canton | Language | Highest Court |
+|------|--------|----------|---------------|
+| TI | Ticino | IT | Tribunale d'appello del Cantone Ticino |
+
+#### Federal Level
+
+| Code | Level | Languages | Court |
+|------|-------|-----------|-------|
+| CH | Bund / Confédération | DE/FR/IT | Bundesgericht / Tribunal fédéral / Tribunale federale |
 
 ---
 
