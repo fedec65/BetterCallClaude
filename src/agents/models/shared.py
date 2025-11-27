@@ -99,43 +99,136 @@ class Jurisdiction(Enum):
     """
     Swiss jurisdictions for legal document formatting and court procedures.
 
-    Includes federal level (Bund/Confédération/Confederazione) and major cantons.
+    All 26 Swiss cantons plus federal level (Bund/Confédération/Confederazione).
 
     Gerichtsbarkeiten / Juridictions / Giurisdizioni:
         FEDERAL: Bundesgericht / Tribunal fédéral / Tribunale federale
+
+    German-speaking cantons (Deutschschweiz):
         ZH: Zürich / Zurich / Zurigo
-        BE: Bern / Berne / Berna
-        GE: Genf / Genève / Ginevra
+        BE: Bern / Berne / Berna (bilingual DE/FR)
+        LU: Luzern / Lucerne / Lucerna
+        UR: Uri / Uri / Uri
+        SZ: Schwyz / Schwytz / Svitto
+        OW: Obwalden / Obwald / Obvaldo
+        NW: Nidwalden / Nidwald / Nidvaldo
+        GL: Glarus / Glaris / Glarona
+        ZG: Zug / Zoug / Zugo
+        SO: Solothurn / Soleure / Soletta
         BS: Basel-Stadt / Bâle-Ville / Basilea Città
+        BL: Basel-Landschaft / Bâle-Campagne / Basilea Campagna
+        SH: Schaffhausen / Schaffhouse / Sciaffusa
+        AR: Appenzell Ausserrhoden / Appenzell Rhodes-Extérieures / Appenzello Esterno
+        AI: Appenzell Innerrhoden / Appenzell Rhodes-Intérieures / Appenzello Interno
+        SG: St. Gallen / Saint-Gall / San Gallo
+        GR: Graubünden / Grisons / Grigioni (trilingual DE/IT/RM)
+        AG: Aargau / Argovie / Argovia
+        TG: Thurgau / Thurgovie / Turgovia
+
+    French-speaking cantons (Romandie):
+        FR: Freiburg / Fribourg / Friburgo (bilingual DE/FR)
         VD: Waadt / Vaud / Vaud
+        VS: Wallis / Valais / Vallese (bilingual DE/FR)
+        NE: Neuenburg / Neuchâtel / Neuchâtel
+        GE: Genf / Genève / Ginevra
+        JU: Jura / Jura / Giura
+
+    Italian-speaking cantons (Svizzera italiana):
         TI: Tessin / Tessin / Ticino
     """
 
+    # Federal
     FEDERAL = "federal"
+
+    # German-speaking cantons
     ZH = "zurich"
     BE = "bern"
-    GE = "geneva"
-    BS = "basel"
+    LU = "lucerne"
+    UR = "uri"
+    SZ = "schwyz"
+    OW = "obwalden"
+    NW = "nidwalden"
+    GL = "glarus"
+    ZG = "zug"
+    SO = "solothurn"
+    BS = "basel_stadt"
+    BL = "basel_land"
+    SH = "schaffhausen"
+    AR = "appenzell_ar"
+    AI = "appenzell_ir"
+    SG = "st_gallen"
+    GR = "graubuenden"
+    AG = "aargau"
+    TG = "thurgau"
+
+    # French-speaking cantons
+    FR = "fribourg"
     VD = "vaud"
+    VS = "valais"
+    NE = "neuchatel"
+    GE = "geneva"
+    JU = "jura"
+
+    # Italian-speaking cantons
     TI = "ticino"
 
     @property
     def primary_language(self) -> Language:
         """Return the primary language for this jurisdiction."""
-        lang_map = {
-            Jurisdiction.FEDERAL: Language.DE,  # Multi-lingual, default DE
-            Jurisdiction.ZH: Language.DE,
-            Jurisdiction.BE: Language.DE,  # Bilingual, default DE
-            Jurisdiction.GE: Language.FR,
-            Jurisdiction.BS: Language.DE,
-            Jurisdiction.VD: Language.FR,
-            Jurisdiction.TI: Language.IT,
+        # French-speaking cantons
+        french_cantons = {
+            Jurisdiction.GE,
+            Jurisdiction.VD,
+            Jurisdiction.NE,
+            Jurisdiction.JU,
         }
-        return lang_map[self]
+        # Italian-speaking cantons
+        italian_cantons = {Jurisdiction.TI}
+        # Note: Bilingual cantons (BE, FR, VS) are handled explicitly below
+
+        if self in french_cantons:
+            return Language.FR
+        elif self == Jurisdiction.FR:
+            return Language.FR  # Fribourg officially bilingual, but FR majority
+        elif self == Jurisdiction.VS:
+            return Language.FR  # Valais officially bilingual, but FR majority
+        elif self in italian_cantons:
+            return Language.IT
+        else:
+            return Language.DE  # All other cantons including BE, GR (trilingual)
+
+    @property
+    def is_bilingual(self) -> bool:
+        """Check if the canton is officially bilingual or trilingual."""
+        multilingual = {
+            Jurisdiction.BE,  # DE/FR
+            Jurisdiction.FR,  # DE/FR
+            Jurisdiction.VS,  # DE/FR
+            Jurisdiction.GR,  # DE/IT/RM (Romansh)
+        }
+        return self in multilingual
+
+    @property
+    def official_languages(self) -> List[Language]:
+        """Return all official languages for this jurisdiction."""
+        lang_map = {
+            Jurisdiction.FEDERAL: [Language.DE, Language.FR, Language.IT],
+            Jurisdiction.BE: [Language.DE, Language.FR],
+            Jurisdiction.FR: [Language.DE, Language.FR],
+            Jurisdiction.VS: [Language.DE, Language.FR],
+            Jurisdiction.GR: [Language.DE, Language.IT],  # Romansh not in enum
+            Jurisdiction.GE: [Language.FR],
+            Jurisdiction.VD: [Language.FR],
+            Jurisdiction.NE: [Language.FR],
+            Jurisdiction.JU: [Language.FR],
+            Jurisdiction.TI: [Language.IT],
+        }
+        # Default to German for all other cantons
+        return lang_map.get(self, [Language.DE])
 
     @property
     def court_name(self) -> Dict[str, str]:
-        """Return court names in multiple languages."""
+        """Return highest cantonal court names in multiple languages."""
         names = {
             Jurisdiction.FEDERAL: {
                 "de": "Bundesgericht",
@@ -155,11 +248,53 @@ class Jurisdiction(Enum):
                 "it": "Tribunale superiore del Canton Berna",
                 "en": "High Court of the Canton of Bern",
             },
-            Jurisdiction.GE: {
-                "de": "Kantonsgericht Genf",
-                "fr": "Cour de justice de Genève",
-                "it": "Corte di giustizia di Ginevra",
-                "en": "Court of Justice of Geneva",
+            Jurisdiction.LU: {
+                "de": "Kantonsgericht Luzern",
+                "fr": "Tribunal cantonal de Lucerne",
+                "it": "Tribunale cantonale di Lucerna",
+                "en": "Cantonal Court of Lucerne",
+            },
+            Jurisdiction.UR: {
+                "de": "Obergericht des Kantons Uri",
+                "fr": "Tribunal supérieur du canton d'Uri",
+                "it": "Tribunale superiore del Canton Uri",
+                "en": "High Court of the Canton of Uri",
+            },
+            Jurisdiction.SZ: {
+                "de": "Kantonsgericht Schwyz",
+                "fr": "Tribunal cantonal de Schwytz",
+                "it": "Tribunale cantonale di Svitto",
+                "en": "Cantonal Court of Schwyz",
+            },
+            Jurisdiction.OW: {
+                "de": "Obergericht des Kantons Obwalden",
+                "fr": "Tribunal supérieur du canton d'Obwald",
+                "it": "Tribunale superiore del Canton Obvaldo",
+                "en": "High Court of the Canton of Obwalden",
+            },
+            Jurisdiction.NW: {
+                "de": "Obergericht des Kantons Nidwalden",
+                "fr": "Tribunal supérieur du canton de Nidwald",
+                "it": "Tribunale superiore del Canton Nidvaldo",
+                "en": "High Court of the Canton of Nidwalden",
+            },
+            Jurisdiction.GL: {
+                "de": "Obergericht des Kantons Glarus",
+                "fr": "Tribunal supérieur du canton de Glaris",
+                "it": "Tribunale superiore del Canton Glarona",
+                "en": "High Court of the Canton of Glarus",
+            },
+            Jurisdiction.ZG: {
+                "de": "Obergericht des Kantons Zug",
+                "fr": "Tribunal supérieur du canton de Zoug",
+                "it": "Tribunale superiore del Canton Zugo",
+                "en": "High Court of the Canton of Zug",
+            },
+            Jurisdiction.SO: {
+                "de": "Obergericht des Kantons Solothurn",
+                "fr": "Tribunal supérieur du canton de Soleure",
+                "it": "Tribunale superiore del Canton Soletta",
+                "en": "High Court of the Canton of Solothurn",
             },
             Jurisdiction.BS: {
                 "de": "Appellationsgericht Basel-Stadt",
@@ -167,20 +302,288 @@ class Jurisdiction(Enum):
                 "it": "Corte d'appello di Basilea Città",
                 "en": "Court of Appeal of Basel-City",
             },
+            Jurisdiction.BL: {
+                "de": "Kantonsgericht Basel-Landschaft",
+                "fr": "Tribunal cantonal de Bâle-Campagne",
+                "it": "Tribunale cantonale di Basilea Campagna",
+                "en": "Cantonal Court of Basel-Landschaft",
+            },
+            Jurisdiction.SH: {
+                "de": "Obergericht des Kantons Schaffhausen",
+                "fr": "Tribunal supérieur du canton de Schaffhouse",
+                "it": "Tribunale superiore del Canton Sciaffusa",
+                "en": "High Court of the Canton of Schaffhausen",
+            },
+            Jurisdiction.AR: {
+                "de": "Obergericht Appenzell Ausserrhoden",
+                "fr": "Tribunal supérieur d'Appenzell Rhodes-Extérieures",
+                "it": "Tribunale superiore di Appenzello Esterno",
+                "en": "High Court of Appenzell Ausserrhoden",
+            },
+            Jurisdiction.AI: {
+                "de": "Kantonsgericht Appenzell Innerrhoden",
+                "fr": "Tribunal cantonal d'Appenzell Rhodes-Intérieures",
+                "it": "Tribunale cantonale di Appenzello Interno",
+                "en": "Cantonal Court of Appenzell Innerrhoden",
+            },
+            Jurisdiction.SG: {
+                "de": "Kantonsgericht St. Gallen",
+                "fr": "Tribunal cantonal de Saint-Gall",
+                "it": "Tribunale cantonale di San Gallo",
+                "en": "Cantonal Court of St. Gallen",
+            },
+            Jurisdiction.GR: {
+                "de": "Kantonsgericht Graubünden",
+                "fr": "Tribunal cantonal des Grisons",
+                "it": "Tribunale cantonale dei Grigioni",
+                "en": "Cantonal Court of Graubünden",
+            },
+            Jurisdiction.AG: {
+                "de": "Obergericht des Kantons Aargau",
+                "fr": "Tribunal supérieur du canton d'Argovie",
+                "it": "Tribunale superiore del Canton Argovia",
+                "en": "High Court of the Canton of Aargau",
+            },
+            Jurisdiction.TG: {
+                "de": "Obergericht des Kantons Thurgau",
+                "fr": "Tribunal supérieur du canton de Thurgovie",
+                "it": "Tribunale superiore del Canton Turgovia",
+                "en": "High Court of the Canton of Thurgau",
+            },
+            Jurisdiction.FR: {
+                "de": "Kantonsgericht Freiburg",
+                "fr": "Tribunal cantonal de Fribourg",
+                "it": "Tribunale cantonale di Friburgo",
+                "en": "Cantonal Court of Fribourg",
+            },
             Jurisdiction.VD: {
                 "de": "Kantonsgericht Waadt",
                 "fr": "Tribunal cantonal vaudois",
                 "it": "Tribunale cantonale vodese",
                 "en": "Cantonal Court of Vaud",
             },
+            Jurisdiction.VS: {
+                "de": "Kantonsgericht Wallis",
+                "fr": "Tribunal cantonal du Valais",
+                "it": "Tribunale cantonale del Vallese",
+                "en": "Cantonal Court of Valais",
+            },
+            Jurisdiction.NE: {
+                "de": "Kantonsgericht Neuenburg",
+                "fr": "Tribunal cantonal de Neuchâtel",
+                "it": "Tribunale cantonale di Neuchâtel",
+                "en": "Cantonal Court of Neuchâtel",
+            },
+            Jurisdiction.GE: {
+                "de": "Kantonsgericht Genf",
+                "fr": "Cour de justice de Genève",
+                "it": "Corte di giustizia di Ginevra",
+                "en": "Court of Justice of Geneva",
+            },
+            Jurisdiction.JU: {
+                "de": "Kantonsgericht Jura",
+                "fr": "Tribunal cantonal du Jura",
+                "it": "Tribunale cantonale del Giura",
+                "en": "Cantonal Court of Jura",
+            },
             Jurisdiction.TI: {
                 "de": "Kantonsgericht Tessin",
                 "fr": "Tribunal cantonal du Tessin",
-                "it": "Tribunale cantonale del Ticino",
-                "en": "Cantonal Court of Ticino",
+                "it": "Tribunale d'appello del Cantone Ticino",
+                "en": "Court of Appeal of Ticino",
             },
         }
         return names[self]
+
+    @property
+    def canton_name(self) -> Dict[str, str]:
+        """Return canton names in multiple languages."""
+        names = {
+            Jurisdiction.FEDERAL: {
+                "de": "Bund",
+                "fr": "Confédération",
+                "it": "Confederazione",
+                "en": "Federal",
+            },
+            Jurisdiction.ZH: {
+                "de": "Zürich",
+                "fr": "Zurich",
+                "it": "Zurigo",
+                "en": "Zurich",
+            },
+            Jurisdiction.BE: {
+                "de": "Bern",
+                "fr": "Berne",
+                "it": "Berna",
+                "en": "Bern",
+            },
+            Jurisdiction.LU: {
+                "de": "Luzern",
+                "fr": "Lucerne",
+                "it": "Lucerna",
+                "en": "Lucerne",
+            },
+            Jurisdiction.UR: {
+                "de": "Uri",
+                "fr": "Uri",
+                "it": "Uri",
+                "en": "Uri",
+            },
+            Jurisdiction.SZ: {
+                "de": "Schwyz",
+                "fr": "Schwytz",
+                "it": "Svitto",
+                "en": "Schwyz",
+            },
+            Jurisdiction.OW: {
+                "de": "Obwalden",
+                "fr": "Obwald",
+                "it": "Obvaldo",
+                "en": "Obwalden",
+            },
+            Jurisdiction.NW: {
+                "de": "Nidwalden",
+                "fr": "Nidwald",
+                "it": "Nidvaldo",
+                "en": "Nidwalden",
+            },
+            Jurisdiction.GL: {
+                "de": "Glarus",
+                "fr": "Glaris",
+                "it": "Glarona",
+                "en": "Glarus",
+            },
+            Jurisdiction.ZG: {
+                "de": "Zug",
+                "fr": "Zoug",
+                "it": "Zugo",
+                "en": "Zug",
+            },
+            Jurisdiction.SO: {
+                "de": "Solothurn",
+                "fr": "Soleure",
+                "it": "Soletta",
+                "en": "Solothurn",
+            },
+            Jurisdiction.BS: {
+                "de": "Basel-Stadt",
+                "fr": "Bâle-Ville",
+                "it": "Basilea Città",
+                "en": "Basel-City",
+            },
+            Jurisdiction.BL: {
+                "de": "Basel-Landschaft",
+                "fr": "Bâle-Campagne",
+                "it": "Basilea Campagna",
+                "en": "Basel-Landschaft",
+            },
+            Jurisdiction.SH: {
+                "de": "Schaffhausen",
+                "fr": "Schaffhouse",
+                "it": "Sciaffusa",
+                "en": "Schaffhausen",
+            },
+            Jurisdiction.AR: {
+                "de": "Appenzell Ausserrhoden",
+                "fr": "Appenzell Rhodes-Extérieures",
+                "it": "Appenzello Esterno",
+                "en": "Appenzell Ausserrhoden",
+            },
+            Jurisdiction.AI: {
+                "de": "Appenzell Innerrhoden",
+                "fr": "Appenzell Rhodes-Intérieures",
+                "it": "Appenzello Interno",
+                "en": "Appenzell Innerrhoden",
+            },
+            Jurisdiction.SG: {
+                "de": "St. Gallen",
+                "fr": "Saint-Gall",
+                "it": "San Gallo",
+                "en": "St. Gallen",
+            },
+            Jurisdiction.GR: {
+                "de": "Graubünden",
+                "fr": "Grisons",
+                "it": "Grigioni",
+                "en": "Graubünden",
+            },
+            Jurisdiction.AG: {
+                "de": "Aargau",
+                "fr": "Argovie",
+                "it": "Argovia",
+                "en": "Aargau",
+            },
+            Jurisdiction.TG: {
+                "de": "Thurgau",
+                "fr": "Thurgovie",
+                "it": "Turgovia",
+                "en": "Thurgau",
+            },
+            Jurisdiction.FR: {
+                "de": "Freiburg",
+                "fr": "Fribourg",
+                "it": "Friburgo",
+                "en": "Fribourg",
+            },
+            Jurisdiction.VD: {
+                "de": "Waadt",
+                "fr": "Vaud",
+                "it": "Vaud",
+                "en": "Vaud",
+            },
+            Jurisdiction.VS: {
+                "de": "Wallis",
+                "fr": "Valais",
+                "it": "Vallese",
+                "en": "Valais",
+            },
+            Jurisdiction.NE: {
+                "de": "Neuenburg",
+                "fr": "Neuchâtel",
+                "it": "Neuchâtel",
+                "en": "Neuchâtel",
+            },
+            Jurisdiction.GE: {
+                "de": "Genf",
+                "fr": "Genève",
+                "it": "Ginevra",
+                "en": "Geneva",
+            },
+            Jurisdiction.JU: {
+                "de": "Jura",
+                "fr": "Jura",
+                "it": "Giura",
+                "en": "Jura",
+            },
+            Jurisdiction.TI: {
+                "de": "Tessin",
+                "fr": "Tessin",
+                "it": "Ticino",
+                "en": "Ticino",
+            },
+        }
+        return names[self]
+
+    @classmethod
+    def from_string(cls, value: str) -> "Jurisdiction":
+        """Parse jurisdiction from string (canton code or name)."""
+        normalized = value.upper().strip()
+        original = value.strip()
+        # Try direct enum name match
+        for jurisdiction in cls:
+            if jurisdiction.name == normalized:
+                return jurisdiction
+        # Try value match
+        for jurisdiction in cls:
+            if jurisdiction.value.upper() == normalized:
+                return jurisdiction
+        # Try canton name match (in any language)
+        for jurisdiction in cls:
+            names = jurisdiction.canton_name
+            for lang_name in names.values():
+                if lang_name.lower() == original.lower():
+                    return jurisdiction
+        raise ValueError(f"Unknown jurisdiction: {value}")
 
 
 @dataclass
