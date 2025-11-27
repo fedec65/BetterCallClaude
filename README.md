@@ -622,7 +622,7 @@ Create `~/.betterask/config.yaml` for personalized settings:
 
 ```yaml
 # Framework version
-version: "1.2.0"
+version: "1.3.0"
 
 # Privacy mode
 privacy_mode: balanced  # strict | balanced | cloud
@@ -822,7 +822,18 @@ python -m build
 
 ## 🎯 Roadmap
 
-### v1.2.0 (Current) - Agent Expansion ✅
+### v1.3.0 (Current) - Enhancement ✅
+
+- ✅ All 26 Swiss cantons with multilingual court names
+- ✅ Ollama integration for local LLM inference with privacy routing
+- ✅ Privacy mode with Swiss attorney-client privilege detection
+- ✅ Complete cantonal court documentation (DE/FR/IT)
+- 🔜 Commercial database integrations (Swisslex, Weblaw)
+- 🔜 Automated legal research reports
+- 🔜 Practice management integrations
+- 🔜 Citation network analysis
+
+### v1.2.0 - Agent Expansion ✅
 
 - ✅ StrategistAgent with risk assessment and settlement analysis
 - ✅ DrafterAgent with Swiss legal document generation
@@ -839,15 +850,6 @@ python -m build
 - ✅ Database infrastructure with SQLite
 - ✅ 267+ tests with >73% coverage
 - ✅ Python 3.11/3.12 support
-
-### v1.3 (Q1 2025) - Enhancement
-
-- 🔜 All 26 Swiss cantons
-- 🔜 Ollama integration (local LLM support)
-- 🔜 Commercial database integrations (Swisslex, Weblaw)
-- 🔜 Automated legal research reports
-- 🔜 Practice management integrations
-- 🔜 Citation network analysis
 
 ### v2.0 (Q2 2025) - International
 
@@ -940,4 +942,4 @@ Special thanks to beta testers from Swiss law firms for their valuable feedback.
 
 **Built for the Swiss legal community with precision, quality, and multi-lingual excellence.**
 
-*BetterCallClaude v1.2.0 - Legal Intelligence Framework*
+*BetterCallClaude v1.3.0 - Legal Intelligence Framework*
