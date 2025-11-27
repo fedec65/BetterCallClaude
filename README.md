@@ -82,7 +82,7 @@ BetterCallClaude is a comprehensive legal intelligence framework that provides S
 | Mode | Coverage | Features |
 |------|----------|----------|
 | **Federal Law** | ZGB, OR, StGB, StPO, ZPO, BV | BGE precedent search, federal statute analysis |
-| **Cantonal Law** | ZH, BE, GE, BS, VD, TI | Canton-specific routing, local regulations |
+| **Cantonal Law** | All 26 cantons | Canton-specific routing, local regulations, bilingual canton support |
 | **Multi-Lingual** | DE, FR, IT, EN | Terminology consistency, citation format adaptation |
 
 ### Agent Framework
