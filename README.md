@@ -2,7 +2,7 @@
 
 **Legal Intelligence Framework for Swiss Lawyers**
 
-[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](https://github.com/fedec65/bettercallclaude)
+[![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)](https://github.com/fedec65/bettercallclaude)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Languages](https://img.shields.io/badge/languages-DE%20%7C%20FR%20%7C%20IT%20%7C%20EN-orange.svg)]()
 [![Claude Code](https://img.shields.io/badge/built%20with-Claude%20Code-purple.svg)](https://claude.ai/code)
@@ -19,8 +19,18 @@ BetterCallClaude is a comprehensive legal intelligence framework that provides S
 
 - **80% time savings** on precedent analysis and legal research
 - **25% quality improvement** through systematic verification
-- **Multi-jurisdictional expertise** across federal and cantonal Swiss law (ZH, BE, GE, BS, VD, TI)
+- **Multi-jurisdictional expertise** across federal and all 26 Swiss cantons (ZH, BE, LU, UR, SZ, OW, NW, GL, ZG, FR, SO, BS, BL, SH, AR, AI, SG, GR, AG, TG, TI, VD, VS, NE, GE, JU)
 - **Multi-lingual precision** in legal terminology and reasoning (DE, FR, IT, EN)
+
+### What's New in v1.3.0
+
+🆕 **All 26 Swiss Cantons** - Complete coverage of Swiss jurisdictions with multilingual support
+
+🆕 **Canton Metadata** - Language assignments, bilingual canton handling, court names in DE/FR/IT
+
+🆕 **Enhanced Jurisdiction API** - `is_bilingual`, `official_languages`, `canton_name`, `from_string` methods
+
+🆕 **110+ Tests** - Extended test coverage for comprehensive canton validation
 
 ### What's New in v1.2.0
 
