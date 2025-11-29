@@ -30,6 +30,10 @@ BetterCallClaude is a comprehensive legal intelligence framework that provides S
 
 🆕 **Enhanced Jurisdiction API** - `is_bilingual`, `official_languages`, `canton_name`, `from_string` methods
 
+🆕 **Ollama Integration** - Local LLM inference with privacy-first routing for sensitive legal work
+
+🆕 **Privacy Mode** - Automatic Swiss attorney-client privilege detection (Anwaltsgeheimnis, Art. 321 StGB)
+
 🆕 **110+ Tests** - Extended test coverage for comprehensive canton validation
 
 ### What's New in v1.2.0
@@ -57,6 +61,7 @@ BetterCallClaude is a comprehensive legal intelligence framework that provides S
 - [Command Reference](#command-reference)
 - [Agent Framework](#agent-framework)
 - [MCP Servers](#mcp-servers)
+- [Ollama Integration](#ollama-integration)
 - [Architecture](#architecture)
 - [Multi-Lingual Support](#multi-lingual-support)
 - [Configuration](#configuration)
@@ -481,6 +486,153 @@ The shared database layer provides:
 
 ---
 
+## Ollama Integration
+
+BetterCallClaude includes full integration with [Ollama](https://ollama.ai/) for local LLM inference, providing privacy-first AI capabilities for sensitive legal work.
+
+### Why Local LLM?
+
+Swiss attorney-client privilege (Anwaltsgeheimnis, Art. 321 StGB) requires strict confidentiality. Local LLM processing ensures:
+
+- **Data Sovereignty**: Sensitive legal content never leaves your infrastructure
+- **Compliance**: Meets Swiss bar association data protection requirements
+- **Control**: Full audit trail of all AI interactions
+- **Flexibility**: Use cloud for general queries, local for privileged content
+
+### Privacy Levels
+
+| Level | Description | Routing | Use Case |
+|-------|-------------|---------|----------|
+| `PUBLIC` | Non-sensitive content | Cloud preferred | General legal research, public case law |
+| `CONFIDENTIAL` | Client-related content | Local preferred, cloud fallback | Standard legal work, client communications |
+| `PRIVILEGED` | Attorney-client privileged | Local only, no cloud | Mandatsgeheimnis, litigation strategy |
+
+### Automatic Privilege Detection
+
+The privacy router automatically detects privileged content in German, French, and Italian:
+
+```yaml
+# Detected patterns (examples)
+german:
+  - "Anwaltsgeheimnis"
+  - "Berufsgeheimnis"
+  - "Art. 321 StGB"
+  - "Mandatsgeheimnis"
+  - "streng vertraulich"
+
+french:
+  - "secret professionnel"
+  - "secret de l'avocat"
+  - "confidentiel"
+
+italian:
+  - "segreto professionale"
+  - "segreto dell'avvocato"
+```
+
+### Supported Models
+
+| Model | Context | Recommended For |
+|-------|---------|-----------------|
+| `llama3.1:70b` | 128K | Complex legal analysis, document review |
+| `llama3.1:8b` | 128K | General tasks, Swiss German processing |
+| `mixtral:8x7b` | 32K | Multilingual support (DE/FR/IT) |
+| `phi3:medium` | 4K | Simple tasks, fast responses |
+| `codellama:13b` | 16K | Legal tech, code generation |
+
+### Configuration
+
+```yaml
+# ~/.betterask/config.yaml
+privacy_mode: balanced  # strict | balanced | cloud
+
+# LLM backend selection
+llm_backend: ollama  # anthropic | ollama
+
+# Ollama settings
+ollama:
+  host: "http://localhost:11434"
+  default_model: "llama3.1:8b"
+  timeout: 120
+
+# Privacy routing
+privacy:
+  default_level: confidential
+  allow_cloud_fallback: true
+  log_routing_decisions: true
+  auto_detect_sensitivity: true
+```
+
+### Installation
+
+```bash
+# Install Ollama
+curl -fsSL https://ollama.ai/install.sh | sh
+
+# Pull recommended models
+ollama pull llama3.1:8b      # Fast, general purpose
+ollama pull llama3.1:70b     # Complex legal analysis (requires 48GB+ RAM)
+ollama pull mixtral:8x7b     # Multilingual support
+
+# Verify installation
+ollama list
+```
+
+### Usage Examples
+
+```python
+from src.integrations.ollama import OllamaClient, PrivacyRouter, PrivacyLevel
+
+# Initialize client
+client = OllamaClient()
+
+# Check availability
+if await client.is_available():
+    # Direct generation
+    response = await client.generate(
+        prompt="Explain Art. 321 StGB",
+        model=OllamaModel.LLAMA3_8B
+    )
+
+# Privacy-aware routing
+router = PrivacyRouter(ollama_client=client)
+
+# Automatic privilege detection
+result = await router.route_request(
+    "Mandatsgeheimnis discussion with client",
+    privacy_level=PrivacyLevel.PRIVILEGED  # Forces local processing
+)
+
+# Chat with privacy
+messages = [ChatMessage(role="user", content="Analyze this contract")]
+result = await router.chat_with_privacy(messages)
+```
+
+### Privacy Router Behavior
+
+| Scenario | Local Available | Cloud Fallback | Result |
+|----------|-----------------|----------------|--------|
+| PUBLIC + Ollama up | ✅ | Allowed | Cloud (preferred for speed) |
+| CONFIDENTIAL + Ollama up | ✅ | Allowed | Local (preferred) |
+| CONFIDENTIAL + Ollama down | ❌ | Allowed | Cloud (fallback) |
+| PRIVILEGED + Ollama up | ✅ | Not allowed | Local |
+| PRIVILEGED + Ollama down | ❌ | Not allowed | **Error** (privacy violation) |
+
+### Audit Trail
+
+All routing decisions are logged for compliance:
+
+```python
+# Get routing history
+history = router.get_routing_history()
+
+# Get statistics
+stats = router.get_routing_statistics()
+# Returns: {"total": 100, "local_count": 75, "cloud_count": 25, ...}
+```
+
+---
+
 ## Architecture
 
 ### Project Structure
@@ -512,6 +664,10 @@ BetterCallClaude/
 │   │   │   └── shared.py     # Language, CaseFacts, Strategy models
 │   │   └── utils/            # Agent utilities
 │   │       └── language.py   # Language detection and terminology
+│   ├── integrations/          # External integrations
+│   │   └── ollama/           # Ollama local LLM integration
+│   │       ├── client.py     # OllamaClient with model selection
+│   │       └── privacy_mode.py # PrivacyRouter with privilege detection
 │   ├── core/                  # Core framework components
 │   ├── framework/             # Framework utilities
 │   ├── tests/                 # Python tests
