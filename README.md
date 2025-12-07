@@ -135,14 +135,66 @@ BetterCallClaude is a comprehensive legal intelligence framework that provides S
 
 ## Installation
 
-### Step 1: Clone the Repository
+### Quick Install (Recommended)
+
+Install BetterCallClaude globally for all your projects with a single command:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/fedec65/BetterCallClaude/main/install.sh | bash
+```
+
+This will:
+- ✅ Clone the framework to `~/.claude/bettercallclaude/`
+- ✅ Create command symlinks in `~/.claude/commands/`
+- ✅ Configure imports in your `CLAUDE.md`
+- ✅ Install the `bettercallclaude` CLI for easy management
+- ✅ Work with both **Claude Code CLI** and **Claude Code Desktop**
+
+After installation, start Claude Code and type `/legal-help` to see all available commands.
+
+### Managing Your Installation
+
+```bash
+# Update to latest version
+bettercallclaude update
+
+# Check installation health
+bettercallclaude doctor
+
+# List installed commands
+bettercallclaude list
+
+# Uninstall (preserves customizations)
+bettercallclaude uninstall
+```
+
+### Customizing Commands
+
+Your customizations are safe from updates:
+
+```bash
+# Copy a command to customize
+cp ~/.claude/bettercallclaude/.claude/commands/legal-research.md \
+   ~/.claude/customizations/legal-research.md
+
+# Edit your version - it will take precedence
+nano ~/.claude/customizations/legal-research.md
+```
+
+---
+
+### Developer Installation
+
+For contributing or development work, install the full development environment:
+
+#### Step 1: Clone the Repository
 
 ```bash
 git clone https://github.com/fedec65/bettercallclaude.git
 cd bettercallclaude
 ```
 
-### Step 2: Install Python Dependencies
+#### Step 2: Install Python Dependencies
 
 ```bash
 # Create virtual environment (recommended)
@@ -153,13 +205,13 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -e ".[dev]"
 ```
 
-### Step 3: Install Node.js Dependencies
+#### Step 3: Install Node.js Dependencies
 
 ```bash
 npm install
 ```
 
-### Step 4: Build MCP Servers
+#### Step 4: Build MCP Servers
 
 ```bash
 cd mcp-servers
@@ -168,7 +220,7 @@ npm run build
 cd ..
 ```
 
-### Step 5: Configure API Keys (Optional)
+#### Step 5: Configure API Keys (Optional)
 
 > **Note**: When using BetterCallClaude through Claude Code CLI, no API keys are required for basic functionality. Claude Code handles authentication automatically. The optional keys below enable advanced features.
 
@@ -185,7 +237,7 @@ TAVILY_API_KEY=your_tavily_api_key_here
 ANTHROPIC_API_KEY=your_anthropic_api_key_here
 ```
 
-### Step 6: Verify Installation
+#### Step 6: Verify Installation
 
 ```bash
 # Run Python tests
