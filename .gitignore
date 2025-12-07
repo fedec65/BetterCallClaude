@@ -84,6 +84,9 @@ mcp-servers/*/.env
 claudedocs/
 .serena/memories/
 .serena/cache/
+sprint_stories/
+SPRINT*.md
+SESSION_*.md
 
 # Work in progress features (not yet released)
 src/citations/
