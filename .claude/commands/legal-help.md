@@ -215,6 +215,32 @@ All commands work in **DE/FR/IT/EN**:
 
 ---
 
+## 🤖 Specialized Agent Commands
+
+### Core Agents (Pipeline)
+| Command | Agent | Domain |
+|---------|-------|--------|
+| `/agent:researcher` | ResearcherAgent | Automated legal research workflows |
+| `/agent:strategist` | StrategistAgent | Case strategy development |
+| `/agent:drafter` | DrafterAgent | Legal document drafting |
+| `/agent:orchestrator` | AgentOrchestrator | Multi-agent pipeline coordination |
+
+### Specialized Domain Agents
+| Command | Agent | Domain |
+|---------|-------|--------|
+| `/agent:citation` | Citation Specialist | BGE citation verification, formatting |
+| `/agent:compliance` | Compliance Officer | FINMA, AML/KYC, regulatory compliance |
+| `/agent:data-protection` | Data Protection Specialist | GDPR, nDSG/FADP, privacy |
+| `/agent:risk` | Risk Analyst | Case outcome probability, damages quantification |
+| `/agent:procedure` | Procedure Specialist | ZPO/StPO deadlines, procedural rules |
+| `/agent:translator` | Legal Translator | DE/FR/IT legal terminology |
+| `/agent:fiscal` | Fiscal Legal Expert | Tax law, DTA, fiscal implications |
+| `/agent:corporate` | Corporate & Commercial | M&A, corporate governance, contracts |
+| `/agent:cantonal` | Cantonal Law Expert | 26 cantons legal systems |
+| `/agent:realestate` | Real Estate Expert | Property law, Grundbuch, Lex Koller |
+
+---
+
 ## 🚀 Quick Examples
 
 ### Research Federal Precedents
