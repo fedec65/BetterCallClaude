@@ -2,7 +2,7 @@
 
 **Legal Intelligence Framework for Swiss Lawyers**
 
-[![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)](https://github.com/fedec65/bettercallclaude)
+[![Version](https://img.shields.io/badge/version-1.3.1-blue.svg)](https://github.com/fedec65/bettercallclaude)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Languages](https://img.shields.io/badge/languages-DE%20%7C%20FR%20%7C%20IT%20%7C%20EN-orange.svg)]()
 [![Claude Code](https://img.shields.io/badge/built%20with-Claude%20Code-purple.svg)](https://claude.ai/code)
@@ -21,6 +21,30 @@ BetterCallClaude is a comprehensive legal intelligence framework that provides S
 - **25% quality improvement** through systematic verification
 - **Multi-jurisdictional expertise** across federal and all 26 Swiss cantons (ZH, BE, LU, UR, SZ, OW, NW, GL, ZG, FR, SO, BS, BL, SH, AR, AI, SG, GR, AG, TG, TI, VD, VS, NE, GE, JU)
 - **Multi-lingual precision** in legal terminology and reasoning (DE, FR, IT, EN)
+
+### What's New in v1.3.1
+
+🆕 **10 Specialized Domain Agents** - Expert agents for Citation, Compliance, Data Protection, Risk, Procedure, Translation, Fiscal, Corporate, Cantonal, and Real Estate law
+
+🆕 **Citation Specialist** - BGE/ATF/DTF citation verification, formatting, cross-reference validation
+
+🆕 **Compliance Officer** - FINMA, AML/KYC, regulatory compliance verification
+
+🆕 **Data Protection Specialist** - GDPR, nDSG/FADP privacy analysis with DPIA workflows
+
+🆕 **Risk Analyst** - Case outcome probability scoring, Monte Carlo simulations, settlement analysis
+
+🆕 **Procedure Specialist** - ZPO/StPO/VwVG deadline calculation, procedural roadmaps
+
+🆕 **Legal Translator** - DE/FR/IT legal terminology with Termdat integration
+
+🆕 **Fiscal Legal Expert** - Tax law, DTAs, transfer pricing, BEPS compliance
+
+🆕 **Corporate & Commercial** - AG/GmbH, M&A, shareholder agreements, commercial contracts
+
+🆕 **Cantonal Law Expert** - All 26 cantons with court comparison, fee calculators
+
+🆕 **Real Estate Expert** - Property transactions, Grundbuch, Lex Koller analysis
 
 ### What's New in v1.3.0
 
@@ -92,6 +116,8 @@ BetterCallClaude is a comprehensive legal intelligence framework that provides S
 
 ### Agent Framework
 
+#### Core Pipeline Agents
+
 | Agent | Purpose | Status |
 |-------|---------|--------|
 | **ResearcherAgent** | Autonomous Swiss legal research with MCP integration | ✅ Implemented |
@@ -100,6 +126,21 @@ BetterCallClaude is a comprehensive legal intelligence framework that provides S
 | **AgentOrchestrator** | Multi-agent pipeline coordination with checkpoints | ✅ Implemented |
 | **CaseManager** | Case lifecycle management with findings tracking | ✅ Implemented |
 | **IntegratedResearchSystem** | Case-bound research orchestration | ✅ Implemented |
+
+#### Specialized Domain Agents (v1.3.1)
+
+| Agent | Command | Domain |
+|-------|---------|--------|
+| **Citation Specialist** | `/agent:citation` | BGE/ATF/DTF citation verification, formatting, validation |
+| **Compliance Officer** | `/agent:compliance` | FINMA, AML/KYC, regulatory compliance |
+| **Data Protection Specialist** | `/agent:data-protection` | GDPR, nDSG/FADP, privacy analysis |
+| **Risk Analyst** | `/agent:risk` | Case outcome probability, damages quantification |
+| **Procedure Specialist** | `/agent:procedure` | ZPO/StPO/VwVG deadlines, procedural rules |
+| **Legal Translator** | `/agent:translator` | DE/FR/IT legal terminology |
+| **Fiscal Legal Expert** | `/agent:fiscal` | Tax law, DTA, fiscal implications |
+| **Corporate & Commercial** | `/agent:corporate` | M&A, corporate governance, contracts |
+| **Cantonal Law Expert** | `/agent:cantonal` | All 26 Swiss cantons legal systems |
+| **Real Estate Expert** | `/agent:realestate` | Property law, Grundbuch, Lex Koller |
 
 ### MCP Servers
 
@@ -318,9 +359,29 @@ Use `/agent:` commands for autonomous research workflows.
 
 ### Agent Commands
 
+#### Core Pipeline Agents
+
 | Command | Description | Options |
 |---------|-------------|---------|
 | `/agent:researcher` | Autonomous legal research | `--depth`, `--focus`, `--canton`, `--language` |
+| `/agent:strategist` | Litigation strategy development | `--risk-tolerance`, `--settlement-focus` |
+| `/agent:drafter` | Legal document generation | `--type`, `--language`, `--style` |
+| `/agent:orchestrator` | Multi-agent pipeline coordination | `--workflow`, `--checkpoints` |
+
+#### Specialized Domain Agents (v1.3.1)
+
+| Command | Description | Domain |
+|---------|-------------|--------|
+| `/agent:citation` | Citation verification and formatting | BGE/ATF/DTF references, validation |
+| `/agent:compliance` | Regulatory compliance checks | FINMA, AML/KYC, GwG |
+| `/agent:data-protection` | Privacy law analysis | GDPR, nDSG/FADP, DPIA |
+| `/agent:risk` | Risk assessment and quantification | Case probability, damages modeling |
+| `/agent:procedure` | Procedural rules and deadlines | ZPO, StPO, VwVG, BGG |
+| `/agent:translator` | Legal translation | DE/FR/IT terminology |
+| `/agent:fiscal` | Tax law analysis | DTAs, transfer pricing, BEPS |
+| `/agent:corporate` | Corporate and commercial law | AG/GmbH, M&A, SHA |
+| `/agent:cantonal` | Cantonal law expertise | All 26 cantons |
+| `/agent:realestate` | Real estate law | Grundbuch, Lex Koller |
 
 ### Swiss Law Commands
 
@@ -1030,7 +1091,21 @@ python -m build
 
 ## 🎯 Roadmap
 
-### v1.3.0 (Current) - Enhancement ✅
+### v1.3.1 (Current) - Specialized Agents ✅
+
+- ✅ 10 specialized domain agents for expert legal analysis
+- ✅ Citation Specialist for BGE/ATF/DTF verification and formatting
+- ✅ Compliance Officer for FINMA, AML/KYC regulatory checks
+- ✅ Data Protection Specialist for GDPR, nDSG/FADP compliance
+- ✅ Risk Analyst for case probability and damages modeling
+- ✅ Procedure Specialist for ZPO/StPO deadline management
+- ✅ Legal Translator for DE/FR/IT terminology
+- ✅ Fiscal Legal Expert for tax law and DTA analysis
+- ✅ Corporate & Commercial agent for M&A and contracts
+- ✅ Cantonal Law Expert for all 26 cantons
+- ✅ Real Estate Expert for Grundbuch and Lex Koller
+
+### v1.3.0 - Canton & Privacy Enhancement ✅
 
 - ✅ All 26 Swiss cantons with multilingual court names
 - ✅ Ollama integration for local LLM inference with privacy routing
@@ -1150,4 +1225,4 @@ Special thanks to beta testers from Swiss law firms for their valuable feedback.
 
 **Built for the Swiss legal community with precision, quality, and multi-lingual excellence.**
 
-*BetterCallClaude v1.3.0 - Legal Intelligence Framework*
+*BetterCallClaude v1.3.1 - Legal Intelligence Framework*
