@@ -79,3 +79,17 @@ out/
 mcp-servers/*/node_modules/
 mcp-servers/*/dist/
 mcp-servers/*/.env
+
+# Development artifacts (not for distribution)
+claudedocs/
+.serena/memories/
+.serena/cache/
+
+# Work in progress features (not yet released)
+src/citations/
+src/reports/
+tests/citations/
+tests/reports/
+
+# Internal planning docs
+docs/workflows/*_WORKFLOW.md
