@@ -2,7 +2,7 @@
 
 **Legal Intelligence Framework for Swiss Lawyers**
 
-[![Version](https://img.shields.io/badge/version-1.3.1-blue.svg)](https://github.com/fedec65/bettercallclaude)
+[![Version](https://img.shields.io/badge/version-1.3.2-blue.svg)](https://github.com/fedec65/bettercallclaude)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Languages](https://img.shields.io/badge/languages-DE%20%7C%20FR%20%7C%20IT%20%7C%20EN-orange.svg)]()
 [![Claude Code](https://img.shields.io/badge/built%20with-Claude%20Code-purple.svg)](https://claude.ai/code)
@@ -21,6 +21,18 @@ BetterCallClaude is a comprehensive legal intelligence framework that provides S
 - **25% quality improvement** through systematic verification
 - **Multi-jurisdictional expertise** across federal and all 26 Swiss cantons (ZH, BE, LU, UR, SZ, OW, NW, GL, ZG, FR, SO, BS, BL, SH, AR, AI, SG, GR, AG, TG, TI, VD, VS, NE, GE, JU)
 - **Multi-lingual precision** in legal terminology and reasoning (DE, FR, IT, EN)
+
+### What's New in v1.3.2
+
+🆕 **Intelligent Legal Proxy (`/legal`)** - Your single entry point to the entire BetterCallClaude framework with smart routing
+
+🆕 **Three Access Modes** - Natural language, direct agent routing (`@researcher`), and explicit workflows (`--workflow full`)
+
+🆕 **Hybrid Orchestration** - Automatic intent detection routes your query to the right agent(s) or pipeline
+
+🆕 **Interactive Dialogue** - Clarification requests, progress updates, and checkpoint confirmations for complex workflows
+
+🆕 **14+ Agent Coordination** - All specialized agents accessible through intelligent routing with confidence scoring
 
 ### What's New in v1.3.1
 
@@ -300,21 +312,39 @@ You should see:
 
 ## Quick Start
 
-### Method 1: Natural Language (Auto-Detection)
+### Method 1: Intelligent Legal Proxy (NEW - Recommended)
 
-Simply start Claude Code and ask legal questions. The framework automatically detects legal keywords and activates the appropriate persona.
+The `/legal` command is your intelligent entry point that routes to the right agent(s) automatically.
 
 ```bash
 # Start Claude Code
 claude
 
+# Mode A: Natural Language - Just describe what you need
+/legal I need to analyze a contract dispute about Art. 97 OR and prepare a legal opinion
+→ Automatically routes: Researcher → Strategist → Drafter
+
+# Mode B: Direct Agent - Use @agent for specific routing
+/legal @compliance Check FINMA requirements for crypto custody
+/legal @risk Calculate settlement range for CHF 500,000 dispute
+
+# Mode C: Explicit Workflow - Define your pipeline
+/legal --workflow full "Art. 97 OR breach, CHF 500,000 dispute"
+/legal --workflow research,strategy "Tenant eviction in Zürich"
+```
+
+### Method 2: Natural Language (Auto-Detection)
+
+Simply ask legal questions. The framework automatically detects legal keywords and activates the appropriate persona.
+
+```bash
 # Ask legal questions
 "Search BGE for Art. 97 OR contractual liability"
 "Draft a service agreement under Swiss OR"
 "Analyze litigation strategy for breach of contract, CHF 500,000 damages"
 ```
 
-### Method 2: Explicit Commands
+### Method 3: Explicit Commands
 
 Use `/legal:` commands for professional assurance and audit trails.
 
@@ -329,7 +359,7 @@ Use `/legal:` commands for professional assurance and audit trails.
 /legal:draft Service agreement under Swiss OR for software development
 ```
 
-### Method 3: Agent Commands
+### Method 4: Agent Commands
 
 Use `/agent:` commands for autonomous research workflows.
 
@@ -344,6 +374,17 @@ Use `/agent:` commands for autonomous research workflows.
 ---
 
 ## Command Reference
+
+### Intelligent Legal Proxy (v1.3.2)
+
+| Command | Description | Example |
+|---------|-------------|---------|
+| `/legal` | Intelligent routing to agents | `/legal I need to analyze a contract dispute` |
+| `/legal @agent` | Direct agent routing | `/legal @compliance Check FINMA requirements` |
+| `/legal --workflow` | Explicit workflow definition | `/legal --workflow full "Art. 97 OR breach"` |
+| `/legal --mode` | Set autonomy mode | `/legal --mode autonomous "Quick BGE search"` |
+
+**Available Agent Routes**: `@researcher`, `@strategist`, `@drafter`, `@orchestrator`, `@citation`, `@compliance`, `@data-protection`, `@risk`, `@procedure`, `@translator`, `@fiscal`, `@corporate`, `@cantonal`, `@realestate`
 
 ### Legal Commands
 
@@ -1091,7 +1132,16 @@ python -m build
 
 ## 🎯 Roadmap
 
-### v1.3.1 (Current) - Specialized Agents ✅
+### v1.3.2 (Current) - Intelligent Orchestration ✅
+
+- ✅ Intelligent Legal Proxy (`/legal`) as unified entry point
+- ✅ Hybrid orchestration combining natural language, direct routing, and workflows
+- ✅ Intent detection system with pattern matching and confidence scoring
+- ✅ Multi-agent coordination with 14+ specialized agents
+- ✅ Interactive dialogue management with checkpoints
+- ✅ Three autonomy modes: guided, balanced, autonomous
+
+### v1.3.1 - Specialized Agents ✅
 
 - ✅ 10 specialized domain agents for expert legal analysis
 - ✅ Citation Specialist for BGE/ATF/DTF verification and formatting
@@ -1225,4 +1275,4 @@ Special thanks to beta testers from Swiss law firms for their valuable feedback.
 
 **Built for the Swiss legal community with precision, quality, and multi-lingual excellence.**
 
-*BetterCallClaude v1.3.1 - Legal Intelligence Framework*
+*BetterCallClaude v1.3.2 - Legal Intelligence Framework*

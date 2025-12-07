@@ -6,12 +6,63 @@
 
 ## 🎯 Quick Start
 
-BetterCallClaude works in **two ways**:
+BetterCallClaude works in **three ways**:
 
-1. **Natural Language** (Auto-Detection) - Just ask your legal question
-2. **Explicit Commands** (Professional Assurance) - Use `/legal:` prefix
+1. **Intelligent Proxy** (NEW in v1.3.2) - Use `/legal` for smart routing
+2. **Natural Language** (Auto-Detection) - Just ask your legal question
+3. **Explicit Commands** (Professional Assurance) - Use `/legal:` prefix
 
-Both methods activate the same powerful legal framework!
+All methods activate the powerful legal framework with different levels of control!
+
+---
+
+## 🆕 NEW: Intelligent Legal Proxy (`/legal`)
+
+### The Simplest Way to Use BetterCallClaude
+
+The `/legal` command is your **intelligent assistant** that:
+- Understands natural language and routes to the right agent(s)
+- Coordinates multi-agent workflows automatically
+- Provides interactive dialogue for complex requests
+
+### Three Usage Modes
+
+**Mode A - Natural Language:**
+```
+/legal I need to analyze a contract dispute and prepare a Klageschrift
+→ Automatically routes: Researcher → Strategist → Drafter
+```
+
+**Mode B - Direct Agent:**
+```
+/legal @compliance Check FINMA requirements for crypto custody
+→ Routes directly to Compliance Officer agent
+```
+
+**Mode C - Explicit Workflow:**
+```
+/legal --workflow full "Art. 97 OR breach, CHF 500,000 dispute"
+→ Executes defined pipeline with checkpoints
+```
+
+### All Available Agent Routes
+
+| Route | Agent | Purpose |
+|-------|-------|---------|
+| `@researcher` | ResearcherAgent | Swiss legal research |
+| `@strategist` | StrategistAgent | Litigation strategy |
+| `@drafter` | DrafterAgent | Document drafting |
+| `@orchestrator` | AgentOrchestrator | Pipeline coordination |
+| `@citation` | Citation Specialist | BGE verification |
+| `@compliance` | Compliance Officer | FINMA, AML/KYC |
+| `@data-protection` | Data Protection | GDPR, nDSG/FADP |
+| `@risk` | Risk Analyst | Probability, damages |
+| `@procedure` | Procedure Specialist | Deadlines, ZPO/StPO |
+| `@translator` | Legal Translator | DE/FR/IT terminology |
+| `@fiscal` | Fiscal Expert | Tax law, DTAs |
+| `@corporate` | Corporate & Commercial | M&A, contracts |
+| `@cantonal` | Cantonal Law Expert | All 26 cantons |
+| `@realestate` | Real Estate Expert | Grundbuch, Lex Koller |
 
 ---
 
@@ -316,6 +367,6 @@ When you use `/legal:` commands, these MCP servers are activated:
 
 ---
 
-**BetterCallClaude v1.0.0-alpha - Built for Swiss Legal Professionals**
+**BetterCallClaude v1.3.2 - Built for Swiss Legal Professionals**
 
-For more help: [GitHub Issues](https://github.com/yourusername/bettercallclaude/issues)
+For more help: [GitHub Issues](https://github.com/fedec65/bettercallclaude/issues)
