@@ -196,14 +196,37 @@ Install BetterCallClaude globally for all your projects with a single command:
 curl -fsSL https://raw.githubusercontent.com/fedec65/BetterCallClaude/main/install.sh | bash
 ```
 
-This will:
-- ✅ Clone the framework to `~/.claude/bettercallclaude/`
-- ✅ Create command symlinks in `~/.claude/commands/`
-- ✅ Configure imports in your `CLAUDE.md`
-- ✅ Install the `bettercallclaude` CLI for easy management
-- ✅ Work with both **Claude Code CLI** and **Claude Code Desktop**
+The interactive installer will guide you through:
+- 📍 **Installation scope** - Global (all projects) or local (current project only)
+- 📂 **MCP server location** - Choose where to install MCP servers
+- 🐍 **Python environment** - Virtual environment, system Python, or skip
+- 💾 **Backup creation** - Preserve existing Claude settings
 
-After installation, start Claude Code and type `/legal-help` to see all available commands.
+**What gets installed:**
+- ✅ Framework cloned to `~/.claude/bettercallclaude/`
+- ✅ Command symlinks in `~/.claude/commands/`
+- ✅ MCP servers built and configured
+- ✅ Settings merged with your existing `settings.json`
+- ✅ `bettercallclaude` CLI for easy management
+- ✅ Works with both **Claude Code CLI** and **Claude Code Desktop**
+
+After installation, start Claude Code and type `/legal:help` to see all available commands.
+
+### Installation Options
+
+```bash
+# Interactive install (default)
+./install.sh install
+
+# Non-interactive with defaults (for scripts/CI)
+curl -fsSL .../install.sh | bash -s -- --no-interactive
+
+# Preview what would be installed
+./install.sh --dry-run install
+
+# Force reinstall
+./install.sh --force install
+```
 
 ### Managing Your Installation
 
@@ -220,6 +243,16 @@ bettercallclaude list
 # Uninstall (preserves customizations)
 bettercallclaude uninstall
 ```
+
+### System Requirements
+
+| Requirement | Version | Check Command |
+|-------------|---------|---------------|
+| Node.js | ≥ 18.0 | `node --version` |
+| Python | ≥ 3.10 | `python --version` |
+| npm | any | `npm --version` |
+| Git | any | `git --version` |
+| Claude Code | CLI or Desktop | `claude --version` |
 
 ### Customizing Commands
 
