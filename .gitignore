@@ -82,11 +82,25 @@ mcp-servers/*/.env
 
 # Development artifacts (not for distribution)
 claudedocs/
-.serena/memories/
-.serena/cache/
+.serena/
 sprint_stories/
 SPRINT*.md
 SESSION_*.md
+
+# Development/setup documentation (internal only)
+GIT_SETUP_*.md
+HANDOFF_SUMMARY.md
+IMPLEMENTATION_*.md
+MVP_COMPLETION_WORKFLOW.md
+PHASE*_COMPLETION_REPORT.md
+INTEGRATION_TEST_RESULTS.md
+
+# Planning directories (internal only)
+bettercallclaude2-0/
+
+# Test coverage reports
+mcp-servers/*/coverage/
+coverage/
 
 # Work in progress features (not yet released)
 src/citations/
