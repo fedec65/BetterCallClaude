@@ -50,6 +50,23 @@ DRY_RUN=false
 FORCE=false
 INTERACTIVE=true
 
+# Detect if stdin is a terminal (needed for piped execution: curl ... | bash)
+# When piped, stdin is the script content, not the terminal
+if [ ! -t 0 ]; then
+    # Check if we can access the terminal directly
+    if [ -e /dev/tty ]; then
+        # Redirect stdin from terminal for interactive prompts
+        exec 3</dev/tty
+        USE_TTY=true
+    else
+        # No terminal available, force non-interactive mode
+        INTERACTIVE=false
+        USE_TTY=false
+    fi
+else
+    USE_TTY=false
+fi
+
 # ============================================================================
 # Colors & Output
 # ============================================================================
@@ -269,7 +286,13 @@ prompt_yes_no() {
         prompt="$prompt [y/N]: "
     fi
 
-    read -r -p "$prompt" response
+    # Read from /dev/tty when running in piped mode (curl | bash)
+    if [ "$USE_TTY" = true ]; then
+        echo -n "$prompt"
+        read -r response <&3
+    else
+        read -r -p "$prompt" response
+    fi
     response=${response:-$default}
 
     [[ "$response" =~ ^[Yy]$ ]]
@@ -296,7 +319,14 @@ prompt_choice() {
     echo "" >&2
 
     local choice
-    read -r -p "Choose [1-${#options[@]}] (default: $default): " choice
+    local read_prompt="Choose [1-${#options[@]}] (default: $default): "
+    # Read from /dev/tty when running in piped mode (curl | bash)
+    if [ "$USE_TTY" = true ]; then
+        echo -n "$read_prompt" >&2
+        read -r choice <&3
+    else
+        read -r -p "$read_prompt" choice
+    fi
     choice=${choice:-$default}
 
     echo "$choice"
@@ -315,7 +345,14 @@ prompt_path() {
     echo "" >&2
     echo -e "${CYAN}$prompt${NC}" >&2
     echo "  Default: $default" >&2
-    read -r -p "  [Enter] to accept or type custom path: " path
+    local read_prompt="  [Enter] to accept or type custom path: "
+    # Read from /dev/tty when running in piped mode (curl | bash)
+    if [ "$USE_TTY" = true ]; then
+        echo -n "$read_prompt" >&2
+        read -r path <&3
+    else
+        read -r -p "$read_prompt" path
+    fi
     path=${path:-$default}
 
     # Expand ~ to home directory
@@ -882,7 +919,12 @@ cmd_doctor() {
 
 cmd_uninstall() {
     echo -e "${YELLOW}Are you sure you want to uninstall BetterCallClaude? [y/N]${NC}"
-    read -r response
+    # Read from /dev/tty when running in piped mode (curl | bash)
+    if [ "$USE_TTY" = true ]; then
+        read -r response <&3
+    else
+        read -r response
+    fi
 
     if [[ ! "$response" =~ ^[Yy]$ ]]; then
         echo "Uninstall cancelled."
