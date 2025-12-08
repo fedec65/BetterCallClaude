@@ -848,7 +848,75 @@ get_version() {
 }
 
 cmd_version() {
-    echo "BetterCallClaude v$(get_version)"
+    echo ""
+    echo -e "${CYAN}BetterCallClaude Version Info${NC}"
+    echo "=============================="
+    echo ""
+
+    # Installed version
+    local installed_version=$(get_version)
+    echo -e "Installed version:  ${GREEN}v${installed_version}${NC}"
+
+    # Installation paths
+    echo ""
+    echo "Installation paths:"
+    echo "  Framework:    $INSTALL_DIR"
+    if [ -f "$MANIFEST" ]; then
+        local mcp_dir=$(node -e "console.log(JSON.parse(require('fs').readFileSync('$MANIFEST')).paths.mcp_servers)" 2>/dev/null)
+        echo "  MCP Servers:  $mcp_dir"
+        local commands_dir=$(node -e "console.log(JSON.parse(require('fs').readFileSync('$MANIFEST')).paths.commands)" 2>/dev/null)
+        echo "  Commands:     $commands_dir"
+    fi
+
+    # MCP servers status
+    echo ""
+    echo "MCP Servers:"
+    if [ -f "$MANIFEST" ]; then
+        local mcp_dir=$(node -e "console.log(JSON.parse(require('fs').readFileSync('$MANIFEST')).paths.mcp_servers)" 2>/dev/null)
+        if [ -d "$mcp_dir" ]; then
+            for server_dir in "$mcp_dir"/*/; do
+                if [ -d "$server_dir" ]; then
+                    local server_name=$(basename "$server_dir")
+                    if [ -f "$server_dir/dist/index.js" ] || [ -f "$server_dir/build/index.js" ]; then
+                        echo -e "  ${GREEN}[✓]${NC} $server_name"
+                    else
+                        echo -e "  ${YELLOW}[!]${NC} $server_name (not built)"
+                    fi
+                fi
+            done
+        fi
+    fi
+
+    # Check for updates
+    echo ""
+    echo -e "${CYAN}Checking for updates...${NC}"
+    cd "$INSTALL_DIR" 2>/dev/null || { echo -e "${YELLOW}Cannot check updates${NC}"; return; }
+
+    git fetch origin --quiet 2>/dev/null || { echo -e "${YELLOW}Cannot fetch from remote${NC}"; return; }
+
+    local current=$(git rev-parse HEAD 2>/dev/null)
+    local remote=$(git rev-parse origin/main 2>/dev/null)
+
+    if [ -z "$current" ] || [ -z "$remote" ]; then
+        echo -e "${YELLOW}Cannot determine version status${NC}"
+    elif [ "$current" = "$remote" ]; then
+        echo -e "${GREEN}✓ You have the latest version!${NC}"
+    else
+        # Get remote version
+        local remote_version=$(git show origin/main:version.txt 2>/dev/null || echo "unknown")
+        echo -e "${YELLOW}⚡ Update available: v${remote_version}${NC}"
+        echo ""
+        echo -e "Run ${CYAN}bettercallclaude update${NC} to upgrade"
+        echo ""
+
+        # Ask if user wants to update
+        echo -n "Would you like to update now? [y/N]: "
+        read -r response
+        if [[ "$response" =~ ^[Yy]$ ]]; then
+            cmd_update
+        fi
+    fi
+    echo ""
 }
 
 cmd_update() {
@@ -1094,6 +1162,118 @@ perform_installation() {
 }
 
 # ============================================================================
+# Version Function
+# ============================================================================
+
+do_version() {
+    print_banner
+
+    # Find existing installation
+    if [ -d "$CLAUDE_DIR/bettercallclaude" ]; then
+        INSTALL_DIR="$CLAUDE_DIR/bettercallclaude"
+    elif [ -d "./.bettercallclaude" ]; then
+        INSTALL_DIR="./.bettercallclaude"
+    else
+        log_error "No existing installation found."
+        echo ""
+        echo "Install BetterCallClaude with:"
+        echo "  curl -fsSL https://raw.githubusercontent.com/fedec65/bettercallclaude/main/install.sh | bash"
+        exit 1
+    fi
+
+    local manifest="$INSTALL_DIR/manifest.json"
+
+    # Installed version
+    local installed_version="unknown"
+    if [ -f "$INSTALL_DIR/version.txt" ]; then
+        installed_version=$(cat "$INSTALL_DIR/version.txt")
+    elif [ -f "$manifest" ]; then
+        installed_version=$(node -e "console.log(JSON.parse(require('fs').readFileSync('$manifest')).version)" 2>/dev/null) || installed_version="unknown"
+    fi
+
+    echo -e "${CYAN}Installed Version${NC}"
+    echo "================="
+    echo -e "  Version:    ${GREEN}v${installed_version}${NC}"
+    echo "  Location:   $INSTALL_DIR"
+    echo ""
+
+    # MCP servers status
+    echo -e "${CYAN}MCP Servers${NC}"
+    echo "==========="
+    if [ -f "$manifest" ]; then
+        local mcp_dir=$(node -e "console.log(JSON.parse(require('fs').readFileSync('$manifest')).paths.mcp_servers)" 2>/dev/null)
+        if [ -d "$mcp_dir" ]; then
+            for server_dir in "$mcp_dir"/*/; do
+                if [ -d "$server_dir" ]; then
+                    local server_name=$(basename "$server_dir")
+                    if [ -f "$server_dir/dist/index.js" ] || [ -f "$server_dir/build/index.js" ]; then
+                        echo -e "  ${GREEN}[✓]${NC} $server_name"
+                    else
+                        echo -e "  ${YELLOW}[!]${NC} $server_name (not built)"
+                    fi
+                fi
+            done
+        else
+            echo -e "  ${YELLOW}[!]${NC} MCP directory not found: $mcp_dir"
+        fi
+    else
+        echo -e "  ${YELLOW}[!]${NC} Manifest not found"
+    fi
+    echo ""
+
+    # Check for updates
+    echo -e "${CYAN}Update Check${NC}"
+    echo "============"
+
+    if [ ! -d "$INSTALL_DIR/.git" ]; then
+        echo -e "  ${YELLOW}[!]${NC} Not a git repository, cannot check for updates"
+        return
+    fi
+
+    cd "$INSTALL_DIR"
+
+    echo -n "  Fetching latest version... "
+    if ! git fetch origin --quiet 2>/dev/null; then
+        echo -e "${YELLOW}failed${NC}"
+        echo -e "  ${YELLOW}[!]${NC} Cannot connect to remote repository"
+        return
+    fi
+    echo -e "${GREEN}done${NC}"
+
+    local current=$(git rev-parse HEAD 2>/dev/null)
+    local remote=$(git rev-parse origin/main 2>/dev/null)
+
+    if [ -z "$current" ] || [ -z "$remote" ]; then
+        echo -e "  ${YELLOW}[!]${NC} Cannot determine version status"
+    elif [ "$current" = "$remote" ]; then
+        echo -e "  ${GREEN}✓ You have the latest version!${NC}"
+    else
+        # Get remote version
+        local remote_version=$(git show origin/main:version.txt 2>/dev/null || echo "unknown")
+        echo -e "  ${YELLOW}⚡ Update available: v${remote_version}${NC}"
+        echo ""
+
+        # Ask if user wants to update (handle piped mode)
+        local response
+        echo -n "  Would you like to update now? [y/N]: "
+        if [ "$USE_TTY" = true ]; then
+            read -r response <&3
+        else
+            read -r response
+        fi
+
+        if [[ "$response" =~ ^[Yy]$ ]]; then
+            echo ""
+            do_update
+        else
+            echo ""
+            echo -e "  Run ${CYAN}./install.sh update${NC} or ${CYAN}bettercallclaude update${NC} to upgrade later"
+        fi
+    fi
+    echo ""
+}
+
+# ============================================================================
 # Update Function
 # ============================================================================
 
@@ -1204,6 +1384,7 @@ print_help() {
     echo "  update        Update existing installation"
     echo "  uninstall     Remove BetterCallClaude"
     echo "  doctor        Check installation health"
+    echo "  version       Show version and check for updates"
     echo ""
     echo "Options:"
     echo "  --help, -h        Show this help"
@@ -1247,6 +1428,10 @@ main() {
                 ;;
             doctor|check)
                 command="doctor"
+                shift
+                ;;
+            version|-v|--version)
+                command="version"
                 shift
                 ;;
             --help|-h)
@@ -1301,6 +1486,9 @@ main() {
             ;;
         doctor)
             do_doctor
+            ;;
+        version)
+            do_version
             ;;
     esac
 }
