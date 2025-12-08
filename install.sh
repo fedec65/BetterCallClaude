@@ -415,10 +415,18 @@ create_backup() {
         log_step "Backed up settings.json"
     fi
 
-    # Backup existing commands
+    # Backup existing commands (handle broken symlinks gracefully)
     if [ -d "$COMMANDS_DIR" ]; then
-        cp -r "$COMMANDS_DIR" "$BACKUP_DIR/"
-        log_step "Backed up commands directory"
+        # Use cp -rP to preserve symlinks without following them
+        # Also suppress errors for broken symlinks and continue
+        if cp -rP "$COMMANDS_DIR" "$BACKUP_DIR/" 2>/dev/null; then
+            log_step "Backed up commands directory"
+        else
+            # Fallback: copy only regular files, skip broken symlinks
+            mkdir -p "$BACKUP_DIR/commands"
+            find "$COMMANDS_DIR" -maxdepth 1 -type f -exec cp {} "$BACKUP_DIR/commands/" \; 2>/dev/null || true
+            log_step "Backed up commands directory (skipped broken symlinks)"
+        fi
     fi
 
     # Backup existing CLAUDE.md
@@ -427,10 +435,13 @@ create_backup() {
         log_step "Backed up CLAUDE.md"
     fi
 
-    # Backup existing installation
+    # Backup existing installation (handle broken symlinks gracefully)
     if [ -d "$INSTALL_DIR" ]; then
-        cp -r "$INSTALL_DIR" "$BACKUP_DIR/"
-        log_step "Backed up previous installation"
+        if cp -rP "$INSTALL_DIR" "$BACKUP_DIR/" 2>/dev/null; then
+            log_step "Backed up previous installation"
+        else
+            log_step "Previous installation backup skipped (broken symlinks)"
+        fi
     fi
 
     log_success "Backup created at: $BACKUP_DIR"
