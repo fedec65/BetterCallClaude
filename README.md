@@ -231,6 +231,11 @@ curl -fsSL .../install.sh | bash -s -- --no-interactive
 ### Managing Your Installation
 
 ```bash
+# Check current version and available updates
+bettercallclaude version
+# or
+./install.sh version
+
 # Update to latest version
 bettercallclaude update
 
@@ -243,6 +248,12 @@ bettercallclaude list
 # Uninstall (preserves customizations)
 bettercallclaude uninstall
 ```
+
+The `version` command shows:
+- ✅ Installed version number
+- ✅ Installation location
+- ✅ MCP servers status (built/not built)
+- ✅ Available updates with one-click upgrade option
 
 ### System Requirements
 
@@ -424,6 +435,7 @@ Use `/agent:` commands for autonomous research workflows.
 | Command | Description | Example |
 |---------|-------------|---------|
 | `/legal:help` | Display command help | `/legal:help --category=research` |
+| `/legal:version` | Show version and MCP status | `/legal:version` |
 | `/legal:research` | Search Swiss legal sources | `/legal:research Art. 97 OR --jurisdiction=federal` |
 | `/legal:strategy` | Case strategy analysis | `/legal:strategy breach of contract CHF 500,000` |
 | `/legal:draft` | Document drafting | `/legal:draft service agreement Swiss OR` |
