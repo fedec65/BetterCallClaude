@@ -495,18 +495,42 @@ clone_repository() {
     # Create parent directory
     mkdir -p "$(dirname "$INSTALL_DIR")"
 
-    # Remove existing if force
-    if [ -d "$INSTALL_DIR" ] && [ "$FORCE" = true ]; then
-        rm -rf "$INSTALL_DIR"
+    # Handle existing directory
+    if [ -d "$INSTALL_DIR" ]; then
+        if [ "$FORCE" = true ]; then
+            log_step "Removing existing installation (--force)"
+            rm -rf "$INSTALL_DIR"
+        elif [ -d "$INSTALL_DIR/.git" ]; then
+            # Already a git repo - update instead of clone
+            log_step "Existing installation found, updating..."
+            (
+                cd "$INSTALL_DIR"
+                git fetch --depth 1 origin main 2>/dev/null
+                git reset --hard origin/main 2>/dev/null
+            ) || {
+                log_warning "Update failed, removing and re-cloning..."
+                rm -rf "$INSTALL_DIR"
+            }
+            if [ -d "$INSTALL_DIR/.git" ]; then
+                log_success "Repository updated: $INSTALL_DIR"
+                return 0
+            fi
+        else
+            # Directory exists but not a git repo - remove it
+            log_step "Removing non-git directory at install location..."
+            rm -rf "$INSTALL_DIR"
+        fi
     fi
 
     # Clone
-    git clone --depth 1 "$REPO_URL" "$INSTALL_DIR" 2>/dev/null || {
+    local clone_output
+    if clone_output=$(git clone --depth 1 "$REPO_URL" "$INSTALL_DIR" 2>&1); then
+        log_success "Repository cloned to: $INSTALL_DIR"
+    else
         log_error "Failed to clone repository"
+        log_error "Git error: $clone_output"
         exit 1
-    }
-
-    log_success "Repository cloned to: $INSTALL_DIR"
+    fi
 }
 
 setup_mcp_servers() {
