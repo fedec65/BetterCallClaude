@@ -1,6 +1,6 @@
 # Getting Started with BetterCallClaude
 
-**Welcome to BetterCallClaude** - Your AI-powered legal intelligence framework for Swiss law.
+**Welcome to BetterCallClaude v1.3.2** - Your AI-powered legal intelligence framework for Swiss law.
 
 This guide will help you set up and start using BetterCallClaude for legal research, case strategy, and document drafting.
 
@@ -12,13 +12,15 @@ This guide will help you set up and start using BetterCallClaude for legal resea
 2. [Prerequisites](#prerequisites)
 3. [Installation](#installation)
 4. [First Steps](#first-steps)
-5. [Using the Legal Personas](#using-the-legal-personas)
-6. [Understanding Swiss Law Modes](#understanding-swiss-law-modes)
-7. [Multi-Lingual Usage](#multi-lingual-usage)
-8. [Common Workflows](#common-workflows)
-9. [Tips & Best Practices](#tips--best-practices)
-10. [Troubleshooting](#troubleshooting)
-11. [Next Steps](#next-steps)
+5. [Using the Intelligent Proxy](#using-the-intelligent-proxy)
+6. [Using the Legal Personas](#using-the-legal-personas)
+7. [Specialized Agents](#specialized-agents)
+8. [Understanding Swiss Law Modes](#understanding-swiss-law-modes)
+9. [Multi-Lingual Usage](#multi-lingual-usage)
+10. [Common Workflows](#common-workflows)
+11. [Tips & Best Practices](#tips--best-practices)
+12. [Troubleshooting](#troubleshooting)
+13. [Next Steps](#next-steps)
 
 ---
 
@@ -29,14 +31,17 @@ BetterCallClaude is a specialized legal intelligence framework built on Claude C
 - **Legal Research**: Search and analyze BGE (Bundesgericht) precedents, federal statutes, and cantonal law
 - **Case Strategy**: Develop litigation strategies with evidence-based risk assessments
 - **Document Drafting**: Create Swiss-standard contracts, court submissions, and legal opinions
+- **Intelligent Routing**: The `/legal` proxy automatically routes your queries to the right specialized agents
 
 ### Key Benefits
 
 ✅ **Save 80% of time** on legal research and precedent analysis
 ✅ **Improve quality by 25%** through systematic verification
-✅ **Multi-jurisdictional**: Federal + 6 cantonal law systems (ZH, BE, GE, BS, VD, TI)
+✅ **All 26 cantons**: Complete coverage of Swiss cantonal law systems
 ✅ **Multi-lingual**: Native support for DE, FR, IT, EN with proper legal terminology
 ✅ **Citation accuracy >95%**: Automated verification against official sources
+✅ **14 specialized agents**: Domain experts for compliance, tax, real estate, and more
+✅ **Ollama integration**: Local LLM inference for privacy-sensitive work
 
 ---
 
@@ -44,88 +49,86 @@ BetterCallClaude is a specialized legal intelligence framework built on Claude C
 
 Before you begin, ensure you have:
 
-### Required Software
-- **Claude Code**: Latest version ([Installation Guide](https://docs.anthropic.com/claude/docs/claude-code))
-- **Node.js**: v18.0.0 or higher ([Download](https://nodejs.org/))
-- **npm**: v8.0.0 or higher (comes with Node.js)
-- **Git**: For cloning the repository
-
-### Required API Keys
-- **Anthropic API Key**: Sign up at [console.anthropic.com](https://console.anthropic.com/)
-- **Tavily API Key** (Optional): For enhanced web research at [app.tavily.com](https://app.tavily.com/)
-
 ### System Requirements
-- **OS**: macOS, Linux, or Windows
-- **RAM**: Minimum 8GB recommended
-- **Disk Space**: ~500MB for framework and dependencies
+
+| Component | Required | Recommended |
+|-----------|----------|-------------|
+| **OS** | macOS, Linux, Windows (WSL2) | macOS or Linux |
+| **Claude Code** | Latest version | Latest version |
+| **Node.js** | v18.0.0+ | v20.0.0+ |
+| **Python** | 3.10+ | 3.11+ |
+| **RAM** | 8GB | 16GB |
+| **Disk Space** | 500MB | 1GB |
+
+### Optional API Keys
+- **Tavily API Key**: For enhanced web research at [app.tavily.com](https://app.tavily.com/)
+- **Ollama**: For local LLM inference (privacy-sensitive work)
+
+> **Note**: When using BetterCallClaude via Claude Code CLI, no API keys are required for basic functionality. Claude Code handles authentication automatically.
 
 ---
 
 ## Installation
 
-Follow these steps to install BetterCallClaude:
+### Quick Install (Recommended)
 
-### Step 1: Clone the Repository
+The easiest way to install BetterCallClaude is with the interactive installer:
 
 ```bash
-git clone https://github.com/yourusername/bettercallclaude.git
+curl -fsSL https://raw.githubusercontent.com/fedec65/bettercallclaude/main/install.sh | bash
+```
+
+The installer will guide you through:
+1. **Installation scope**: User-only or system-wide
+2. **MCP server location**: Default or custom path
+3. **Python environment**: Virtual environment, system Python, or skip
+4. **Backup options**: Automatic backup of existing configurations
+
+### Installation Options
+
+```bash
+# Preview what will be installed (no changes made)
+curl -fsSL https://raw.githubusercontent.com/fedec65/bettercallclaude/main/install.sh | bash -s -- --dry-run
+
+# Non-interactive installation with defaults
+curl -fsSL https://raw.githubusercontent.com/fedec65/bettercallclaude/main/install.sh | bash -s -- --no-interactive
+
+# Force reinstall
+curl -fsSL https://raw.githubusercontent.com/fedec65/bettercallclaude/main/install.sh | bash -s -- --force
+```
+
+### Developer Installation
+
+For development or contributing:
+
+```bash
+git clone https://github.com/fedec65/bettercallclaude.git
 cd bettercallclaude
+./install.sh
 ```
 
-### Step 2: Install Dependencies
+### Post-Installation
+
+After installation, verify everything is working:
 
 ```bash
-npm install
+# Check installation status
+./install.sh doctor
+
+# Or if installed globally
+bettercallclaude doctor
 ```
 
-This installs all required Node.js packages for the framework.
+### Optional: Configure API Keys
 
-### Step 3: Build MCP Servers
-
-BetterCallClaude uses **MCP (Model Context Protocol) servers** for Swiss court decision search and citation verification:
+Create a `.env` file only if you need optional features:
 
 ```bash
-cd mcp-servers
-npm install
-npm run build
-cd ..
-```
+# Optional - For enhanced web research
+TAVILY_API_KEY=your_tavily_key
 
-### Step 4: Configure API Keys
-
-Create a `.env` file in the project root directory:
-
-```bash
-# Create .env file
-cat > .env << 'EOF'
-# Required: Anthropic API Key for Claude Code
-ANTHROPIC_API_KEY=your_anthropic_api_key_here
-
-# Optional: Tavily API Key for enhanced web research
-TAVILY_API_KEY=your_tavily_api_key_here
-EOF
-```
-
-**Important**: Replace `your_anthropic_api_key_here` with your actual API key from [console.anthropic.com](https://console.anthropic.com/).
-
-### Step 5: Verify Installation
-
-Run the verification script:
-
-```bash
-npm run verify
-```
-
-You should see:
-```
-✅ Node.js version compatible (v18.x.x)
-✅ npm version compatible (v8.x.x)
-✅ Claude Code detected
-✅ MCP servers built successfully
-✅ Framework configuration loaded
-✅ API keys configured
-
-🎉 BetterCallClaude is ready to use!
+# Optional - For Ollama local LLM
+OLLAMA_HOST=http://localhost:11434
 ```
 
 ---
@@ -164,6 +167,49 @@ The response will include:
 - **Jurisdiction**: Federal or cantonal law context (🇨🇭)
 - **Analysis**: Legal analysis with proper citations
 - **Sources**: BGE references with verification status
+
+---
+
+## Using the Intelligent Proxy
+
+The easiest way to use BetterCallClaude is the `/legal` intelligent proxy. It understands natural language and routes your request to the right agent(s).
+
+### Three Usage Modes
+
+**Mode A - Natural Language (Simplest)**:
+```
+/legal I need to analyze a contract dispute and prepare a Klageschrift
+→ Automatically routes: Researcher → Strategist → Drafter
+```
+
+**Mode B - Direct Agent**:
+```
+/legal @compliance Check FINMA requirements for crypto custody
+→ Routes directly to Compliance Officer agent
+```
+
+**Mode C - Explicit Workflow**:
+```
+/legal --workflow full "Art. 97 OR breach, CHF 500,000 dispute"
+→ Executes defined pipeline with checkpoints
+```
+
+### Available Agent Routes
+
+| Route | Agent | Purpose |
+|-------|-------|---------|
+| `@researcher` | ResearcherAgent | Swiss legal research |
+| `@strategist` | StrategistAgent | Litigation strategy |
+| `@drafter` | DrafterAgent | Document drafting |
+| `@compliance` | Compliance Officer | FINMA, AML/KYC |
+| `@data-protection` | Data Protection | GDPR, nDSG/FADP |
+| `@risk` | Risk Analyst | Probability, damages |
+| `@procedure` | Procedure Specialist | Deadlines, ZPO/StPO |
+| `@translator` | Legal Translator | DE/FR/IT terminology |
+| `@fiscal` | Fiscal Expert | Tax law, DTAs |
+| `@corporate` | Corporate & Commercial | M&A, contracts |
+| `@cantonal` | Cantonal Law Expert | All 26 cantons |
+| `@realestate` | Real Estate Expert | Grundbuch, Lex Koller |
 
 ---
 
@@ -249,15 +295,17 @@ BetterCallClaude operates in **three Swiss law modes** that provide the correct 
 
 ### 2. Cantonal Law Mode 🏛️
 
-**Automatic Activation**: Canton codes (ZH, BE, GE, BS, VD, TI) or canton names
+**Automatic Activation**: Canton codes or canton names
 
-**Supported Cantons** (v1.0):
-- **Zürich (ZH)**: German, 1.5M population
-- **Bern (BE)**: German/French bilingual
-- **Genève (GE)**: French
-- **Basel-Stadt (BS)**: German
-- **Vaud (VD)**: French
-- **Ticino (TI)**: Italian
+**Supported Cantons** (v1.3.2 - All 26 cantons):
+
+| German-speaking | French-speaking | Italian/Romansh |
+|-----------------|-----------------|-----------------|
+| ZH, BE, LU, UR | GE, VD, NE, JU | TI, GR |
+| SZ, OW, NW, GL | FR (bilingual) | |
+| ZG, SO, BS, BL | BE, VS (bilingual) | |
+| SH, AR, AI, SG | | |
+| AG, TG | | |
 
 **Example**:
 ```
@@ -347,7 +395,7 @@ Explain Art. 41 OR liability requirements
 /legal:cantonal ZH
 Court fees for Zürich Commercial Court
 
-Supported cantons: ZH, BE, GE, BS, VD, TI
+Supported cantons: All 26 Swiss cantons
 ```
 
 #### Help Command
@@ -557,19 +605,19 @@ Activate the right persona for your task:
 
 **Solutions**:
 1. Verify Claude Code is installed: `claude --version`
-2. Check framework directory is in correct location
-3. Restart Claude Code
-4. Run verification script: `npm run verify`
+2. Run the doctor command: `./install.sh doctor`
+3. Check framework directory is in correct location
+4. Restart Claude Code
 
 ### Issue: MCP Servers Not Responding
 
 **Symptoms**: No BGE search results or citation verification
 
 **Solutions**:
-1. Check MCP servers are built: `cd mcp-servers && npm run build`
-2. Verify API keys in `.env` file
-3. Check network connectivity
-4. Review MCP server logs: `npm run logs`
+1. Run the doctor command: `./install.sh doctor`
+2. Check MCP servers are built: `cd mcp-servers && npm run build`
+3. Verify API keys in `.env` file (if using Tavily)
+4. Check network connectivity
 
 ### Issue: Wrong Language Output
 
@@ -586,8 +634,8 @@ Activate the right persona for your task:
 
 **Solutions**:
 1. Explicitly mention canton: "according to ZH law"
-2. Check if canton is supported (v1.0: ZH/BE/GE/BS/VD/TI)
-3. Use canton abbreviation: ZH, BE, GE, BS, VD, TI
+2. All 26 cantons are supported in v1.3.2
+3. Use standard canton abbreviations (ZH, BE, GE, etc.)
 
 ### Issue: Citation Not Found
 
@@ -659,4 +707,4 @@ Need help? We're here for you:
 
 You're now ready to transform your legal research and case strategy with AI-powered intelligence.
 
-*BetterCallClaude v1.0.0-alpha - Built for the Swiss legal community*
+*BetterCallClaude v1.3.2 - Built for Swiss Legal Professionals*

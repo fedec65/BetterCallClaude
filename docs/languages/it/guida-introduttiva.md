@@ -1,6 +1,6 @@
 # Guida Introduttiva - BetterCallClaude
 
-**Intelligenza Giuridica per Avvocati Svizzeri**
+**Intelligenza Giuridica per Avvocati Svizzeri** - Versione 1.3.2
 
 ---
 
@@ -10,103 +10,139 @@ BetterCallClaude è un framework completo di intelligenza giuridica che offre ag
 
 - **80% di risparmio di tempo** nell'analisi dei precedenti e nella ricerca giuridica
 - **25% di miglioramento della qualità** attraverso la verifica sistematica
-- **Competenza multi-giurisdizionale** nel diritto federale e cantonale (ZH, BE, GE, BS, VD, TI)
+- **Tutti i 26 Cantoni**: Copertura completa di tutti i cantoni svizzeri
 - **Precisione multilingue** nella terminologia giuridica (DE, FR, IT, EN)
+- **14 agenti specializzati** per conformità, fiscalità, immobiliare e altro
+- **Integrazione Ollama** per inferenza LLM locale su dati sensibili
 
 ---
 
-## Novità v1.1.0
+## Novità v1.3.2
 
-### Framework degli Agenti
-- **ResearcherAgent**: Ricerca giuridica autonoma con autonomia configurabile
-- **CaseManager**: Gestione intelligente dei casi e analisi dei precedenti
-- **IntegratedResearchSystem**: Orchestrazione di agente, case manager e database
+### Proxy Intelligente (`/legal`)
+- **Linguaggio naturale**: Descrivi la tua esigenza semplicemente con le tue parole
+- **Routing automatico**: Reindirizzamento agli agenti specializzati appropriati
+- **Workflow multi-agente**: Esecuzione coordinata di richieste complesse
 
-### Modalità di Autonomia
-- **CAUTIOUS**: Massima supervisione dell'utente (predefinita)
-- **BALANCED**: Decisioni di routine automatiche
-- **AUTONOMOUS**: Interazione minima per ricerche complesse
+### 14 Agenti Specializzati
+| Agente | Ambito |
+|--------|--------|
+| `@researcher` | Ricerca giuridica svizzera |
+| `@strategist` | Strategia processuale |
+| `@drafter` | Redazione documenti |
+| `@compliance` | FINMA, AML/KYC |
+| `@data-protection` | GDPR, nLPD/LPD |
+| `@risk` | Probabilità, risarcimenti |
+| `@procedure` | Termini, CPC/CPP |
+| `@translator` | Terminologia DE/FR/IT |
+| `@fiscal` | Diritto fiscale, CDI |
+| `@corporate` | M&A, contratti |
+| `@cantonal` | Tutti i 26 cantoni |
+| `@realestate` | Registro fondiario, Lex Koller |
 
-### Infrastruttura Database
-- Sistema di cache basato su SQLite
-- Decisioni DTF e tribunali cantonali
-- Gestione persistente dei casi
+### Integrazione Ollama
+- Inferenza LLM locale per lavori sensibili alla privacy
+- Nessun trasferimento di dati verso server esterni
 
 ---
 
 ## Requisiti di Sistema
 
-- **Sistema operativo**: macOS, Linux o Windows
-- **Python**: 3.11 o superiore
-- **Node.js**: v18.0.0 o superiore
-- **npm**: v8.0.0 o superiore
-- **Claude Code**: Ultima versione
+| Componente | Richiesto | Raccomandato |
+|------------|-----------|--------------|
+| **Sistema operativo** | macOS, Linux, Windows (WSL2) | macOS o Linux |
+| **Claude Code** | Ultima versione | Ultima versione |
+| **Node.js** | v18.0.0+ | v20.0.0+ |
+| **Python** | 3.10+ | 3.11+ |
+| **RAM** | 8GB | 16GB |
+| **Spazio disco** | 500MB | 1GB |
 
 ---
 
 ## Installazione
 
-### Passo 1: Clonare il repository
+### Installazione Rapida (Raccomandata)
+
+Il modo più semplice per installare BetterCallClaude è con l'installatore interattivo:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/fedec65/bettercallclaude/main/install.sh | bash
+```
+
+L'installatore ti guida attraverso:
+1. **Ambito dell'installazione**: Solo utente o sistema
+2. **Percorso server MCP**: Predefinito o personalizzato
+3. **Ambiente Python**: Ambiente virtuale, Python di sistema o salta
+4. **Opzioni di backup**: Backup automatico delle configurazioni esistenti
+
+### Opzioni di Installazione
+
+```bash
+# Anteprima dell'installazione (nessuna modifica)
+curl -fsSL https://raw.githubusercontent.com/fedec65/bettercallclaude/main/install.sh | bash -s -- --dry-run
+
+# Installazione non-interattiva con valori predefiniti
+curl -fsSL https://raw.githubusercontent.com/fedec65/bettercallclaude/main/install.sh | bash -s -- --no-interactive
+
+# Forzare la reinstallazione
+curl -fsSL https://raw.githubusercontent.com/fedec65/bettercallclaude/main/install.sh | bash -s -- --force
+```
+
+### Installazione per Sviluppatori
+
+Per lo sviluppo o i contributi:
 
 ```bash
 git clone https://github.com/fedec65/bettercallclaude.git
 cd bettercallclaude
+./install.sh
 ```
 
-### Passo 2: Configurare l'ambiente Python
+### Dopo l'Installazione
+
+Verifica che tutto funzioni:
 
 ```bash
-# Creare un ambiente virtuale
-python3 -m venv venv
-
-# Attivare (macOS/Linux)
-source venv/bin/activate
-
-# Attivare (Windows)
-.\venv\Scripts\activate
-
-# Installare le dipendenze
-pip install -r requirements.txt
+# Controllare lo stato dell'installazione
+./install.sh doctor
 ```
 
-### Passo 3: Installare i server MCP
+### Opzionale: Configurare le Chiavi API
+
+Crea un file `.env` solo se hai bisogno delle funzionalità opzionali:
 
 ```bash
-cd mcp-servers
-
-# Server Entscheidsuche (DTF e tribunali cantonali)
-cd entscheidsuche && npm install && npm run build && cd ..
-
-# Server Legal Citations
-cd legal-citations && npm install && npm run build && cd ..
-
-# Server BGE Search
-cd bge-search && npm install && npm run build && cd ..
-```
-
-### Passo 4: Configurare le chiavi API (Opzionale)
-
-> **Nota**: Quando si utilizza BetterCallClaude tramite Claude Code CLI, non sono richieste chiavi API per le funzionalità di base. Claude Code gestisce l'autenticazione automaticamente. Le chiavi opzionali seguenti abilitano funzionalità avanzate.
-
-Crea un file `.env` nella radice del progetto solo se hai bisogno delle funzionalità opzionali:
-
-```bash
-# Opzionale - Per capacità di ricerca web avanzate
+# Opzionale - Per ricerca web avanzata
 TAVILY_API_KEY=la_tua_chiave_tavily
 
-# Opzionale - Per utilizzo avanzato/autonomo
-# Necessario solo se esegui componenti Python al di fuori di Claude Code
-ANTHROPIC_API_KEY=la_tua_chiave_api
+# Opzionale - Per Ollama LLM locale
+OLLAMA_HOST=http://localhost:11434
 ```
 
-### Passo 5: Verificare l'installazione
+> **Nota**: Quando si utilizza BetterCallClaude tramite Claude Code CLI, non sono richieste chiavi API per le funzionalità di base.
 
-```bash
-# Eseguire i test Python
-pytest
+---
 
-# Eseguire i test del server MCP
-cd mcp-servers/legal-citations && npm test
+## Utilizzo del Proxy Intelligente
+
+Il modo più semplice per usare BetterCallClaude è il proxy intelligente `/legal`:
+
+### Modalità A - Linguaggio Naturale (La Più Semplice)
+```
+/legal Ho bisogno di analizzare una controversia contrattuale e preparare un atto di citazione
+→ Routing automatico: Researcher → Strategist → Drafter
+```
+
+### Modalità B - Agente Diretto
+```
+/legal @compliance Verificare i requisiti FINMA per la custodia di crypto
+→ Routing diretto all'agente Compliance Officer
+```
+
+### Modalità C - Workflow Esplicito
+```
+/legal --workflow full "Violazione art. 97 CO, CHF 500'000 in controversia"
+→ Esecuzione del workflow definito con checkpoint
 ```
 
 ---
@@ -128,16 +164,16 @@ cd mcp-servers/legal-citations && npm test
 | Comando | Descrizione |
 |---------|-------------|
 | `/agent:researcher` | Avvia la ricerca giuridica autonoma |
-| `/agent:researcher --mode cautious` | Con massima supervisione |
-| `/agent:researcher --mode balanced` | Con autonomia equilibrata |
-| `/agent:researcher --mode autonomous` | Con interazione minima |
+| `/agent:strategist` | Avvia l'analisi strategica |
+| `/agent:drafter` | Avvia la redazione documenti |
 
 ### Comandi di Aiuto
 
 | Comando | Descrizione |
 |---------|-------------|
 | `/legal:help` | Mostra l'aiuto dei comandi |
-| `/legal:version` | Mostra le informazioni sulla versione |
+| `/legal:federal` | Forza la modalità diritto federale |
+| `/legal:cantonal [CANTONE]` | Forza la modalità diritto cantonale |
 
 ---
 
@@ -152,27 +188,41 @@ claude
 # Ricerca DTF
 "Cerca DTF sulla responsabilità contrattuale art. 97 CO"
 
-# Con il Framework degli Agenti
-"/agent:researcher 'Trova tutti i DTF rilevanti sul diritto di locazione e la protezione contro le disdette'"
+# Con il proxy intelligente
+"/legal Trova tutti i DTF rilevanti sul diritto di locazione e la protezione contro le disdette"
 ```
 
 ### Strategia del Caso
 
 ```bash
-"Analizza la strategia processuale per una violazione del contratto ai sensi dell'art. 97 CO"
+"/legal @strategist Analizza la strategia processuale per una violazione del contratto ai sensi dell'art. 97 CO"
 ```
 
 ### Redazione di Documenti
 
 ```bash
-"Redigi un contratto di servizi secondo il CO svizzero per lo sviluppo software"
+"/legal @drafter Redigi un contratto di servizi secondo il CO svizzero per lo sviluppo software"
 ```
 
-### Analisi dei Precedenti
+### Verifica di Conformità
 
 ```bash
-"/legal:compare 'DTF 123 III 456' 'DTF 130 III 789'"
+"/legal @compliance Verifica i requisiti LRD per una transazione immobiliare di CHF 2 Mio."
 ```
+
+---
+
+## Cantoni Supportati
+
+BetterCallClaude v1.3.2 supporta tutti i 26 cantoni svizzeri:
+
+| Germanofoni | Francofoni | Italiano/Romancio |
+|-------------|------------|-------------------|
+| ZH, BE, LU, UR | GE, VD, NE, JU | TI, GR |
+| SZ, OW, NW, GL | FR (bilingue) | |
+| ZG, SO, BS, BL | BE, VS (bilingue) | |
+| SH, AR, AI, SG | | |
+| AG, TG | | |
 
 ---
 
@@ -184,30 +234,27 @@ Cerca le decisioni su bundesgericht.ch e tribunali cantonali.
 ### Server Legal Citations
 Verifica e formatta le citazioni secondo gli standard svizzeri:
 - Formato DTF (DTF 123 III 456)
-- Formati cantonali (ZH, BE, GE, BS, VD, TI)
+- Formati cantonali (tutti i 26 cantoni)
 - Adattamento multilingue
-
-### Server BGE Search
-Ricerca specializzata nelle decisioni DTF con:
-- Ricerca nel testo integrale
-- Filtro per area giuridica
-- Restrizione del periodo
 
 ---
 
 ## Risoluzione dei Problemi
 
-### Ambiente Python
+### Framework non caricato
 ```bash
-# Ricreare l'ambiente virtuale
-rm -rf venv
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
+# Controllare lo stato dell'installazione
+./install.sh doctor
+
+# Riavviare Claude Code
+claude
 ```
 
 ### Problemi del Server MCP
 ```bash
+# Eseguire il comando doctor
+./install.sh doctor
+
 # Reinstallare i moduli Node
 cd mcp-servers/legal-citations
 rm -rf node_modules
@@ -215,18 +262,33 @@ npm install
 npm run build
 ```
 
-### Chiavi API
-Assicurati che il file `.env` sia configurato correttamente e che le chiavi siano valide.
+### Cantone sbagliato applicato
+- Tutti i 26 cantoni sono supportati in v1.3.2
+- Usa le abbreviazioni cantonali standard (ZH, BE, GE, etc.)
+- Menzione esplicita: "secondo il diritto di TI"
 
 ---
 
 ## Risorse Aggiuntive
 
-- [Documentazione in inglese](../../README.md)
-- [Architettura degli Agenti](../../docs/AGENT_ARCHITECTURE.md)
-- [Riferimento dei Comandi](../../docs/command-reference.md)
-- [Architettura del Framework](../../../.claude/BETTERASK.md)
+- [Documentazione in inglese](../../getting-started.md)
+- [Riferimento dei Comandi](../../.claude/commands/legal-help.md)
+- [Repository GitHub](https://github.com/fedec65/bettercallclaude)
 
 ---
 
-*BetterCallClaude v1.1.0 - Intelligenza Giuridica per gli Avvocati Svizzeri*
+## Avvertenza
+
+**IMPORTANTE**: BetterCallClaude è uno strumento di ricerca e analisi giuridica. Tutti i risultati:
+
+- Richiedono una revisione professionale da parte di un avvocato
+- Non costituiscono consulenza legale
+- Possono contenere errori o omissioni
+- Devono essere verificati presso le fonti ufficiali
+- Devono essere adattati alle circostanze specifiche del caso
+
+**Gli avvocati mantengono la piena responsabilità professionale per tutti i lavori giuridici.**
+
+---
+
+*BetterCallClaude v1.3.2 - Intelligenza Giuridica per gli Avvocati Svizzeri*
