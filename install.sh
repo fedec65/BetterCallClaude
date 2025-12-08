@@ -478,21 +478,38 @@ setup_mcp_servers() {
         log_step "Copied MCP server sources"
     fi
 
-    # Build each MCP server
-    for server_dir in "$MCP_SERVERS_DIR"/*/; do
-        if [ -d "$server_dir" ] && [ -f "$server_dir/package.json" ]; then
-            local server_name=$(basename "$server_dir")
-            log_step "Building $server_name..."
+    # Check if this is a npm workspaces monorepo
+    if [ -f "$MCP_SERVERS_DIR/package.json" ]; then
+        local has_workspaces=$(grep -c '"workspaces"' "$MCP_SERVERS_DIR/package.json" 2>/dev/null || echo "0")
 
+        if [ "$has_workspaces" -gt 0 ]; then
+            # Build using npm workspaces (handles dependencies correctly)
+            log_step "Building MCP servers using npm workspaces..."
             (
-                cd "$server_dir"
+                cd "$MCP_SERVERS_DIR"
+                # Install all dependencies and setup workspace symlinks
                 npm install --silent 2>/dev/null || npm install
-                if [ -f "tsconfig.json" ]; then
-                    npm run build --silent 2>/dev/null || npm run build || true
+                # Build all workspaces (shared first due to dependency order)
+                npm run build --silent 2>/dev/null || npm run build || true
+            ) || log_warning "Some MCP servers failed to build"
+        else
+            # Fallback: Build each server individually
+            for server_dir in "$MCP_SERVERS_DIR"/*/; do
+                if [ -d "$server_dir" ] && [ -f "$server_dir/package.json" ]; then
+                    local server_name=$(basename "$server_dir")
+                    log_step "Building $server_name..."
+
+                    (
+                        cd "$server_dir"
+                        npm install --silent 2>/dev/null || npm install
+                        if [ -f "tsconfig.json" ]; then
+                            npm run build --silent 2>/dev/null || npm run build || true
+                        fi
+                    ) || log_warning "Failed to build $server_name"
                 fi
-            ) || log_warning "Failed to build $server_name"
+            done
         fi
-    done
+    fi
 
     log_success "MCP servers configured"
 }

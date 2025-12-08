@@ -438,7 +438,8 @@ async function getRelatedDecisions(decisionId: string, limit: number = 5): Promi
     }
 
     // Convert Decision entities to API format (Date → string)
-    const relatedDecisions = related.map(d => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const relatedDecisions = related.map((d: any) => ({
       ...d,
       decisionDate: d.decisionDate.toISOString().split('T')[0],
     })) as Array<BundesgerichtDecision | CantonalDecision>;
@@ -898,7 +899,7 @@ function calculateSimilarity(
     // Legal area overlap
     const baseLegalAreas = new Set(base.legalAreas || []);
     const candidateLegalAreas = candidate.legalAreas || [];
-    const legalAreaOverlap = candidateLegalAreas.filter(a => baseLegalAreas.has(a));
+    const legalAreaOverlap = candidateLegalAreas.filter((a: string) => baseLegalAreas.has(a));
     if (legalAreaOverlap.length > 0) {
       score += 0.3;
       factors.push(`Matching legal areas: ${legalAreaOverlap.join(", ")}`);
