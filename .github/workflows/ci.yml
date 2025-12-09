@@ -80,7 +80,7 @@ jobs:
         working-directory: mcp-servers
         run: npm run build
 
-      - name: Run Jest tests
+      - name: Run Vitest tests
         working-directory: mcp-servers
         run: npm test -- --coverage
 

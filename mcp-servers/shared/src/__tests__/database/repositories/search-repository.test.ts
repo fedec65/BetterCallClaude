@@ -2,6 +2,7 @@
  * Search Repository Tests
  */
 
+import { describe, test, expect, beforeEach, afterEach } from 'vitest';
 import { DatabaseClient, DatabaseConfig } from '../../../database/client';
 import { SearchRepository, SearchQuery } from '../../../database/repositories/search-repository';
 import { randomUUID } from 'crypto';

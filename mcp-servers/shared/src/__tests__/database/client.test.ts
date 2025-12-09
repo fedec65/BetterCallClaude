@@ -3,6 +3,7 @@
  * Tests for unified PostgreSQL and SQLite database client
  */
 
+import { describe, it, test, expect, beforeEach, afterEach } from 'vitest';
 import { DatabaseClient, createDatabaseClient, DatabaseConfig } from '../../database/client';
 import { randomUUID } from 'crypto';
 import { unlinkSync, existsSync } from 'fs';

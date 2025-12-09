@@ -3,6 +3,7 @@
  * Tests: config/index.ts (getConfig, validateConfig)
  */
 
+import { describe, it, expect } from 'vitest';
 import { getConfig } from '../config/config';
 
 describe('Configuration System', () => {

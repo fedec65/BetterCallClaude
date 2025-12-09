@@ -11,6 +11,7 @@
  * which has ~5-10x overhead compared to native better-sqlite3.
  */
 
+import { describe, it, test, expect, beforeEach, afterEach } from 'vitest';
 import { DatabaseClient, DatabaseConfig } from '../../database/client';
 import { BGERepository } from '../../database/repositories/bge-repository';
 import { CacheRepository } from '../../database/repositories/cache-repository';

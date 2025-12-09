@@ -3,8 +3,10 @@
  * Tests: api-clients/CantonalClient.ts
  */
 
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+
 // Mock p-retry to avoid ESM import issues
-jest.mock('p-retry', () => ({
+vi.mock('p-retry', () => ({
   __esModule: true,
   default: async (fn: () => Promise<unknown>): Promise<unknown> => await fn(),
 }));

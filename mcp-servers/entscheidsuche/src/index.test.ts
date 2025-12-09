@@ -3,7 +3,7 @@
  * Tests for Swiss federal and cantonal court decision search functionality
  */
 
-import { describe, it, expect } from '@jest/globals';
+import { describe, it, expect } from 'vitest';
 
 // Court decision type definition
 interface CourtDecision {

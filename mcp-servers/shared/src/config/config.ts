@@ -5,7 +5,7 @@
 
 import Joi from 'joi';
 
-export type Environment = 'development' | 'staging' | 'production';
+export type Environment = 'development' | 'staging' | 'production' | 'test';
 export type DatabaseType = 'postgres' | 'sqlite';
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 export type LogFormat = 'json' | 'text';
@@ -55,7 +55,7 @@ export interface AppConfig {
  */
 const configSchema = Joi.object<AppConfig>({
   environment: Joi.string()
-    .valid('development', 'staging', 'production')
+    .valid('development', 'staging', 'production', 'test')
     .required(),
 
   database: Joi.object({

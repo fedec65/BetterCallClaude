@@ -3,7 +3,7 @@
  * Tests for Swiss Federal Supreme Court decision search functionality
  */
 
-import { describe, it, expect } from '@jest/globals';
+import { describe, it, expect } from 'vitest';
 
 // Import types and functions to test
 interface BGEDecision {

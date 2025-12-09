@@ -3,6 +3,7 @@
  * Tests: logging/Logger.ts, logging/index.ts
  */
 
+import { describe, it, expect, beforeEach } from 'vitest';
 import { Logger, getLogger } from '../logging/logger';
 import * as winston from 'winston';
 

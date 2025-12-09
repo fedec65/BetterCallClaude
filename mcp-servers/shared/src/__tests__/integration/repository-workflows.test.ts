@@ -4,6 +4,7 @@
  * Tests complete CRUD cycles, cross-repository operations, and real-world scenarios
  */
 
+import { describe, it, test, expect, beforeEach, afterEach } from 'vitest';
 import { DatabaseClient, DatabaseConfig } from '../../database/client';
 import { BGERepository, BGEDecision } from '../../database/repositories/bge-repository';
 import { CantonalRepository, CantonalDecision } from '../../database/repositories/cantonal-repository';

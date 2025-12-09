@@ -3,24 +3,25 @@
  * Tests the complete integration with shared infrastructure
  */
 
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import nock from 'nock';
 
 // Mock MCP SDK before imports
-jest.mock('@modelcontextprotocol/sdk/server/index.js', () => ({
-  Server: jest.fn().mockImplementation(() => ({
-    setRequestHandler: jest.fn(),
-    connect: jest.fn(),
+vi.mock('@modelcontextprotocol/sdk/server/index.js', () => ({
+  Server: vi.fn().mockImplementation(() => ({
+    setRequestHandler: vi.fn(),
+    connect: vi.fn(),
   })),
 }));
 
-jest.mock('@modelcontextprotocol/sdk/server/stdio.js', () => ({
-  StdioServerTransport: jest.fn(),
+vi.mock('@modelcontextprotocol/sdk/server/stdio.js', () => ({
+  StdioServerTransport: vi.fn(),
 }));
 
 describe('BGE-Search MCP Server Integration', () => {
   beforeEach(() => {
     // Clear all mocks
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     nock.cleanAll();
 
     // Set test environment variables

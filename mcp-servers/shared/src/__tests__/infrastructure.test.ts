@@ -3,6 +3,7 @@
  * Tests core infrastructure components for Phase 1 and Phase 2
  */
 
+import { describe, it, expect, beforeEach } from 'vitest';
 import { getConfig } from '../config/config';
 import { Logger, getLogger } from '../logging/logger';
 

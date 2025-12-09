@@ -2,6 +2,7 @@
  * Cache Repository Tests
  */
 
+import { describe, test, expect, beforeEach, afterEach } from 'vitest';
 import { DatabaseClient, DatabaseConfig } from '../../../database/client';
 import { CacheRepository } from '../../../database/repositories/cache-repository';
 

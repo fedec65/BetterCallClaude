@@ -2,6 +2,7 @@
  * Cantonal Repository Tests
  */
 
+import { describe, test, expect, beforeEach, afterEach } from 'vitest';
 import { DatabaseClient, DatabaseConfig } from '../../../database/client';
 import { CantonalRepository, CantonalDecision } from '../../../database/repositories/cantonal-repository';
 import { randomUUID } from 'crypto';

@@ -2,6 +2,7 @@
  * BGE Repository Tests
  */
 
+import { describe, test, expect, beforeEach, afterEach } from 'vitest';
 import { DatabaseClient, DatabaseConfig } from '../../../database/client';
 import { BGERepository, BGEDecision } from '../../../database/repositories/bge-repository';
 import { randomUUID } from 'crypto';
