@@ -320,12 +320,17 @@ check_prerequisites() {
         errors=$((errors + 1))
     fi
 
-    # Node.js >= 18 (required for MCP servers)
+    # Node.js >= 18 and <= 22 (required for MCP servers with native modules)
     if check_command node; then
         local node_ver=$(get_version node)
         local node_major=$(echo "$node_ver" | cut -d. -f1)
-        if [ "$node_major" -ge 18 ]; then
-            log_success "Node.js: $node_ver (>= 18 required)"
+        if [ "$node_major" -ge 18 ] && [ "$node_major" -le 22 ]; then
+            log_success "Node.js: $node_ver (18-22 supported)"
+        elif [ "$node_major" -ge 18 ]; then
+            log_warning "Node.js: $node_ver (v23+ may have issues with native modules)"
+            log_warning "Some packages like better-sqlite3 may fail to build."
+            log_warning "Recommended: Use Node.js 20.x or 22.x LTS for best compatibility."
+            warnings=$((warnings + 1))
         else
             log_error "Node.js: $node_ver (>= 18 required, found $node_major)"
             errors=$((errors + 1))
@@ -355,9 +360,15 @@ check_prerequisites() {
         local py_ver=$(get_version "$python_cmd")
         local py_major=$(echo "$py_ver" | cut -d. -f1)
         local py_minor=$(echo "$py_ver" | cut -d. -f2)
-        if [ "$py_major" -ge 3 ] && [ "$py_minor" -ge 10 ]; then
-            log_success "Python: $py_ver (>= 3.10 required)"
+        if [ "$py_major" -ge 3 ] && [ "$py_minor" -ge 10 ] && [ "$py_minor" -le 12 ]; then
+            log_success "Python: $py_ver (3.10-3.12 supported)"
             PYTHON_CMD="$python_cmd"
+        elif [ "$py_major" -ge 3 ] && [ "$py_minor" -ge 10 ]; then
+            log_warning "Python: $py_ver (3.13+ may have compatibility issues)"
+            log_warning "Some packages like lxml may fail to build from source."
+            log_warning "Recommended: Use Python 3.11 or 3.12 for best compatibility."
+            PYTHON_CMD="$python_cmd"
+            warnings=$((warnings + 1))
         else
             log_error "Python: $py_ver (>= 3.10 required)"
             errors=$((errors + 1))
@@ -640,7 +651,10 @@ clone_repository() {
             log_step "Existing installation found, updating..."
             (
                 cd "$INSTALL_DIR"
-                git fetch --depth 1 origin main 2>/dev/null
+                # Unshallow if necessary and fetch all refs properly
+                git fetch --unshallow origin 2>/dev/null || git fetch origin 2>/dev/null || true
+                git fetch origin main 2>/dev/null
+                git checkout main 2>/dev/null || true
                 git reset --hard origin/main 2>/dev/null
             ) || {
                 log_warning "Update failed, removing and re-cloning..."
