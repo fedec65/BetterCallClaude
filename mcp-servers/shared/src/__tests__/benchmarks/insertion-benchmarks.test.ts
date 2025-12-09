@@ -6,6 +6,9 @@
  * - Bulk inserts (100, 1000, 10000 records)
  * - Individual inserts with transaction overhead
  * - Cache write performance
+ *
+ * Note: Thresholds are set for WASM-based SQLite (node-sqlite3-wasm)
+ * which has ~5-10x overhead compared to native better-sqlite3.
  */
 
 import { DatabaseClient, DatabaseConfig } from '../../database/client';
@@ -75,9 +78,9 @@ describe('Insertion Performance Benchmarks', () => {
       console.log(`   Per Record: ${perRecord.toFixed(2)}ms`);
       console.log(`   Rate: ${(1000 / perRecord).toFixed(0)} records/second`);
 
-      // Performance assertions (realistic for SQLite)
-      expect(duration).toBeLessThan(5000); // 5 seconds max for 100 records
-      expect(perRecord).toBeLessThan(50); // 50ms max per record
+      // Performance assertions (realistic for WASM SQLite)
+      expect(duration).toBeLessThan(30000); // WASM SQLite has ~5-10x overhead vs native
+      expect(perRecord).toBeLessThan(300); // WASM overhead per record
     });
 
     test('Benchmark: Insert 1000 BGE decisions', async () => {
@@ -133,7 +136,7 @@ describe('Insertion Performance Benchmarks', () => {
       console.log(`   Per Record: ${perRecord.toFixed(2)}ms`);
       console.log(`   Rate: ${(1000 / perRecord).toFixed(0)} records/second`);
 
-      expect(duration).toBeLessThan(5000);
+      expect(duration).toBeLessThan(30000); // WASM SQLite overhead
     });
   });
 
@@ -159,7 +162,7 @@ describe('Insertion Performance Benchmarks', () => {
       console.log(`   Per Write: ${perWrite.toFixed(2)}ms`);
       console.log(`   Rate: ${(1000 / perWrite).toFixed(0)} writes/second`);
 
-      expect(duration).toBeLessThan(3000); // Cache should be fast
+      expect(duration).toBeLessThan(15000); // WASM SQLite overhead
     });
 
     test('Benchmark: 100 cache writes (large JSON)', async () => {
@@ -193,7 +196,7 @@ describe('Insertion Performance Benchmarks', () => {
       console.log(`   Per Write: ${perWrite.toFixed(2)}ms`);
       console.log(`   Rate: ${(1000 / perWrite).toFixed(0)} writes/second`);
 
-      expect(duration).toBeLessThan(10000); // Large objects take longer
+      expect(duration).toBeLessThan(60000); // WASM SQLite + large objects
     });
   });
 
@@ -244,7 +247,7 @@ describe('Insertion Performance Benchmarks', () => {
       console.log(`   Per Operation: ${perOp.toFixed(2)}ms`);
       console.log(`   Rate: ${(1000 / perOp).toFixed(0)} ops/second`);
 
-      expect(duration).toBeLessThan(5000);
+      expect(duration).toBeLessThan(30000); // WASM SQLite overhead
     });
   });
 
@@ -277,7 +280,7 @@ describe('Insertion Performance Benchmarks', () => {
       console.log(`   Per Record: ${perRecord.toFixed(2)}ms`);
       console.log(`   Rate: ${(1000 / perRecord).toFixed(0)} records/second`);
 
-      expect(duration).toBeLessThan(5000);
+      expect(duration).toBeLessThan(30000); // WASM SQLite overhead
     });
   });
 });

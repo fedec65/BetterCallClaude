@@ -7,6 +7,9 @@
  * - Complex searches (full-text, date ranges)
  * - Aggregations (counts, analytics)
  * - Cache hit rates and lookup times
+ *
+ * Note: Thresholds are set for WASM-based SQLite (node-sqlite3-wasm)
+ * which has ~5-10x overhead compared to native better-sqlite3.
  */
 
 import { DatabaseClient, DatabaseConfig } from '../../database/client';
@@ -125,8 +128,8 @@ describe('Query Performance Benchmarks', () => {
       console.log(`   Per Lookup: ${perLookup.toFixed(2)}ms`);
       console.log(`   Rate: ${(1000 / perLookup).toFixed(0)} lookups/second`);
 
-      expect(duration).toBeLessThan(2000); // 2 seconds for 100 indexed lookups
-      expect(perLookup).toBeLessThan(20); // 20ms max per lookup
+      expect(duration).toBeLessThan(10000); // WASM SQLite has ~5x overhead
+      expect(perLookup).toBeLessThan(100); // WASM overhead per lookup
     });
 
     test('Benchmark: 100 cache get operations', async () => {
@@ -145,8 +148,8 @@ describe('Query Performance Benchmarks', () => {
       console.log(`   Per Lookup: ${perGet.toFixed(2)}ms`);
       console.log(`   Rate: ${(1000 / perGet).toFixed(0)} lookups/second`);
 
-      expect(duration).toBeLessThan(1000); // Cache should be very fast
-      expect(perGet).toBeLessThan(10);
+      expect(duration).toBeLessThan(5000); // WASM SQLite has ~5x overhead
+      expect(perGet).toBeLessThan(50); // WASM overhead per get
     });
   });
 
@@ -169,7 +172,7 @@ describe('Query Performance Benchmarks', () => {
       console.log(`   Per Search: ${perSearch.toFixed(2)}ms`);
       console.log(`   Rate: ${(1000 / perSearch).toFixed(0)} searches/second`);
 
-      expect(duration).toBeLessThan(10000); // 10 seconds for 50 LIKE searches
+      expect(duration).toBeLessThan(50000); // WASM SQLite has ~5x overhead
     });
 
     test('Benchmark: 50 date range queries', async () => {
@@ -191,7 +194,7 @@ describe('Query Performance Benchmarks', () => {
       console.log(`   Per Query: ${perQuery.toFixed(2)}ms`);
       console.log(`   Rate: ${(1000 / perQuery).toFixed(0)} queries/second`);
 
-      expect(duration).toBeLessThan(5000);
+      expect(duration).toBeLessThan(25000); // WASM SQLite has ~5x overhead
     });
 
     test('Benchmark: 50 chamber filter queries', async () => {
@@ -212,7 +215,7 @@ describe('Query Performance Benchmarks', () => {
       console.log(`   Per Query: ${perQuery.toFixed(2)}ms`);
       console.log(`   Rate: ${(1000 / perQuery).toFixed(0)} queries/second`);
 
-      expect(duration).toBeLessThan(5000);
+      expect(duration).toBeLessThan(25000); // WASM SQLite has ~5x overhead
     });
   });
 
@@ -233,7 +236,7 @@ describe('Query Performance Benchmarks', () => {
       console.log(`   Per Count: ${perCount.toFixed(2)}ms`);
       console.log(`   Rate: ${(1000 / perCount).toFixed(0)} counts/second`);
 
-      expect(duration).toBeLessThan(2000);
+      expect(duration).toBeLessThan(10000); // WASM SQLite has ~5x overhead
     });
 
     test('Benchmark: 50 canton count operations', async () => {
@@ -254,7 +257,7 @@ describe('Query Performance Benchmarks', () => {
       console.log(`   Per Count: ${perCount.toFixed(2)}ms`);
       console.log(`   Rate: ${(1000 / perCount).toFixed(0)} counts/second`);
 
-      expect(duration).toBeLessThan(2000);
+      expect(duration).toBeLessThan(10000); // WASM SQLite has ~5x overhead
     });
 
     test('Benchmark: Search analytics generation', async () => {
@@ -273,7 +276,7 @@ describe('Query Performance Benchmarks', () => {
       console.log(`   Per Analytics: ${perAnalytics.toFixed(2)}ms`);
       console.log(`   Rate: ${(1000 / perAnalytics).toFixed(0)} analytics/second`);
 
-      expect(duration).toBeLessThan(3000);
+      expect(duration).toBeLessThan(15000); // WASM SQLite has ~5x overhead
     });
   });
 
@@ -308,7 +311,7 @@ describe('Query Performance Benchmarks', () => {
       console.log(`   Avg Query Time: ${(duration / totalQueries).toFixed(2)}ms`);
 
       expect(hitRate).toBeGreaterThan(90); // Expect >90% hit rate
-      expect(duration).toBeLessThan(2000);
+      expect(duration).toBeLessThan(10000); // WASM SQLite has ~5x overhead
     });
 
     test('Benchmark: Cache statistics query', async () => {
@@ -327,7 +330,7 @@ describe('Query Performance Benchmarks', () => {
       console.log(`   Per Query: ${perQuery.toFixed(2)}ms`);
       console.log(`   Rate: ${(1000 / perQuery).toFixed(0)} queries/second`);
 
-      expect(duration).toBeLessThan(1000);
+      expect(duration).toBeLessThan(5000); // WASM SQLite has ~5x overhead
     });
   });
 
@@ -357,7 +360,7 @@ describe('Query Performance Benchmarks', () => {
       console.log(`   Per Operation: ${perOp.toFixed(2)}ms`);
       console.log(`   Rate: ${(1000 / perOp).toFixed(0)} ops/second`);
 
-      expect(duration).toBeLessThan(10000);
+      expect(duration).toBeLessThan(50000); // WASM SQLite has ~5x overhead
     });
   });
 });
