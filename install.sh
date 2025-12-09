@@ -1040,6 +1040,10 @@ cmd_version() {
             for server_dir in "$mcp_dir"/*/; do
                 if [ -d "$server_dir" ]; then
                     local server_name=$(basename "$server_dir")
+                    # Skip non-server directories
+                    if [ "$server_name" = "node_modules" ] || [ "$server_name" = "integration-tests" ]; then
+                        continue
+                    fi
                     if [ -f "$server_dir/dist/index.js" ] || [ -f "$server_dir/build/index.js" ]; then
                         echo -e "  ${GREEN}[✓]${NC} $server_name"
                     else
@@ -1373,6 +1377,10 @@ do_version() {
             for server_dir in "$mcp_dir"/*/; do
                 if [ -d "$server_dir" ]; then
                     local server_name=$(basename "$server_dir")
+                    # Skip non-server directories
+                    if [ "$server_name" = "node_modules" ] || [ "$server_name" = "integration-tests" ]; then
+                        continue
+                    fi
                     if [ -f "$server_dir/dist/index.js" ] || [ -f "$server_dir/build/index.js" ]; then
                         echo -e "  ${GREEN}[✓]${NC} $server_name"
                     else
