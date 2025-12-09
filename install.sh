@@ -23,6 +23,7 @@ set -e
 VERSION="1.3.2"
 REPO_URL="https://github.com/fedec65/BetterCallClaude.git"
 REPO_RAW_URL="https://raw.githubusercontent.com/fedec65/BetterCallClaude/main"
+SUPPORT_EMAIL="federico@cesconi.com"
 
 # Detect home directory (cross-platform)
 if [ -n "$HOME" ]; then
@@ -40,6 +41,142 @@ DEFAULT_MCP_DIR="$HOME_DIR/.bettercallclaude"
 BACKUP_DIR="$CLAUDE_DIR/backups/bettercallclaude-$(date +%Y%m%d-%H%M%S)"
 CUSTOMIZATIONS_DIR="$CLAUDE_DIR/customizations"
 
+# ============================================================================
+# Logging System
+# ============================================================================
+
+# Create log directory and file
+LOG_DIR="$HOME_DIR/.bettercallclaude/logs"
+LOG_TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+LOG_FILE="$LOG_DIR/install-$LOG_TIMESTAMP.log"
+INSTALL_SUCCESS=false
+
+# Initialize logging
+init_logging() {
+    mkdir -p "$LOG_DIR"
+
+    # Create log file with system info header
+    {
+        echo "================================================================================"
+        echo "BetterCallClaude Installation Log"
+        echo "================================================================================"
+        echo "Timestamp:     $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+        echo "Installer:     v${VERSION}"
+        echo "Platform:      $(uname -s) $(uname -r)"
+        echo "Architecture:  $(uname -m)"
+        echo "Shell:         $SHELL ($BASH_VERSION)"
+        echo "User:          $(whoami)"
+        echo "Home:          $HOME_DIR"
+        echo "Working Dir:   $(pwd)"
+        echo ""
+        echo "--- Environment ---"
+        echo "PATH: $PATH"
+        echo "LANG: ${LANG:-not set}"
+        echo "LC_ALL: ${LC_ALL:-not set}"
+        echo ""
+        echo "--- Tool Versions ---"
+        echo "Git:     $(git --version 2>/dev/null || echo 'not found')"
+        echo "Node:    $(node --version 2>/dev/null || echo 'not found')"
+        echo "npm:     $(npm --version 2>/dev/null || echo 'not found')"
+        echo "Python:  $(python3 --version 2>/dev/null || python --version 2>/dev/null || echo 'not found')"
+        echo ""
+        echo "================================================================================"
+        echo "Installation Log"
+        echo "================================================================================"
+        echo ""
+    } > "$LOG_FILE"
+
+    # Start capturing all output to log file (while still showing on screen)
+    exec > >(tee -a "$LOG_FILE") 2>&1
+}
+
+# Log a message to file only (for internal tracking)
+log_to_file() {
+    echo "[$(date '+%H:%M:%S')] $1" >> "$LOG_FILE"
+}
+
+# Error handler - called when installation fails
+handle_error() {
+    local exit_code=$?
+    local line_number=$1
+    local command="$2"
+
+    # Add error details to log
+    {
+        echo ""
+        echo "================================================================================"
+        echo "INSTALLATION FAILED"
+        echo "================================================================================"
+        echo "Exit Code:     $exit_code"
+        echo "Failed at:     Line $line_number"
+        echo "Command:       $command"
+        echo "Timestamp:     $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+        echo ""
+        echo "--- Last 50 lines of output ---"
+        tail -50 "$LOG_FILE" 2>/dev/null || echo "(unable to read log)"
+        echo ""
+        echo "================================================================================"
+    } >> "$LOG_FILE"
+
+    # Show user-friendly error message
+    echo ""
+    echo -e "${RED}╔═══════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${RED}║              INSTALLATION FAILED                              ║${NC}"
+    echo -e "${RED}╚═══════════════════════════════════════════════════════════════╝${NC}"
+    echo ""
+    echo -e "${YELLOW}An error occurred during installation.${NC}"
+    echo ""
+    echo -e "${BOLD}📋 A detailed log file has been created:${NC}"
+    echo -e "   ${CYAN}$LOG_FILE${NC}"
+    echo ""
+    echo -e "${BOLD}📧 Please send this log file for support:${NC}"
+    echo -e "   ${CYAN}$SUPPORT_EMAIL${NC}"
+    echo ""
+    echo -e "${BOLD}Quick email command:${NC}"
+    if [ "$PLATFORM" = "macos" ]; then
+        echo -e "   ${CYAN}open \"mailto:$SUPPORT_EMAIL?subject=BetterCallClaude%20Installation%20Error&body=Please%20attach%20the%20log%20file%20from%20$LOG_FILE\"${NC}"
+    else
+        echo -e "   ${CYAN}mail -s 'BetterCallClaude Installation Error' $SUPPORT_EMAIL < \"$LOG_FILE\"${NC}"
+    fi
+    echo ""
+    echo -e "${BOLD}Or manually:${NC}"
+    echo "   1. Open your email client"
+    echo "   2. Create a new email to: $SUPPORT_EMAIL"
+    echo "   3. Subject: BetterCallClaude Installation Error"
+    echo "   4. Attach the log file: $LOG_FILE"
+    echo "   5. Describe what you were trying to do"
+    echo ""
+    echo -e "${YELLOW}We'll investigate and help you resolve this issue!${NC}"
+    echo ""
+
+    exit $exit_code
+}
+
+# Success handler - clean up old logs on successful installation
+handle_success() {
+    INSTALL_SUCCESS=true
+
+    {
+        echo ""
+        echo "================================================================================"
+        echo "INSTALLATION SUCCESSFUL"
+        echo "================================================================================"
+        echo "Completed at: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+        echo ""
+    } >> "$LOG_FILE"
+
+    # Keep only the last 5 log files to avoid clutter
+    local log_count=$(ls -1 "$LOG_DIR"/install-*.log 2>/dev/null | wc -l | tr -d ' ')
+    if [ "$log_count" -gt 5 ]; then
+        ls -1t "$LOG_DIR"/install-*.log | tail -n +6 | xargs rm -f 2>/dev/null
+    fi
+}
+
+# Set up error trap (will be enabled after color detection)
+setup_error_trap() {
+    trap 'handle_error ${LINENO} "$BASH_COMMAND"' ERR
+}
+
 # Installation state
 INSTALL_DIR=""
 MCP_SERVERS_DIR=""
@@ -52,19 +189,17 @@ INTERACTIVE=true
 
 # Detect if stdin is a terminal (needed for piped execution: curl ... | bash)
 # When piped, stdin is the script content, not the terminal
+USE_TTY=false
 if [ ! -t 0 ]; then
-    # Check if we can access the terminal directly
-    if [ -e /dev/tty ]; then
-        # Redirect stdin from terminal for interactive prompts
-        exec 3</dev/tty
-        USE_TTY=true
-    else
+    # Try to redirect stdin from terminal for interactive prompts
+    # This is needed for curl | bash scenarios where we still want interactivity
+    # Suppress all errors since /dev/tty may not exist or be accessible
+    {
+        exec 3</dev/tty && USE_TTY=true
+    } 2>/dev/null || {
         # No terminal available, force non-interactive mode
         INTERACTIVE=false
-        USE_TTY=false
-    fi
-else
-    USE_TTY=false
+    }
 fi
 
 # ============================================================================
@@ -1159,6 +1294,10 @@ perform_installation() {
     echo -e "${BOLD}Documentation:${NC}"
     echo "  https://github.com/fedec65/BetterCallClaude"
     echo ""
+    echo -e "${BOLD}Support:${NC}"
+    echo "  📧 $SUPPORT_EMAIL"
+    echo "  📋 Installation log: $LOG_FILE"
+    echo ""
 }
 
 # ============================================================================
@@ -1465,6 +1604,13 @@ main() {
     # Default to install
     command="${command:-install}"
 
+    # Initialize logging for install and update commands
+    if [ "$command" = "install" ] || [ "$command" = "update" ]; then
+        init_logging
+        setup_error_trap
+        log_to_file "Starting $command command"
+    fi
+
     case "$command" in
         install)
             if [ "$INTERACTIVE" = true ]; then
@@ -1477,9 +1623,11 @@ main() {
                 MCP_SERVERS_DIR="$DEFAULT_MCP_DIR/mcp-servers"
                 perform_installation
             fi
+            handle_success
             ;;
         update)
             do_update
+            handle_success
             ;;
         uninstall)
             do_uninstall
