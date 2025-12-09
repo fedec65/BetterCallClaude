@@ -175,9 +175,9 @@ class CaseOpenCommand(BaseCommand):
             "success": True,
             "case_id": case.case_id,
             "title": case.title,
-            "case_type": case.case_type.value
-            if isinstance(case.case_type, CaseType)
-            else case.case_type,
+            "case_type": (
+                case.case_type.value if isinstance(case.case_type, CaseType) else case.case_type
+            ),
             "status": case.status.value if isinstance(case.status, CaseStatus) else case.status,
             "parties_count": len(case.parties),
             "facts_count": len(case.facts),

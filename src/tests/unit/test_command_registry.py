@@ -4,7 +4,6 @@ Unit tests for Command Registry System
 Tests the CommandRegistry, BaseCommand, and command discovery functionality.
 """
 
-
 from typing import Any, Dict
 
 import pytest

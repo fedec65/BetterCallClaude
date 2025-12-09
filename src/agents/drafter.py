@@ -712,9 +712,11 @@ class DrafterAgent(AgentBase):
                 "parsed_type": parsed.source_type,
                 "format_valid": self._validate_citation_format(citation_text),
                 "is_verified": parsed.is_verified,
-                "issues": []
-                if self._validate_citation_format(citation_text)
-                else ["Invalid citation format"],
+                "issues": (
+                    []
+                    if self._validate_citation_format(citation_text)
+                    else ["Invalid citation format"]
+                ),
             }
 
             results.append(validation)

@@ -319,9 +319,9 @@ class ManagedCaseContext:
         return {
             "case_id": self.case_id,
             "title": self.title,
-            "case_type": self.case_type.value
-            if isinstance(self.case_type, CaseType)
-            else self.case_type,
+            "case_type": (
+                self.case_type.value if isinstance(self.case_type, CaseType) else self.case_type
+            ),
             "status": self.status.value if isinstance(self.status, CaseStatus) else self.status,
             "firm_id": self.firm_id,
             "created_by": self.created_by,
@@ -398,9 +398,9 @@ class ManagedCaseContext:
         return {
             "case_id": self.case_id,
             "title": self.title,
-            "case_type": self.case_type.value
-            if isinstance(self.case_type, CaseType)
-            else self.case_type,
+            "case_type": (
+                self.case_type.value if isinstance(self.case_type, CaseType) else self.case_type
+            ),
             "jurisdiction_federal": self.jurisdiction_federal,
             "jurisdiction_cantons": self.jurisdiction_cantons,
             "languages": self.languages,
@@ -720,9 +720,9 @@ class CaseManager:
         return {
             "case_id": case.case_id,
             "title": case.title,
-            "case_type": case.case_type.value
-            if isinstance(case.case_type, CaseType)
-            else case.case_type,
+            "case_type": (
+                case.case_type.value if isinstance(case.case_type, CaseType) else case.case_type
+            ),
             "status": case.status.value if isinstance(case.status, CaseStatus) else case.status,
             "created_at": case.created_at.isoformat() if case.created_at else None,
             "parties_count": len(case.parties),
