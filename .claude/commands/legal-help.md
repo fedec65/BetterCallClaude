@@ -145,7 +145,11 @@ The `/legal` command is your **intelligent assistant** that:
 ### `/legal:cantonal [CANTON]` - Force Cantonal Law Mode
 **Forces**: Specific cantonal law analysis
 
-**Supported Cantons**: ZH, BE, GE, BS, VD, TI
+**Supported Cantons**: All 26 Swiss Cantons
+- **German-speaking**: ZH, BE, LU, UR, SZ, OW, NW, GL, ZG, SO, BS, BL, SH, AR, AI, SG, GR, AG, TG
+- **French-speaking**: VD, GE, NE, JU
+- **Italian-speaking**: TI
+- **Bilingual**: FR (DE/FR), VS (DE/FR)
 
 **Use for**:
 - Cantonal court decisions and procedure
@@ -262,7 +266,87 @@ All commands work in **DE/FR/IT/EN**:
 | `/legal:draft` | Legal Drafter ✍️ | Document creation, contracts | Service agreements, court complaints |
 | `/legal:federal` | [Mode Override] | Federal law exclusive analysis | Federal statutes, BGE precedents |
 | `/legal:cantonal [CANTON]` | [Mode Override] | Cantonal law specific analysis | Cantonal courts, local procedure |
+| `/legal:cite` | Citation Specialist 📑 | Citation formatting and verification | BGE/ATF/DTF citation formatting |
+| `/swiss:federal` | Federal Court Expert 🏛️ | Federal Supreme Court search | BGE/ATF/DTF decision search |
+| `/swiss:precedent` | Precedent Analyst 📊 | Precedent chain analysis | Citation evolution, case chains |
+| `/doc:analyze` | Document Analyst 📄 | Legal document analysis | Contract review, issue identification |
+| `/legal:version` | [Reference] | Framework version information | Current version and capabilities |
 | `/legal:help` | [Reference] | Command documentation | This help document |
+
+---
+
+## 🇨🇭 Swiss Namespace Commands
+
+### `/swiss:federal` - Federal Court Search
+**Purpose**: Direct search and analysis of Federal Supreme Court decisions
+
+**Use for**:
+- Searching BGE/ATF/DTF decisions by topic or citation
+- Finding recent Federal Supreme Court rulings
+- Analyzing federal precedents in all three official languages
+
+**Examples**:
+```
+/swiss:federal Art. 97 OR breach of contract
+/swiss:federal Recent BGE on data protection
+/swiss:federal ATF 147 III 226 analysis
+```
+
+---
+
+### `/swiss:precedent` - Precedent Analysis
+**Purpose**: Deep precedent analysis and citation chain exploration
+
+**Use for**:
+- Analyzing how precedents evolved over time
+- Finding supporting and distinguishing cases
+- Building citation chains for legal arguments
+
+**Examples**:
+```
+/swiss:precedent Trace evolution of Art. 41 OR interpretation
+/swiss:precedent Find cases distinguishing BGE 130 III 321
+/swiss:precedent Citation chain for contractual good faith
+```
+
+---
+
+## 📄 Document Analysis Commands
+
+### `/doc:analyze` - Legal Document Analysis
+**Purpose**: Analyze legal documents for structure, issues, and recommendations
+
+**Use for**:
+- Contract review and issue identification
+- Court decision analysis
+- Legal opinion evaluation
+- Document comparison
+
+**Examples**:
+```
+/doc:analyze [paste contract text]
+/doc:analyze Review this employment agreement
+/doc:analyze Compare these two settlement proposals
+```
+
+---
+
+## 📑 Citation Commands
+
+### `/legal:cite` - Citation Formatting & Verification
+**Purpose**: Format and verify Swiss legal citations
+
+**Use for**:
+- Converting citations between BGE/ATF/DTF formats
+- Verifying citation accuracy
+- Generating properly formatted citation strings
+
+**Examples**:
+```
+/legal:cite BGE 147 III 226
+/legal:cite Format ATF 143 II 459 for French brief
+/legal:cite Verify citation: DTF 145 III 324
+```
 
 ---
 
@@ -327,7 +411,9 @@ Handelsgericht Zürich commercial litigation procedure
 When you use `/legal:` commands, these MCP servers are activated:
 
 - **entscheidsuche**: Swiss court decision search (bundesgericht.ch + cantonal)
+- **bge-search**: Federal Supreme Court decision search and analysis
 - **legal-citations**: Citation verification and multi-lingual formatting
+- **shared**: Common legal utilities and data services
 - **sequential-thinking**: Complex legal reasoning and analysis
 
 ---
@@ -336,7 +422,7 @@ When you use `/legal:` commands, these MCP servers are activated:
 
 ### "Command not working"
 - Ensure you're using the correct syntax: `/legal:research` not `/legal research`
-- Check canton code is valid: ZH, BE, GE, BS, VD, TI (not ZU, GN, etc.)
+- Check canton code is valid: All 26 Swiss canton codes (ZH, BE, LU, GE, VD, TI, etc.)
 
 ### "Auto-detection not activating"
 - Use explicit command to force activation: `/legal:research`
@@ -348,9 +434,37 @@ When you use `/legal:` commands, these MCP servers are activated:
 
 ---
 
+## ℹ️ System Information Commands
+
+### `/legal:version` - Framework Version
+**Purpose**: Display current BetterCallClaude version and capabilities
+
+**Shows**:
+- Current version number (v1.3.2)
+- Available MCP servers and their status
+- Supported cantons (all 26)
+- Language capabilities (DE/FR/IT/EN)
+- Installed agents count
+
+**Example**:
+```
+/legal:version
+→ BetterCallClaude v1.3.2
+→ MCP Servers: entscheidsuche ✅, bge-search ✅, legal-citations ✅, shared ✅
+→ Cantons: 26/26 supported
+→ Languages: DE, FR, IT, EN
+→ Agents: 14 specialized agents active
+```
+
+---
+
 ## 📚 Additional Resources
 
-- **Getting Started Guide**: `docs/getting-started.md`
+- **Onboarding Guides**:
+  - English: `docs/onboarding/GETTING_STARTED.md`
+  - Deutsch: `docs/languages/de/ERSTE_SCHRITTE.md`
+  - Français: `docs/languages/fr/GUIDE_DEMARRAGE.md`
+  - Italiano: `docs/languages/it/GUIDA_INTRODUTTIVA.md`
 - **Research Workflow**: `docs/workflows/research-precedents.md`
 - **Strategy Workflow**: `docs/workflows/case-strategy.md`
 - **Drafting Workflow**: `docs/workflows/draft-contracts.md`
