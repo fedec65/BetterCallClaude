@@ -217,7 +217,7 @@ When using explicit commands, every response includes confirmation:
 Complete command reference available:
 - Quick reference: Type `/legal:help` for command list
 - Full documentation: `docs/workflows/` directory
-- Command files: `.claude/commands/legal-*.md`
+- Command files: `.claude/commands/legal:*.md`
 
 ---
 

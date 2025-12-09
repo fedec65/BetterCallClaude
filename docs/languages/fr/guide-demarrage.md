@@ -272,7 +272,7 @@ npm run build
 ## Ressources Supplémentaires
 
 - [Documentation en anglais](../../getting-started.md)
-- [Référence des Commandes](../../.claude/commands/legal-help.md)
+- [Référence des Commandes](../../.claude/commands/legal:help.md)
 - [Dépôt GitHub](https://github.com/fedec65/bettercallclaude)
 
 ---

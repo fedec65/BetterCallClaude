@@ -308,11 +308,11 @@ Your customizations are safe from updates:
 
 ```bash
 # Copy a command to customize
-cp ~/.claude/bettercallclaude/.claude/commands/legal-research.md \
-   ~/.claude/customizations/legal-research.md
+cp ~/.claude/bettercallclaude/.claude/commands/legal:research.md \
+   ~/.claude/customizations/legal:research.md
 
 # Edit your version - it will take precedence
-nano ~/.claude/customizations/legal-research.md
+nano ~/.claude/customizations/legal:research.md
 ```
 
 ---
@@ -884,10 +884,10 @@ BetterCallClaude/
 │   ├── modes/                 # Swiss law operation modes
 │   ├── mcp/                   # MCP server documentation
 │   └── commands/              # Slash commands
-│       ├── legal-research.md
-│       ├── legal-strategy.md
-│       ├── legal-draft.md
-│       └── agent-researcher.md
+│       ├── legal:research.md
+│       ├── legal:strategy.md
+│       ├── legal:draft.md
+│       └── agent:researcher.md
 │
 ├── src/                        # Python source code
 │   ├── agents/                # Agent Framework
