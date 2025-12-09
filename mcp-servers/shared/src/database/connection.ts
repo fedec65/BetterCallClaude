@@ -75,7 +75,7 @@ export function createDataSource(config: DatabaseConfig): DataSource {
       location: dbPath, // Path for auto-save
       autoSave: true, // Automatically persist changes to file
       autoSaveCallback: dbPath && dbPath !== ':memory:'
-        ? (data: Uint8Array) => {
+        ? (data: Uint8Array): void => {
             writeFileSync(dbPath, Buffer.from(data));
           }
         : undefined,
