@@ -326,11 +326,16 @@ check_prerequisites() {
         local node_major=$(echo "$node_ver" | cut -d. -f1)
         if [ "$node_major" -ge 18 ] && [ "$node_major" -le 22 ]; then
             log_success "Node.js: $node_ver (18-22 supported)"
-        elif [ "$node_major" -ge 18 ]; then
-            log_warning "Node.js: $node_ver (v23+ may have issues with native modules)"
-            log_warning "Some packages like better-sqlite3 may fail to build."
-            log_warning "Recommended: Use Node.js 20.x or 22.x LTS for best compatibility."
-            warnings=$((warnings + 1))
+        elif [ "$node_major" -ge 23 ]; then
+            log_error "Node.js: $node_ver (v23+ not supported - native modules will fail)"
+            log_error "Node.js 23+ requires C++20 for native modules like better-sqlite3."
+            log_error "Most native packages don't have prebuilt binaries for Node 23+."
+            log_error ""
+            log_error "Please install Node.js 20.x or 22.x LTS:"
+            log_error "  - Using nvm: nvm install 22 && nvm use 22"
+            log_error "  - Using Homebrew: brew install node@22"
+            log_error "  - Direct download: https://nodejs.org/en/download/"
+            errors=$((errors + 1))
         else
             log_error "Node.js: $node_ver (>= 18 required, found $node_major)"
             errors=$((errors + 1))
@@ -709,10 +714,28 @@ setup_mcp_servers() {
             (
                 cd "$MCP_SERVERS_DIR"
                 # Install all dependencies and setup workspace symlinks
-                npm install --silent 2>/dev/null || npm install
+                log_step "Installing npm dependencies..."
+                if ! npm install 2>&1; then
+                    log_error "npm install failed - this usually means:"
+                    log_error "  1. Node.js version incompatibility (use Node 20.x or 22.x LTS)"
+                    log_error "  2. Native module build failure (better-sqlite3 requires prebuilt binaries)"
+                    log_error "  3. Network issues or npm registry problems"
+                    log_error ""
+                    log_error "Try: nvm install 22 && nvm use 22 && re-run installation"
+                    exit 1
+                fi
                 # Build all workspaces (shared first due to dependency order)
-                npm run build --silent 2>/dev/null || npm run build || true
-            ) || log_warning "Some MCP servers failed to build"
+                log_step "Compiling TypeScript..."
+                if ! npm run build 2>&1; then
+                    log_error "TypeScript compilation failed"
+                    log_error "This may indicate missing dependencies from failed npm install"
+                    exit 1
+                fi
+            ) || {
+                log_error "MCP server build failed - see errors above"
+                log_error "Installation cannot continue without working MCP servers"
+                return 1
+            }
         else
             # Fallback: Build each server individually
             for server_dir in "$MCP_SERVERS_DIR"/*/; do
