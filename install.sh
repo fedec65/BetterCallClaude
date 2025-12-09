@@ -320,22 +320,13 @@ check_prerequisites() {
         errors=$((errors + 1))
     fi
 
-    # Node.js >= 18 and <= 22 (required for MCP servers with native modules)
+    # Node.js >= 18 (required for MCP servers)
+    # Now supports Node.js 18-24+ thanks to WASM-based SQLite (no native modules)
     if check_command node; then
         local node_ver=$(get_version node)
         local node_major=$(echo "$node_ver" | cut -d. -f1)
-        if [ "$node_major" -ge 18 ] && [ "$node_major" -le 22 ]; then
-            log_success "Node.js: $node_ver (18-22 supported)"
-        elif [ "$node_major" -ge 23 ]; then
-            log_error "Node.js: $node_ver (v23+ not supported - native modules will fail)"
-            log_error "Node.js 23+ requires C++20 for native modules like better-sqlite3."
-            log_error "Most native packages don't have prebuilt binaries for Node 23+."
-            log_error ""
-            log_error "Please install Node.js 20.x or 22.x LTS:"
-            log_error "  - Using nvm: nvm install 22 && nvm use 22"
-            log_error "  - Using Homebrew: brew install node@22"
-            log_error "  - Direct download: https://nodejs.org/en/download/"
-            errors=$((errors + 1))
+        if [ "$node_major" -ge 18 ]; then
+            log_success "Node.js: $node_ver (>= 18 supported)"
         else
             log_error "Node.js: $node_ver (>= 18 required, found $node_major)"
             errors=$((errors + 1))

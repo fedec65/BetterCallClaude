@@ -1,12 +1,16 @@
 /**
  * Database Client for BetterCallClaude v2.0
- * Supports PostgreSQL (production) and SQLite (development)
+ * Supports PostgreSQL (production) and SQLite via WASM (development)
+ *
+ * Uses node-sqlite3-wasm for cross-platform compatibility without native compilation.
+ * This enables support for Node.js 18-24+ without requiring C++ build tools.
  */
 
 import { Pool, PoolConfig, QueryResult } from 'pg';
-import Database from 'better-sqlite3';
+import { Database } from 'node-sqlite3-wasm';
 import { readFileSync } from 'fs';
-import { join } from 'path';
+import { join, dirname } from 'path';
+import { mkdirSync, existsSync } from 'fs';
 import { randomUUID } from 'crypto';
 
 export type DatabaseType = 'postgres' | 'sqlite';
@@ -39,12 +43,12 @@ export interface QueryOptions {
 }
 
 /**
- * Unified database client supporting PostgreSQL and SQLite
+ * Unified database client supporting PostgreSQL and SQLite (WASM)
  */
 export class DatabaseClient {
   private config: DatabaseConfig;
   private pgPool?: Pool;
-  private sqliteDb?: Database.Database;
+  private sqliteDb?: Database;
   private type: DatabaseType;
 
   constructor(config: DatabaseConfig) {
@@ -91,20 +95,29 @@ export class DatabaseClient {
   }
 
   /**
-   * Connect to SQLite (file-based or in-memory)
+   * Connect to SQLite via WASM (file-based or in-memory)
+   * Uses node-sqlite3-wasm for cross-platform compatibility without native compilation
    */
   private async connectSQLite(): Promise<void> {
     try {
       if (this.config.memory) {
+        // In-memory database for testing
         this.sqliteDb = new Database(':memory:');
       } else {
         const filename = this.config.filename || join(process.cwd(), 'data', 'bettercallclaude.db');
+
+        // Ensure directory exists
+        const dir = dirname(filename);
+        if (!existsSync(dir)) {
+          mkdirSync(dir, { recursive: true });
+        }
+
         this.sqliteDb = new Database(filename);
       }
 
-      // Enable WAL mode for better concurrency
-      this.sqliteDb.pragma('journal_mode = WAL');
-      this.sqliteDb.pragma('foreign_keys = ON');
+      // Enable WAL mode for better concurrency (node-sqlite3-wasm uses exec for pragma)
+      this.sqliteDb.exec('PRAGMA journal_mode = WAL');
+      // Foreign keys are enabled by default in node-sqlite3-wasm
 
     } catch (error) {
       throw new Error(`Failed to connect to SQLite: ${error}`);
@@ -139,7 +152,11 @@ export class DatabaseClient {
   }
 
   /**
-   * Execute SQLite query
+   * Execute SQLite query using node-sqlite3-wasm
+   *
+   * Note: node-sqlite3-wasm API differs from better-sqlite3:
+   * - Uses db.all() for SELECT queries (returns array)
+   * - Uses db.run() for INSERT/UPDATE/DELETE (returns { changes, lastInsertRowid })
    */
   private querySQLite<T>(sql: string, options?: QueryOptions): T[] {
     if (!this.sqliteDb) {
@@ -147,12 +164,16 @@ export class DatabaseClient {
     }
 
     try {
-      const stmt = this.sqliteDb.prepare(sql);
+      // Cast to JSValue[] for node-sqlite3-wasm compatibility
+      // JSValue = boolean | number | bigint | string | Uint8Array | null
+      const params = (options?.values || []) as (boolean | number | bigint | string | Uint8Array | null)[];
 
       if (sql.trim().toUpperCase().startsWith('SELECT')) {
-        return stmt.all(options?.values || []) as T[];
+        // For SELECT queries, use all() which returns array of rows
+        return this.sqliteDb.all(sql, params) as T[];
       } else {
-        stmt.run(options?.values || []);
+        // For INSERT/UPDATE/DELETE, use run()
+        this.sqliteDb.run(sql, params);
         return [];
       }
     } catch (error) {
@@ -203,7 +224,7 @@ export class DatabaseClient {
   }
 
   /**
-   * SQLite transaction
+   * SQLite transaction using node-sqlite3-wasm
    */
   private async transactionSQLite<T>(callback: (client: DatabaseClient) => Promise<T>): Promise<T> {
     if (!this.sqliteDb) {
@@ -211,12 +232,15 @@ export class DatabaseClient {
     }
 
     try {
-      this.sqliteDb.prepare('BEGIN').run();
+      this.sqliteDb.exec('BEGIN TRANSACTION');
       const result = await callback(this);
-      this.sqliteDb.prepare('COMMIT').run();
+      this.sqliteDb.exec('COMMIT');
       return result;
     } catch (error) {
-      this.sqliteDb.prepare('ROLLBACK').run();
+      // Check if we're in a transaction before rolling back
+      if (this.sqliteDb.inTransaction) {
+        this.sqliteDb.exec('ROLLBACK');
+      }
       throw error;
     }
   }
@@ -282,6 +306,7 @@ export class DatabaseClient {
 
   /**
    * Close database connection
+   * Important: Must be called to prevent memory leaks with WASM
    */
   async close(): Promise<void> {
     if (this.pgPool) {

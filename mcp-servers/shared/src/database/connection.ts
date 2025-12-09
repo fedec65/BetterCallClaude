@@ -1,12 +1,17 @@
 /**
  * Database Connection Management
  * TypeORM DataSource configuration and connection handling
+ *
+ * Uses sql.js (WASM) for SQLite support to enable cross-platform
+ * compatibility without native module compilation (Node.js 18-24+).
  */
 
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { DatabaseConfig } from '../config/config';
 import { Decision, Citation, CacheEntry } from './entities';
 import { DatabaseConnectionError } from '../errors/errors';
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
+import { dirname } from 'path';
 
 /**
  * Create TypeORM DataSource from configuration
@@ -46,16 +51,36 @@ export function createDataSource(config: DatabaseConfig): DataSource {
       },
     } as DataSourceOptions;
   } else if (config.type === 'sqlite') {
+    // Use sql.js (WASM) for cross-platform compatibility without native compilation
+    // This enables support for Node.js 18-24+ without requiring C++ build tools
+    const dbPath = config.database;
+
+    // Ensure directory exists for file-based database
+    if (dbPath && dbPath !== ':memory:') {
+      const dir = dirname(dbPath);
+      if (!existsSync(dir)) {
+        mkdirSync(dir, { recursive: true });
+      }
+    }
+
+    // Load existing database file if it exists
+    const location = dbPath && dbPath !== ':memory:' && existsSync(dbPath)
+      ? readFileSync(dbPath)
+      : undefined;
+
     options = {
       ...baseOptions,
-      type: 'better-sqlite3',
-      database: config.database,
-      prepareDatabase: (db: unknown) => {
-        // Enable WAL mode for better concurrency
-        (db as { pragma: (sql: string) => void }).pragma('journal_mode = WAL');
-        // Enable foreign keys
-        (db as { pragma: (sql: string) => void }).pragma('foreign_keys = ON');
-      },
+      type: 'sqljs',
+      database: location,
+      location: dbPath, // Path for auto-save
+      autoSave: true, // Automatically persist changes to file
+      autoSaveCallback: dbPath && dbPath !== ':memory:'
+        ? (data: Uint8Array) => {
+            writeFileSync(dbPath, Buffer.from(data));
+          }
+        : undefined,
+      // Note: sql.js doesn't support WAL mode or prepareDatabase callback
+      // Foreign keys are enabled by default in TypeORM's sqljs driver
     } as DataSourceOptions;
   } else {
     throw new DatabaseConnectionError(
