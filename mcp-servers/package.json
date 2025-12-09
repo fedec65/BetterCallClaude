@@ -7,11 +7,7 @@
     "shared",
     "bge-search",
     "entscheidsuche",
-    "cantonal-courts",
-    "legal-citations",
-    "commercial-registry",
-    "land-registry",
-    "legal-news"
+    "legal-citations"
   ],
   "scripts": {
     "build": "npm run build --workspaces",

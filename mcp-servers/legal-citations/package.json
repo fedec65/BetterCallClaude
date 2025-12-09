@@ -6,9 +6,9 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
-    "watch": "tsc --watch",
-    "dev": "tsx watch src/index.ts",
+    "build": "npx tsc",
+    "watch": "npx tsc --watch",
+    "dev": "npx tsx watch src/index.ts",
     "lint": "echo 'No linting configured for legal-citations'",
     "test": "vitest --run",
     "test:coverage": "vitest --coverage"
