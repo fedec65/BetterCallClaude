@@ -10,7 +10,7 @@ This module provides the foundation for the command system, including:
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 
 class CommandCategory(Enum):
@@ -45,8 +45,8 @@ class CommandMetadata:
     category: CommandCategory
     description: str
     help_text: str
-    auto_personas: List[str] = field(default_factory=list)
-    mcp_servers: List[str] = field(default_factory=list)
+    auto_personas: list[str] = field(default_factory=list)
+    mcp_servers: list[str] = field(default_factory=list)
     requires_auth: bool = False
 
     def __post_init__(self) -> None:
@@ -81,7 +81,7 @@ class CommandArgument:
         self.default = default
         self.help_text = help_text
 
-    def validate(self, value: Any) -> tuple[bool, Optional[str]]:
+    def validate(self, value: Any) -> tuple[bool, str | None]:
         """
         Validate argument value
 
@@ -139,7 +139,7 @@ class BaseCommand(ABC):
             metadata: Command metadata for registration
         """
         self.metadata = metadata
-        self.arguments: List[CommandArgument] = []
+        self.arguments: list[CommandArgument] = []
 
     def add_argument(
         self,
@@ -168,7 +168,7 @@ class BaseCommand(ABC):
         )
         self.arguments.append(arg)
 
-    def validate_arguments(self, args: Dict[str, Any]) -> tuple[bool, Optional[str]]:
+    def validate_arguments(self, args: dict[str, Any]) -> tuple[bool, str | None]:
         """
         Validate provided arguments against specifications
 
@@ -187,7 +187,7 @@ class BaseCommand(ABC):
         return True, None
 
     @abstractmethod
-    async def execute(self, args: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, args: dict[str, Any]) -> dict[str, Any]:
         """
         Execute the command with validated arguments
 

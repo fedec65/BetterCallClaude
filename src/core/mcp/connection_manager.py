@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from .adapters import BGESearchAdapter, CantonalCourtsAdapter, EntscheidausucheAdapter
 
@@ -34,8 +34,8 @@ class ServerHealth:
     server_id: str
     status: ServerStatus
     last_check: datetime
-    response_time_ms: Optional[float]
-    error_message: Optional[str] = None
+    response_time_ms: float | None
+    error_message: str | None = None
 
 
 @dataclass
@@ -45,7 +45,7 @@ class ServerConfig:
     server_id: str
     name: str
     description: str
-    endpoint: Optional[str] = None
+    endpoint: str | None = None
     max_retries: int = 3
     timeout_seconds: int = 30
     health_check_interval: int = 60
@@ -84,7 +84,7 @@ class MCPConnectionManager:
         health = await manager.check_health("bge_search")
     """
 
-    def __init__(self, mcp_servers_path: Optional[Path] = None) -> None:
+    def __init__(self, mcp_servers_path: Path | None = None) -> None:
         """
         Initialize MCP connection manager
 
@@ -96,17 +96,17 @@ class MCPConnectionManager:
             mcp_servers_path = Path.cwd() / "mcp-servers"
 
         self.mcp_servers_path = Path(mcp_servers_path)
-        self._servers: Dict[str, ServerConfig] = {}
-        self._health_status: Dict[str, ServerHealth] = {}
-        self._adapters: Dict[str, Any] = {}  # Active MCP adapters
-        self._health_check_tasks: Dict[str, asyncio.Task] = {}
+        self._servers: dict[str, ServerConfig] = {}
+        self._health_status: dict[str, ServerHealth] = {}
+        self._adapters: dict[str, Any] = {}  # Active MCP adapters
+        self._health_check_tasks: dict[str, asyncio.Task] = {}
 
     def register_server(
         self,
         server_id: str,
         name: str,
         description: str = "",
-        endpoint: Optional[str] = None,
+        endpoint: str | None = None,
         max_retries: int = 3,
         timeout_seconds: int = 30,
         health_check_interval: int = 60,
@@ -179,9 +179,9 @@ class MCPConnectionManager:
         self,
         server_id: str,
         method: str,
-        params: Optional[Dict[str, Any]] = None,
-        timeout: Optional[int] = None,
-    ) -> Dict[str, Any]:
+        params: dict[str, Any] | None = None,
+        timeout: int | None = None,
+    ) -> dict[str, Any]:
         """
         Execute request on MCP server with retry logic
 
@@ -276,8 +276,8 @@ class MCPConnectionManager:
         raise ConnectionError(f"Request to {server_id}.{method} failed")
 
     async def _execute_request(
-        self, server_id: str, method: str, params: Optional[Dict], timeout: int
-    ) -> Dict[str, Any]:
+        self, server_id: str, method: str, params: dict | None, timeout: int
+    ) -> dict[str, Any]:
         """
         Execute single request to MCP server using appropriate adapter
 
@@ -356,7 +356,7 @@ class MCPConnectionManager:
         return adapter
 
     async def _execute_bge_method(
-        self, adapter: BGESearchAdapter, method: str, params: Dict[str, Any]
+        self, adapter: BGESearchAdapter, method: str, params: dict[str, Any]
     ) -> Any:
         """Execute method on BGE Search adapter"""
         if method == "search":
@@ -391,7 +391,7 @@ class MCPConnectionManager:
             raise ValueError(f"Unknown BGE method: {method}")
 
     async def _execute_entscheidsuche_method(
-        self, adapter: EntscheidausucheAdapter, method: str, params: Dict[str, Any]
+        self, adapter: EntscheidausucheAdapter, method: str, params: dict[str, Any]
     ) -> Any:
         """Execute method on Entscheidsuche adapter"""
         if method == "search":
@@ -424,7 +424,7 @@ class MCPConnectionManager:
             raise ValueError(f"Unknown Entscheidsuche method: {method}")
 
     async def _execute_cantonal_method(
-        self, adapter: CantonalCourtsAdapter, method: str, params: Dict[str, Any]
+        self, adapter: CantonalCourtsAdapter, method: str, params: dict[str, Any]
     ) -> Any:
         """Execute method on Cantonal Courts adapter"""
         if method == "search":
@@ -517,7 +517,7 @@ class MCPConnectionManager:
 
         return self._health_status[server_id]
 
-    def get_all_health_status(self) -> List[ServerHealth]:
+    def get_all_health_status(self) -> list[ServerHealth]:
         """
         Get health status for all registered servers
 

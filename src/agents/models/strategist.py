@@ -12,7 +12,7 @@ Strategiemodelle / Modèles stratégiques / Modelli strategici
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from src.agents.models.shared import Jurisdiction, Language, RiskLevel
 
@@ -34,7 +34,7 @@ class StrategyType(Enum):
     HYBRID = "hybrid"
 
     @property
-    def description(self) -> Dict[str, str]:
+    def description(self) -> dict[str, str]:
         """Return strategy description in multiple languages."""
         descriptions = {
             StrategyType.AGGRESSIVE: {
@@ -146,8 +146,8 @@ class RiskAssessment:
     litigation_risk: RiskLevel
     cost_risk: RiskLevel
     reputation_risk: RiskLevel
-    factors: List[str] = field(default_factory=list)
-    mitigations: List[str] = field(default_factory=list)
+    factors: list[str] = field(default_factory=list)
+    mitigations: list[str] = field(default_factory=list)
     confidence_score: float = 0.0
 
     def __post_init__(self) -> None:
@@ -170,7 +170,7 @@ class RiskAssessment:
             + self.reputation_risk.numeric_score * 0.2
         )
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Serialize risk assessment to dictionary."""
         return {
             "overall_level": self.overall_level.value,
@@ -206,8 +206,8 @@ class CostEstimate:
     minimum_chf: float
     maximum_chf: float
     most_likely_chf: float
-    breakdown: Dict[str, float] = field(default_factory=dict)
-    assumptions: List[str] = field(default_factory=list)
+    breakdown: dict[str, float] = field(default_factory=dict)
+    assumptions: list[str] = field(default_factory=list)
     court_costs: float = 0.0
     expert_fees: float = 0.0
     recovery_potential: float = 0.0  # Potential recovery if successful
@@ -255,7 +255,7 @@ class CostEstimate:
             likely=self.most_likely_chf,
         )
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Serialize cost estimate to dictionary."""
         return {
             "minimum_chf": self.minimum_chf,
@@ -290,15 +290,15 @@ class OpponentProfile:
     """
 
     name: str
-    legal_representation: Optional[str] = None
-    litigation_history: List[str] = field(default_factory=list)
-    financial_capacity: Optional[str] = None  # "low", "medium", "high", "unknown"
-    settlement_tendency: Optional[str] = None  # "likely", "unlikely", "unknown"
-    strengths: List[str] = field(default_factory=list)
-    weaknesses: List[str] = field(default_factory=list)
+    legal_representation: str | None = None
+    litigation_history: list[str] = field(default_factory=list)
+    financial_capacity: str | None = None  # "low", "medium", "high", "unknown"
+    settlement_tendency: str | None = None  # "likely", "unlikely", "unknown"
+    strengths: list[str] = field(default_factory=list)
+    weaknesses: list[str] = field(default_factory=list)
     notes: str = ""
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Serialize opponent profile to dictionary."""
         return {
             "name": self.name,
@@ -325,10 +325,10 @@ class TimelineEvent:
         responsible: Party responsible for this event
     """
 
-    date: Optional[str]  # ISO format or "TBD"
+    date: str | None  # ISO format or "TBD"
     event: str
     is_deadline: bool = False
-    dependencies: List[str] = field(default_factory=list)
+    dependencies: list[str] = field(default_factory=list)
     responsible: str = "client"  # client, opponent, court
 
 
@@ -357,14 +357,14 @@ class StrategyRecommendation:
     success_probability: SuccessProbability
     risk_assessment: RiskAssessment
     cost_estimate: CostEstimate
-    recommended_actions: List[str] = field(default_factory=list)
-    alternative_strategies: List[Dict[str, Any]] = field(default_factory=list)
-    key_arguments: List[str] = field(default_factory=list)
-    weak_points: List[str] = field(default_factory=list)
+    recommended_actions: list[str] = field(default_factory=list)
+    alternative_strategies: list[dict[str, Any]] = field(default_factory=list)
+    key_arguments: list[str] = field(default_factory=list)
+    weak_points: list[str] = field(default_factory=list)
     timeline_weeks: int = 0
-    timeline_events: List[TimelineEvent] = field(default_factory=list)
-    checkpoints: List[str] = field(default_factory=list)
-    opponent_profile: Optional[OpponentProfile] = None
+    timeline_events: list[TimelineEvent] = field(default_factory=list)
+    checkpoints: list[str] = field(default_factory=list)
+    opponent_profile: OpponentProfile | None = None
     jurisdiction: Jurisdiction = Jurisdiction.FEDERAL
     language: Language = Language.DE
     created_at: datetime = field(default_factory=datetime.utcnow)
@@ -387,7 +387,7 @@ class StrategyRecommendation:
         cost = self.cost_estimate.most_likely_chf
         return (recovery * prob) - cost
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Serialize strategy recommendation to dictionary."""
         return {
             "strategy_type": self.strategy_type.value,

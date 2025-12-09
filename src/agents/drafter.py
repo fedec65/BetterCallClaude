@@ -17,7 +17,7 @@ Workflow:
 import logging
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from .base import (
     ActionType,
@@ -181,9 +181,9 @@ class DraftingParameters:
     document_type: DocumentType
     language: Language
     jurisdiction: Jurisdiction
-    parties: List[LegalParty]
-    case_facts: Optional[CaseFacts] = None
-    strategy_input: Optional[Dict[str, Any]] = None
+    parties: list[LegalParty]
+    case_facts: CaseFacts | None = None
+    strategy_input: dict[str, Any] | None = None
     style_formal: bool = True
     include_citations: bool = True
 
@@ -193,11 +193,11 @@ class DrafterDeliverable:
     """Complete deliverable from DrafterAgent."""
 
     document: LegalDocument
-    drafting_notes: List[str]
-    citation_report: Dict[str, Any]
-    metadata: Dict[str, Any]
+    drafting_notes: list[str]
+    citation_report: dict[str, Any]
+    metadata: dict[str, Any]
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Serialize deliverable to dictionary."""
         return {
             "document": self.document.to_dict(),
@@ -282,10 +282,10 @@ class DrafterAgent(AgentBase):
         document_type: DocumentType = DocumentType.MEMORANDUM,
         language: Language = Language.DE,
         jurisdiction: Jurisdiction = Jurisdiction.FEDERAL,
-        case_context: Optional[Dict[str, Any]] = None,
-        case_facts: Optional[CaseFacts] = None,
-        parties: Optional[List[LegalParty]] = None,
-        strategy_input: Optional[Dict[str, Any]] = None,
+        case_context: dict[str, Any] | None = None,
+        case_facts: CaseFacts | None = None,
+        parties: list[LegalParty] | None = None,
+        strategy_input: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> AgentResult[DrafterDeliverable]:
         """
@@ -498,7 +498,7 @@ class DrafterAgent(AgentBase):
         self,
         doc_type: DocumentType,
         language: Language,
-    ) -> List[Tuple[str, str, bool]]:
+    ) -> list[tuple[str, str, bool]]:
         """
         Generate document structure for document type.
 
@@ -536,7 +536,7 @@ class DrafterAgent(AgentBase):
         self,
         section_type: str,
         title: str,
-        content_input: Dict[str, Any],
+        content_input: dict[str, Any],
         language: Language,
         order: int = 0,
     ) -> DocumentSection:
@@ -574,7 +574,7 @@ class DrafterAgent(AgentBase):
     async def add_citations(
         self,
         document: LegalDocument,
-        citations: List[str],
+        citations: list[str],
     ) -> LegalDocument:
         """
         Add and format legal citations.
@@ -691,8 +691,8 @@ class DrafterAgent(AgentBase):
 
     async def validate_citations(
         self,
-        citations: List[str],
-    ) -> List[Dict[str, Any]]:
+        citations: list[str],
+    ) -> list[dict[str, Any]]:
         """
         Validate citation format and existence.
 
@@ -730,7 +730,7 @@ class DrafterAgent(AgentBase):
     def _generate_section_content(
         self,
         section_type: str,
-        content_input: Dict[str, Any],
+        content_input: dict[str, Any],
         language: Language,
     ) -> str:
         """Generate content for a document section."""
@@ -769,7 +769,7 @@ class DrafterAgent(AgentBase):
 
     def _generate_rubrum(
         self,
-        parties: List[LegalParty],
+        parties: list[LegalParty],
         jurisdiction: Jurisdiction,
         language: Language,
     ) -> str:
@@ -834,7 +834,7 @@ class DrafterAgent(AgentBase):
 
     def _generate_sachverhalt(
         self,
-        case_facts: Optional[CaseFacts],
+        case_facts: CaseFacts | None,
         language: Language,
     ) -> str:
         """Generate sachverhalt/facts section."""
@@ -887,8 +887,8 @@ class DrafterAgent(AgentBase):
 
     def _generate_rechtliches(
         self,
-        case_facts: Optional[CaseFacts],
-        strategy_input: Optional[Dict[str, Any]],
+        case_facts: CaseFacts | None,
+        strategy_input: dict[str, Any] | None,
         language: Language,
     ) -> str:
         """Generate rechtliches/legal analysis section."""
@@ -924,7 +924,7 @@ class DrafterAgent(AgentBase):
     def _generate_summary(
         self,
         task: str,
-        case_facts: Optional[CaseFacts],
+        case_facts: CaseFacts | None,
         language: Language,
     ) -> str:
         """Generate summary/introduction section."""
@@ -965,7 +965,7 @@ class DrafterAgent(AgentBase):
 
     def _generate_conclusion(
         self,
-        strategy_input: Optional[Dict[str, Any]],
+        strategy_input: dict[str, Any] | None,
         language: Language,
     ) -> str:
         """Generate conclusion/recommendation section."""
@@ -1030,9 +1030,9 @@ class DrafterAgent(AgentBase):
 
     def _extract_citations_from_content(
         self,
-        sections: List[DocumentSection],
+        sections: list[DocumentSection],
         language: Language,
-    ) -> List[str]:
+    ) -> list[str]:
         """Extract citation references from section content."""
         citations = []
         import re
@@ -1103,7 +1103,7 @@ class DrafterAgent(AgentBase):
         self,
         document: LegalDocument,
         language: Language,
-    ) -> List[str]:
+    ) -> list[str]:
         """Generate drafting notes for review."""
         notes = []
 
@@ -1131,7 +1131,7 @@ class DrafterAgent(AgentBase):
 
         return notes
 
-    def _generate_citation_report(self, document: LegalDocument) -> Dict[str, Any]:
+    def _generate_citation_report(self, document: LegalDocument) -> dict[str, Any]:
         """Generate citation verification report."""
         return {
             "total_citations": len(document.citations_used),
@@ -1140,9 +1140,9 @@ class DrafterAgent(AgentBase):
             "by_type": self._group_citations_by_type(document.citations_used),
         }
 
-    def _group_citations_by_type(self, citations: List[Citation]) -> Dict[str, int]:
+    def _group_citations_by_type(self, citations: list[Citation]) -> dict[str, int]:
         """Group citations by source type."""
-        groups: Dict[str, int] = {}
+        groups: dict[str, int] = {}
         for citation in citations:
             groups[citation.source_type] = groups.get(citation.source_type, 0) + 1
         return groups

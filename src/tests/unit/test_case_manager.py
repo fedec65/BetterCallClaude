@@ -6,7 +6,7 @@ Tests the CaseManager and related data classes from src/core/case/manager.py
 
 import json
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import pytest
 
@@ -34,13 +34,13 @@ class MockCaseStorage(CaseStorage):
     """In-memory mock storage for testing."""
 
     def __init__(self) -> None:
-        self._cases: Dict[str, Dict[str, Any]] = {}
+        self._cases: dict[str, dict[str, Any]] = {}
 
-    async def save_case(self, case_id: str, data: Dict[str, Any]) -> bool:
+    async def save_case(self, case_id: str, data: dict[str, Any]) -> bool:
         self._cases[case_id] = data
         return True
 
-    async def load_case(self, case_id: str) -> Optional[Dict[str, Any]]:
+    async def load_case(self, case_id: str) -> dict[str, Any] | None:
         return self._cases.get(case_id)
 
     async def delete_case(self, case_id: str) -> bool:
@@ -51,11 +51,11 @@ class MockCaseStorage(CaseStorage):
 
     async def list_cases(
         self,
-        firm_id: Optional[str] = None,
-        status: Optional[str] = None,
+        firm_id: str | None = None,
+        status: str | None = None,
         limit: int = 100,
         offset: int = 0,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         results = []
         for case_id, data in self._cases.items():
             if firm_id and data.get("firm_id") != firm_id:

@@ -5,7 +5,7 @@ Tests the AgentBase, CaseContext, and related data classes from src/agents/base.
 """
 
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any
 
 import pytest
 
@@ -409,7 +409,7 @@ class TestAgentResult:
             checkpoints=[],
         )
 
-        result: AgentResult[Dict[str, str]] = AgentResult(
+        result: AgentResult[dict[str, str]] = AgentResult(
             success=True,
             outcome=AgentOutcome.SUCCESS,
             deliverable={"key": "value"},

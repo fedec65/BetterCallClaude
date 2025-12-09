@@ -14,7 +14,7 @@ Terminology Reference:
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 
 class Language(Enum):
@@ -209,7 +209,7 @@ class Jurisdiction(Enum):
         return self in multilingual
 
     @property
-    def official_languages(self) -> List[Language]:
+    def official_languages(self) -> list[Language]:
         """Return all official languages for this jurisdiction."""
         lang_map = {
             Jurisdiction.FEDERAL: [Language.DE, Language.FR, Language.IT],
@@ -227,7 +227,7 @@ class Jurisdiction(Enum):
         return lang_map.get(self, [Language.DE])
 
     @property
-    def court_name(self) -> Dict[str, str]:
+    def court_name(self) -> dict[str, str]:
         """Return highest cantonal court names in multiple languages."""
         names = {
             Jurisdiction.FEDERAL: {
@@ -396,7 +396,7 @@ class Jurisdiction(Enum):
         return names[self]
 
     @property
-    def canton_name(self) -> Dict[str, str]:
+    def canton_name(self) -> dict[str, str]:
         """Return canton names in multiple languages."""
         names = {
             Jurisdiction.FEDERAL: {
@@ -604,13 +604,13 @@ class LegalParty:
 
     name: str
     role: str  # plaintiff, defendant, appellant, respondent, intervenor
-    representation: Optional[str] = None
+    representation: str | None = None
     language_preference: Language = Language.DE
-    address: Optional[str] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    address: str | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
-    def role_translated(self) -> Dict[str, str]:
+    def role_translated(self) -> dict[str, str]:
         """Return role in multiple languages."""
         role_translations = {
             "plaintiff": {
@@ -669,15 +669,15 @@ class CaseFacts:
     """
 
     summary: str
-    key_events: List[Dict[str, Any]] = field(default_factory=list)
-    disputed_facts: List[str] = field(default_factory=list)
-    undisputed_facts: List[str] = field(default_factory=list)
-    evidence_available: List[str] = field(default_factory=list)
-    legal_questions: List[str] = field(default_factory=list)
-    value_in_dispute: Optional[float] = None  # CHF
+    key_events: list[dict[str, Any]] = field(default_factory=list)
+    disputed_facts: list[str] = field(default_factory=list)
+    undisputed_facts: list[str] = field(default_factory=list)
+    evidence_available: list[str] = field(default_factory=list)
+    legal_questions: list[str] = field(default_factory=list)
+    value_in_dispute: float | None = None  # CHF
     created_at: datetime = field(default_factory=datetime.utcnow)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Serialize case facts to dictionary."""
         return {
             "summary": self.summary,
@@ -691,7 +691,7 @@ class CaseFacts:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "CaseFacts":
+    def from_dict(cls, data: dict[str, Any]) -> "CaseFacts":
         """Create CaseFacts from dictionary."""
         created_at = data.get("created_at")
         if isinstance(created_at, str):

@@ -12,7 +12,7 @@ Implements the /case:* command family for case lifecycle management:
 
 import logging
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from ..case.manager import (
     CaseManager,
@@ -26,7 +26,7 @@ from .base import BaseCommand, CommandCategory, CommandMetadata
 logger = logging.getLogger(__name__)
 
 # Singleton case manager instance
-_case_manager: Optional[CaseManager] = None
+_case_manager: CaseManager | None = None
 
 
 def get_case_manager() -> CaseManager:
@@ -92,7 +92,7 @@ class CaseCreateCommand(BaseCommand):
             help_text="Client name",
         )
 
-    async def execute(self, args: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, args: dict[str, Any]) -> dict[str, Any]:
         """Execute case creation."""
         manager = get_case_manager()
 
@@ -104,12 +104,12 @@ class CaseCreateCommand(BaseCommand):
             case_type = CaseType.OTHER
 
         # Build parties list
-        parties: List[Party] = []
+        parties: list[Party] = []
         if args.get("client"):
             parties.append(Party(name=args["client"], role="client"))
 
         # Build canton list
-        cantons: List[str] = []
+        cantons: list[str] = []
         if args.get("canton"):
             cantons = [c.strip().upper() for c in args["canton"].split(",")]
 
@@ -158,7 +158,7 @@ class CaseOpenCommand(BaseCommand):
 
         self.add_argument("case_id", str, required=True, help_text="Case identifier")
 
-    async def execute(self, args: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, args: dict[str, Any]) -> dict[str, Any]:
         """Execute case opening."""
         manager = get_case_manager()
         case_id = args["case_id"]
@@ -217,7 +217,7 @@ class CaseCloseCommand(BaseCommand):
             help_text="Reason for closure",
         )
 
-    async def execute(self, args: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, args: dict[str, Any]) -> dict[str, Any]:
         """Execute case closure."""
         manager = get_case_manager()
 
@@ -292,7 +292,7 @@ class CaseListCommand(BaseCommand):
             help_text="Pagination offset",
         )
 
-    async def execute(self, args: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, args: dict[str, Any]) -> dict[str, Any]:
         """Execute case listing."""
         manager = get_case_manager()
 
@@ -348,7 +348,7 @@ class CaseSummaryCommand(BaseCommand):
             help_text="Case identifier (defaults to current case)",
         )
 
-    async def execute(self, args: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, args: dict[str, Any]) -> dict[str, Any]:
         """Execute case summary generation."""
         manager = get_case_manager()
 
@@ -399,7 +399,7 @@ class CaseExportCommand(BaseCommand):
             help_text="Export format: json, markdown",
         )
 
-    async def execute(self, args: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, args: dict[str, Any]) -> dict[str, Any]:
         """Execute case export."""
         manager = get_case_manager()
 
@@ -456,7 +456,7 @@ class CaseAddPartyCommand(BaseCommand):
             help_text="Case identifier (defaults to current case)",
         )
 
-    async def execute(self, args: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, args: dict[str, Any]) -> dict[str, Any]:
         """Execute adding a party."""
         manager = get_case_manager()
 
@@ -508,7 +508,7 @@ class CaseAddFactCommand(BaseCommand):
             help_text="Case identifier (defaults to current case)",
         )
 
-    async def execute(self, args: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, args: dict[str, Any]) -> dict[str, Any]:
         """Execute adding a fact."""
         manager = get_case_manager()
 
@@ -561,7 +561,7 @@ class CaseAddDeadlineCommand(BaseCommand):
             help_text="Case identifier (defaults to current case)",
         )
 
-    async def execute(self, args: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, args: dict[str, Any]) -> dict[str, Any]:
         """Execute adding a deadline."""
         manager = get_case_manager()
 

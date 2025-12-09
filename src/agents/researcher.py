@@ -18,7 +18,7 @@ import re
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from .base import (
     ActionType,
@@ -65,15 +65,15 @@ class ResearchParameters:
     """Extracted parameters from research question."""
 
     original_question: str
-    legal_domains: List[LegalDomain]
-    key_terms: List[str]
-    concepts: List[str]
+    legal_domains: list[LegalDomain]
+    key_terms: list[str]
+    concepts: list[str]
     jurisdiction_federal: bool
-    jurisdiction_cantons: List[str]
-    time_range_from: Optional[datetime] = None
-    time_range_to: Optional[datetime] = None
-    languages: List[str] = field(default_factory=lambda: ["DE"])
-    statute_references: List[str] = field(default_factory=list)
+    jurisdiction_cantons: list[str]
+    time_range_from: datetime | None = None
+    time_range_to: datetime | None = None
+    languages: list[str] = field(default_factory=lambda: ["DE"])
+    statute_references: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -93,7 +93,7 @@ class SearchQuery:
 
     source: str
     query: str
-    filters: Dict[str, Any]
+    filters: dict[str, Any]
     language: str
     max_results: int
 
@@ -102,8 +102,8 @@ class SearchQuery:
 class SearchStrategy:
     """Complete search strategy."""
 
-    sources: List[SearchSource]
-    queries: List[SearchQuery]
+    sources: list[SearchSource]
+    queries: list[SearchQuery]
     relevance_threshold: float
     max_total_results: int
     parallel_limit: int
@@ -116,12 +116,12 @@ class RawResult:
     id: str
     title: str
     citation: str
-    date: Optional[datetime]
+    date: datetime | None
     court: str
     summary: str
     relevance_score: float
     source: str
-    full_text_url: Optional[str] = None
+    full_text_url: str | None = None
     language: str = "DE"
 
 
@@ -129,8 +129,8 @@ class RawResult:
 class SearchResults:
     """Aggregated search results."""
 
-    results: List[RawResult]
-    by_source: Dict[str, List[RawResult]]
+    results: list[RawResult]
+    by_source: dict[str, list[RawResult]]
     total_found: int
     deduplicated_count: int
     processing_time_ms: int
@@ -145,17 +145,17 @@ class VerifiedCitation:
     is_current: bool
     formatted: str
     court: str
-    date: Optional[datetime]
-    issues: List[str] = field(default_factory=list)
+    date: datetime | None
+    issues: list[str] = field(default_factory=list)
 
 
 @dataclass
 class VerificationReport:
     """Citation verification report."""
 
-    verified: List[VerifiedCitation]
-    outdated: List[VerifiedCitation]
-    errors: List[Dict[str, str]]
+    verified: list[VerifiedCitation]
+    outdated: list[VerifiedCitation]
+    errors: list[dict[str, str]]
     overall_accuracy: float
 
 
@@ -165,20 +165,20 @@ class Finding:
 
     issue: str
     conclusion: str
-    supporting_citations: List[str]
+    supporting_citations: list[str]
     confidence: float
-    conflicts: List[str] = field(default_factory=list)
+    conflicts: list[str] = field(default_factory=list)
 
 
 @dataclass
 class Synthesis:
     """Research synthesis."""
 
-    key_findings: List[Finding]
-    precedent_chain: List[str]
-    conflicts: List[Dict[str, Any]]
-    gaps: List[str]
-    recommendations: List[str]
+    key_findings: list[Finding]
+    precedent_chain: list[str]
+    conflicts: list[dict[str, Any]]
+    gaps: list[str]
+    recommendations: list[str]
 
 
 @dataclass
@@ -188,11 +188,11 @@ class ResearchMemo:
     title: str
     executive_summary: str
     methodology: str
-    findings: List[Finding]
-    citations: List[VerifiedCitation]
-    limitations: List[str]
-    next_steps: List[str]
-    metadata: Dict[str, Any]
+    findings: list[Finding]
+    citations: list[VerifiedCitation]
+    limitations: list[str]
+    next_steps: list[str]
+    metadata: dict[str, Any]
 
 
 # =============================================================================
@@ -208,7 +208,7 @@ class MCPClient:
     For now, provides interface definition and mock responses.
     """
 
-    async def call(self, server: str, method: str, params: Dict[str, Any]) -> Dict[str, Any]:
+    async def call(self, server: str, method: str, params: dict[str, Any]) -> dict[str, Any]:
         """
         Call an MCP server method.
 
@@ -224,8 +224,8 @@ class MCPClient:
         return await self._mock_response(server, method, params)
 
     async def _mock_response(
-        self, server: str, method: str, params: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, server: str, method: str, params: dict[str, Any]
+    ) -> dict[str, Any]:
         """Generate mock responses for testing."""
         if server == "bge-search" and method == "search":
             return {
@@ -362,10 +362,10 @@ class ResearcherAgent(AgentBase):
     def __init__(
         self,
         autonomy_mode: AutonomyMode = AutonomyMode.BALANCED,
-        case_context: Optional[CaseContext] = None,
+        case_context: CaseContext | None = None,
         user_id: str = "anonymous",
         firm_id: str = "default",
-        mcp_client: Optional[MCPClient] = None,
+        mcp_client: MCPClient | None = None,
     ):
         """Initialize researcher agent."""
         super().__init__(autonomy_mode, case_context, user_id, firm_id)
@@ -517,7 +517,7 @@ class ResearcherAgent(AgentBase):
         self.update_state("parameters", params)
         return params
 
-    def _detect_domains(self, question: str) -> List[LegalDomain]:
+    def _detect_domains(self, question: str) -> list[LegalDomain]:
         """Detect legal domains from question text."""
         question_lower = question.lower()
         detected = []
@@ -534,7 +534,7 @@ class ResearcherAgent(AgentBase):
 
         return detected
 
-    def _extract_key_terms(self, question: str) -> List[str]:
+    def _extract_key_terms(self, question: str) -> list[str]:
         """Extract key legal terms from question."""
         # Remove common words
         stopwords = {
@@ -578,7 +578,7 @@ class ResearcherAgent(AgentBase):
 
         return list(set(terms))[:20]  # Limit to 20 terms
 
-    def _extract_statute_references(self, question: str) -> List[str]:
+    def _extract_statute_references(self, question: str) -> list[str]:
         """Extract statute references like 'Art. 368 OR'."""
         patterns = [
             r"Art\.?\s*\d+(?:\s*(?:Abs|lit|Ziff)\.?\s*\d+)*\s*(?:OR|ZGB|StGB|ZPO|StPO|SchKG|BGG)",
@@ -592,7 +592,7 @@ class ResearcherAgent(AgentBase):
 
         return list(set(refs))
 
-    def _detect_jurisdiction(self, question: str) -> Tuple[bool, List[str]]:
+    def _detect_jurisdiction(self, question: str) -> tuple[bool, list[str]]:
         """Detect federal and cantonal jurisdiction from question."""
         question_upper = question.upper()
 
@@ -615,7 +615,7 @@ class ResearcherAgent(AgentBase):
 
         return federal, cantons
 
-    def _detect_languages(self, question: str) -> List[str]:
+    def _detect_languages(self, question: str) -> list[str]:
         """Detect language requirements from question."""
         # Simple heuristic based on question content
         german_indicators = ["Vertrag", "Recht", "Gesetz", "Urteil"]
@@ -636,7 +636,7 @@ class ResearcherAgent(AgentBase):
 
         return languages if languages else ["DE"]
 
-    def _extract_concepts(self, question: str, domains: List[LegalDomain]) -> List[str]:
+    def _extract_concepts(self, question: str, domains: list[LegalDomain]) -> list[str]:
         """Extract legal concepts based on domains."""
         concepts = []
 
@@ -723,7 +723,7 @@ class ResearcherAgent(AgentBase):
         self.update_state("strategy", strategy)
         return strategy
 
-    def _configure_sources(self, params: ResearchParameters) -> List[SearchSource]:
+    def _configure_sources(self, params: ResearchParameters) -> list[SearchSource]:
         """Configure search sources based on parameters."""
         sources = []
 
@@ -767,8 +767,8 @@ class ResearcherAgent(AgentBase):
     def _generate_queries(
         self,
         params: ResearchParameters,
-        sources: List[SearchSource],
-    ) -> List[SearchQuery]:
+        sources: list[SearchSource],
+    ) -> list[SearchQuery]:
         """Generate search queries for each source."""
         queries = []
 
@@ -786,7 +786,7 @@ class ResearcherAgent(AgentBase):
             if statute_query:
                 query_text = f"({base_query}) AND ({statute_query})"
 
-            filters: Dict[str, Any] = {}
+            filters: dict[str, Any] = {}
             if params.time_range_from:
                 filters["date_from"] = params.time_range_from.isoformat()
             if params.time_range_to:
@@ -829,8 +829,8 @@ class ResearcherAgent(AgentBase):
         """Execute parallel searches across sources."""
         start = datetime.utcnow()
 
-        all_results: List[RawResult] = []
-        by_source: Dict[str, List[RawResult]] = {}
+        all_results: list[RawResult] = []
+        by_source: dict[str, list[RawResult]] = {}
 
         # Execute queries in parallel batches
         for i in range(0, len(strategy.queries), strategy.parallel_limit):
@@ -839,7 +839,7 @@ class ResearcherAgent(AgentBase):
                 *[self._execute_query(q) for q in batch], return_exceptions=True
             )
 
-            for query, result in zip(batch, batch_results):
+            for query, result in zip(batch, batch_results, strict=True):
                 if isinstance(result, BaseException):
                     self._handle_search_error(result, query.source)
                     continue
@@ -883,7 +883,7 @@ class ResearcherAgent(AgentBase):
             processing_time_ms=duration_ms,
         )
 
-    async def _execute_query(self, query: SearchQuery) -> Dict[str, Any]:
+    async def _execute_query(self, query: SearchQuery) -> dict[str, Any]:
         """Execute a single search query via MCP."""
         # Map source to MCP server
         mcp_server = self._get_mcp_server(query.source)
@@ -908,7 +908,7 @@ class ResearcherAgent(AgentBase):
         else:
             return "entscheidsuche"
 
-    def _parse_results(self, response: Dict[str, Any], source: str) -> List[RawResult]:
+    def _parse_results(self, response: dict[str, Any], source: str) -> list[RawResult]:
         """Parse MCP response into RawResult objects."""
         results = []
         for item in response.get("results", []):
@@ -937,7 +937,7 @@ class ResearcherAgent(AgentBase):
 
         return results
 
-    def _deduplicate_results(self, results: List[RawResult]) -> List[RawResult]:
+    def _deduplicate_results(self, results: list[RawResult]) -> list[RawResult]:
         """Remove duplicate results based on citation."""
         seen_citations: set[str] = set()
         unique = []
@@ -969,9 +969,9 @@ class ResearcherAgent(AgentBase):
         """Verify all citations in results."""
         start = datetime.utcnow()
 
-        verified: List[VerifiedCitation] = []
-        outdated: List[VerifiedCitation] = []
-        errors: List[Dict[str, str]] = []
+        verified: list[VerifiedCitation] = []
+        outdated: list[VerifiedCitation] = []
+        errors: list[dict[str, str]] = []
 
         # Extract unique citations
         citations = list({r.citation for r in results.results if r.citation})
@@ -1102,11 +1102,11 @@ class ResearcherAgent(AgentBase):
 
     def _group_by_issue(
         self,
-        results: List[RawResult],
+        results: list[RawResult],
         params: ResearchParameters,
-    ) -> Dict[str, List[RawResult]]:
+    ) -> dict[str, list[RawResult]]:
         """Group results by legal issue."""
-        grouped: Dict[str, List[RawResult]] = {}
+        grouped: dict[str, list[RawResult]] = {}
 
         for result in results:
             # Simple grouping by domain - could be enhanced with NLP
@@ -1121,7 +1121,7 @@ class ResearcherAgent(AgentBase):
     def _generate_finding(
         self,
         issue: str,
-        results: List[RawResult],
+        results: list[RawResult],
         verification: VerificationReport,
     ) -> Finding:
         """Generate a finding for an issue."""
@@ -1149,13 +1149,13 @@ class ResearcherAgent(AgentBase):
             confidence=confidence,
         )
 
-    def _build_precedent_chain(self, results: List[RawResult]) -> List[str]:
+    def _build_precedent_chain(self, results: list[RawResult]) -> list[str]:
         """Build chronological precedent chain."""
         dated_results = [r for r in results if r.date]
         dated_results.sort(key=lambda r: r.date or datetime.min)
         return [r.citation for r in dated_results[:10]]
 
-    def _identify_conflicts(self, findings: List[Finding]) -> List[Dict[str, Any]]:
+    def _identify_conflicts(self, findings: list[Finding]) -> list[dict[str, Any]]:
         """Identify conflicting findings."""
         # Simplified - would use more sophisticated analysis
         return []
@@ -1163,8 +1163,8 @@ class ResearcherAgent(AgentBase):
     def _identify_gaps(
         self,
         params: ResearchParameters,
-        findings: List[Finding],
-    ) -> List[str]:
+        findings: list[Finding],
+    ) -> list[str]:
         """Identify gaps in research."""
         gaps = []
 
@@ -1183,9 +1183,9 @@ class ResearcherAgent(AgentBase):
 
     def _generate_recommendations(
         self,
-        findings: List[Finding],
-        gaps: List[str],
-    ) -> List[str]:
+        findings: list[Finding],
+        gaps: list[str],
+    ) -> list[str]:
         """Generate recommendations for next steps."""
         recommendations = []
 
@@ -1296,7 +1296,7 @@ class ResearcherAgent(AgentBase):
         self,
         results: SearchResults,
         verification: VerificationReport,
-    ) -> List[str]:
+    ) -> list[str]:
         """Compile research limitations."""
         limitations = []
 
@@ -1343,7 +1343,7 @@ class ResearcherAgent(AgentBase):
         )
 
         # Try to get partial results - not implemented yet
-        partial: Optional[ResearchMemo] = None
+        partial: ResearchMemo | None = None
 
         audit_log = self._create_audit_log(
             AgentOutcome.FAILED,

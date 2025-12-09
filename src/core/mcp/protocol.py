@@ -17,7 +17,7 @@ import logging
 import subprocess
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, cast
 
 logger = logging.getLogger(__name__)
 
@@ -37,8 +37,8 @@ class MCPCapability:
 
     name: str
     description: str
-    parameters: Dict[str, Any]
-    returns: Optional[Dict[str, Any]] = None
+    parameters: dict[str, Any]
+    returns: dict[str, Any] | None = None
 
 
 @dataclass
@@ -48,7 +48,7 @@ class MCPServerInfo:
     server_id: str
     name: str
     version: str
-    capabilities: List[MCPCapability]
+    capabilities: list[MCPCapability]
     protocol_version: str = "2024-11-05"
 
 
@@ -95,9 +95,9 @@ class MCPClient:
 
     def __init__(
         self,
-        command: List[str],
+        command: list[str],
         server_id: str,
-        env: Optional[Dict[str, str]] = None,
+        env: dict[str, str] | None = None,
         timeout: int = 30,
     ) -> None:
         """
@@ -114,8 +114,8 @@ class MCPClient:
         self.env = env or {}
         self.timeout = timeout
 
-        self._process: Optional[subprocess.Popen] = None
-        self._server_info: Optional[MCPServerInfo] = None
+        self._process: subprocess.Popen | None = None
+        self._server_info: MCPServerInfo | None = None
         self._request_id: int = 0
         self._connected: bool = False
 
@@ -216,7 +216,7 @@ class MCPClient:
 
         return self._server_info
 
-    async def invoke_tool(self, tool_name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
+    async def invoke_tool(self, tool_name: str, arguments: dict[str, Any]) -> dict[str, Any]:
         """
         Invoke a tool on the MCP server
 
@@ -253,12 +253,12 @@ class MCPClient:
                     f"Tool invocation failed: {error.get('message', 'Unknown error')}"
                 )
 
-            return cast(Dict[str, Any], response.get("result", {}))
+            return cast(dict[str, Any], response.get("result", {}))
 
         except Exception as e:
             raise MCPInvocationError(f"Failed to invoke tool {tool_name}: {e}") from e
 
-    async def _send_request(self, request: Dict[str, Any]) -> Dict[str, Any]:
+    async def _send_request(self, request: dict[str, Any]) -> dict[str, Any]:
         """
         Send JSON-RPC request and wait for response
 
@@ -291,7 +291,7 @@ class MCPClient:
             if not response_line:
                 raise MCPProtocolError("Server closed connection")
 
-            response = cast(Dict[str, Any], json.loads(response_line))
+            response = cast(dict[str, Any], json.loads(response_line))
 
             # Validate response
             if response.get("id") != request.get("id"):
@@ -309,7 +309,7 @@ class MCPClient:
         except Exception as e:
             raise MCPProtocolError(f"Communication error: {e}") from e
 
-    def _parse_capabilities(self, capabilities_data: Dict[str, Any]) -> List[MCPCapability]:
+    def _parse_capabilities(self, capabilities_data: dict[str, Any]) -> list[MCPCapability]:
         """Parse capabilities from server initialization response"""
         capabilities = []
 
@@ -332,7 +332,7 @@ class MCPClient:
         self._request_id += 1
         return self._request_id
 
-    def get_server_info(self) -> Optional[MCPServerInfo]:
+    def get_server_info(self) -> MCPServerInfo | None:
         """Get cached server info (None if not initialized)"""
         return self._server_info
 

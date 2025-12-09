@@ -5,7 +5,7 @@ This module implements the /legal:research command for searching Swiss legal sou
 including BGE precedents, federal statutes, and cantonal law.
 """
 
-from typing import Any, Dict
+from typing import Any
 
 from ..mcp.connection_manager import MCPConnectionManager
 from .base import BaseCommand, CommandCategory, CommandMetadata
@@ -86,7 +86,7 @@ class LegalResearchCommand(BaseCommand):
             help_text="Maximum number of results to return (default: 10)",
         )
 
-    async def execute(self, args: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, args: dict[str, Any]) -> dict[str, Any]:
         """
         Execute legal research search using MCP servers
 

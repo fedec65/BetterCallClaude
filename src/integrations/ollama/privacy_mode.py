@@ -7,10 +7,11 @@ with automatic fallback to cloud when local is unavailable.
 
 import logging
 import re
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any
 
 from src.integrations.ollama.client import (
     ChatMessage,
@@ -46,7 +47,7 @@ class PrivacyLevel(Enum):
         return self == PrivacyLevel.PRIVILEGED
 
     @property
-    def description(self) -> Dict[str, str]:
+    def description(self) -> dict[str, str]:
         """Return multilingual description."""
         descriptions = {
             PrivacyLevel.PUBLIC: {
@@ -77,7 +78,7 @@ class PrivacyConfig:
 
     default_level: PrivacyLevel = PrivacyLevel.CONFIDENTIAL
     allow_cloud_fallback: bool = True
-    local_only_patterns: List[str] = field(default_factory=list)
+    local_only_patterns: list[str] = field(default_factory=list)
     log_routing_decisions: bool = True
     warn_on_cloud_usage: bool = True
     auto_detect_sensitivity: bool = True
@@ -116,9 +117,9 @@ class RoutingDecision:
     backend_used: str  # "local" or "cloud"
     fallback_used: bool
     reason: str
-    prompt_hash: Optional[str] = None  # Hash of prompt for audit trail
+    prompt_hash: str | None = None  # Hash of prompt for audit trail
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Serialize to dictionary."""
         return {
             "timestamp": self.timestamp.isoformat(),
@@ -135,9 +136,9 @@ class PrivacyRoutingResult:
     """Result of privacy-aware request routing."""
 
     backend: str  # "local" or "cloud"
-    response: Optional[OllamaResponse]
+    response: OllamaResponse | None
     decision: RoutingDecision
-    cloud_response: Optional[Any] = None  # For cloud responses
+    cloud_response: Any | None = None  # For cloud responses
 
 
 class PrivacyViolationError(Exception):
@@ -164,8 +165,8 @@ class PrivacyRouter:
     def __init__(
         self,
         ollama_client: OllamaClient,
-        config: Optional[PrivacyConfig] = None,
-        cloud_handler: Optional[Callable[..., Any]] = None,
+        config: PrivacyConfig | None = None,
+        cloud_handler: Callable[..., Any] | None = None,
     ):
         """Initialize privacy router.
 
@@ -177,8 +178,8 @@ class PrivacyRouter:
         self.ollama = ollama_client
         self.config = config or PrivacyConfig()
         self.cloud_handler = cloud_handler
-        self._routing_history: List[RoutingDecision] = []
-        self._compiled_patterns: List[re.Pattern[str]] = [
+        self._routing_history: list[RoutingDecision] = []
+        self._compiled_patterns: list[re.Pattern[str]] = [
             re.compile(p) for p in self.config.local_only_patterns
         ]
 
@@ -219,9 +220,9 @@ class PrivacyRouter:
     async def route_request(
         self,
         prompt: str,
-        privacy_level: Optional[PrivacyLevel] = None,
-        model: Optional[OllamaModel] = None,
-        system_prompt: Optional[str] = None,
+        privacy_level: PrivacyLevel | None = None,
+        model: OllamaModel | None = None,
+        system_prompt: str | None = None,
         **kwargs: Any,
     ) -> PrivacyRoutingResult:
         """Route request to appropriate backend.
@@ -260,8 +261,8 @@ class PrivacyRouter:
     async def _route_privileged(
         self,
         prompt: str,
-        model: Optional[OllamaModel],
-        system_prompt: Optional[str],
+        model: OllamaModel | None,
+        system_prompt: str | None,
         **kwargs: Any,
     ) -> PrivacyRoutingResult:
         """Route privileged request - local only, no fallback."""
@@ -312,8 +313,8 @@ class PrivacyRouter:
     async def _route_confidential(
         self,
         prompt: str,
-        model: Optional[OllamaModel],
-        system_prompt: Optional[str],
+        model: OllamaModel | None,
+        system_prompt: str | None,
         **kwargs: Any,
     ) -> PrivacyRoutingResult:
         """Route confidential request - local preferred, cloud fallback if allowed."""
@@ -374,8 +375,8 @@ class PrivacyRouter:
     async def _route_public(
         self,
         prompt: str,
-        model: Optional[OllamaModel],
-        system_prompt: Optional[str],
+        model: OllamaModel | None,
+        system_prompt: str | None,
         **kwargs: Any,
     ) -> PrivacyRoutingResult:
         """Route public request - cloud preferred for quality."""
@@ -432,7 +433,7 @@ class PrivacyRouter:
     async def _route_to_cloud(
         self,
         prompt: str,
-        system_prompt: Optional[str],
+        system_prompt: str | None,
         **kwargs: Any,
     ) -> Any:
         """Route request to cloud handler."""
@@ -479,7 +480,7 @@ class PrivacyRouter:
     def get_routing_history(
         self,
         limit: int = 100,
-    ) -> List[RoutingDecision]:
+    ) -> list[RoutingDecision]:
         """Get recent routing decisions for audit.
 
         Args:
@@ -490,7 +491,7 @@ class PrivacyRouter:
         """
         return self._routing_history[-limit:]
 
-    def get_routing_statistics(self) -> Dict[str, Any]:
+    def get_routing_statistics(self) -> dict[str, Any]:
         """Get statistics about routing decisions.
 
         Returns:
@@ -522,9 +523,9 @@ class PrivacyRouter:
 
     async def chat_with_privacy(
         self,
-        messages: List[ChatMessage],
-        privacy_level: Optional[PrivacyLevel] = None,
-        model: Optional[OllamaModel] = None,
+        messages: list[ChatMessage],
+        privacy_level: PrivacyLevel | None = None,
+        model: OllamaModel | None = None,
     ) -> PrivacyRoutingResult:
         """Chat completion with privacy routing.
 

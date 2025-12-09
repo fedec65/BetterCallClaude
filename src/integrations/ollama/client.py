@@ -6,10 +6,11 @@ with graceful fallback to Claude when needed.
 """
 
 import logging
+from collections.abc import AsyncGenerator
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, AsyncGenerator, Dict, List, Optional, Union
+from typing import Any
 
 import httpx
 
@@ -38,7 +39,7 @@ class OllamaModel(Enum):
     @property
     def recommended_for(self) -> str:
         """Get recommended use case for this model."""
-        recommendations: dict["OllamaModel", str] = {
+        recommendations: dict[OllamaModel, str] = {
             OllamaModel.LLAMA3_70B: "Complex legal analysis, document review, strategic reasoning",
             OllamaModel.LLAMA3_8B: "General tasks, quick responses, Swiss German processing",
             OllamaModel.MIXTRAL: "Balanced quality/speed, multilingual support",
@@ -51,7 +52,7 @@ class OllamaModel(Enum):
     @property
     def context_length(self) -> int:
         """Return approximate context window size."""
-        context_sizes: dict["OllamaModel", int] = {
+        context_sizes: dict[OllamaModel, int] = {
             OllamaModel.LLAMA3_70B: 128000,
             OllamaModel.LLAMA3_8B: 128000,
             OllamaModel.MIXTRAL: 32000,
@@ -72,7 +73,7 @@ class OllamaConfig:
     max_retries: int = 3
     retry_delay: float = 1.0
     verify_ssl: bool = True
-    custom_headers: Dict[str, str] = field(default_factory=dict)
+    custom_headers: dict[str, str] = field(default_factory=dict)
 
 
 @dataclass
@@ -94,7 +95,7 @@ class OllamaResponse:
             return self.tokens_used / self.generation_time
         return 0.0
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Serialize to dictionary."""
         return {
             "content": self.content,
@@ -115,7 +116,7 @@ class ChatMessage:
     role: str  # "system", "user", "assistant"
     content: str
 
-    def to_dict(self) -> Dict[str, str]:
+    def to_dict(self) -> dict[str, str]:
         """Convert to API format."""
         return {"role": self.role, "content": self.content}
 
@@ -144,17 +145,17 @@ class OllamaClient:
     - Swiss multilingual support (DE/FR/IT)
     """
 
-    def __init__(self, config: Optional[OllamaConfig] = None):
+    def __init__(self, config: OllamaConfig | None = None):
         """Initialize Ollama client.
 
         Args:
             config: Optional configuration. Uses defaults if not provided.
         """
         self.config = config or OllamaConfig()
-        self._http_client: Optional[httpx.AsyncClient] = None
-        self._available: Optional[bool] = None
-        self._available_models: List[str] = []
-        self._last_health_check: Optional[datetime] = None
+        self._http_client: httpx.AsyncClient | None = None
+        self._available: bool | None = None
+        self._available_models: list[str] = []
+        self._last_health_check: datetime | None = None
 
     async def __aenter__(self) -> "OllamaClient":
         """Async context manager entry."""
@@ -221,7 +222,7 @@ class OllamaClient:
         self._last_health_check = datetime.now()
         return False
 
-    async def list_models(self) -> List[str]:
+    async def list_models(self) -> list[str]:
         """List available models.
 
         Returns:
@@ -231,7 +232,7 @@ class OllamaClient:
             return []
         return self._available_models
 
-    async def has_model(self, model: Union[OllamaModel, str]) -> bool:
+    async def has_model(self, model: OllamaModel | str) -> bool:
         """Check if a specific model is available.
 
         Args:
@@ -254,12 +255,12 @@ class OllamaClient:
     async def generate(
         self,
         prompt: str,
-        model: Optional[OllamaModel] = None,
-        system_prompt: Optional[str] = None,
+        model: OllamaModel | None = None,
+        system_prompt: str | None = None,
         temperature: float = 0.7,
         max_tokens: int = 4096,
         top_p: float = 0.9,
-        stop_sequences: Optional[List[str]] = None,
+        stop_sequences: list[str] | None = None,
     ) -> OllamaResponse:
         """Generate completion from Ollama.
 
@@ -294,7 +295,7 @@ class OllamaClient:
         await self._ensure_client()
         assert self._http_client is not None
 
-        payload: Dict[str, Any] = {
+        payload: dict[str, Any] = {
             "model": model_name,
             "prompt": prompt,
             "stream": False,
@@ -335,8 +336,8 @@ class OllamaClient:
     async def generate_stream(
         self,
         prompt: str,
-        model: Optional[OllamaModel] = None,
-        system_prompt: Optional[str] = None,
+        model: OllamaModel | None = None,
+        system_prompt: str | None = None,
         temperature: float = 0.7,
         max_tokens: int = 4096,
     ) -> AsyncGenerator[str, None]:
@@ -364,7 +365,7 @@ class OllamaClient:
         await self._ensure_client()
         assert self._http_client is not None
 
-        payload: Dict[str, Any] = {
+        payload: dict[str, Any] = {
             "model": model_name,
             "prompt": prompt,
             "stream": True,
@@ -397,8 +398,8 @@ class OllamaClient:
 
     async def chat(
         self,
-        messages: List[ChatMessage],
-        model: Optional[OllamaModel] = None,
+        messages: list[ChatMessage],
+        model: OllamaModel | None = None,
         temperature: float = 0.7,
         max_tokens: int = 4096,
     ) -> OllamaResponse:
@@ -425,7 +426,7 @@ class OllamaClient:
         await self._ensure_client()
         assert self._http_client is not None
 
-        payload: Dict[str, Any] = {
+        payload: dict[str, Any] = {
             "model": model_name,
             "messages": [m.to_dict() for m in messages],
             "stream": False,
@@ -460,8 +461,8 @@ class OllamaClient:
     async def embeddings(
         self,
         text: str,
-        model: Optional[OllamaModel] = None,
-    ) -> List[float]:
+        model: OllamaModel | None = None,
+    ) -> list[float]:
         """Generate embeddings for text.
 
         Args:
@@ -499,7 +500,7 @@ class OllamaClient:
             )
 
         data: dict[str, Any] = response.json()
-        embedding: List[float] = data.get("embedding", [])
+        embedding: list[float] = data.get("embedding", [])
         return embedding
 
     def select_model_for_task(

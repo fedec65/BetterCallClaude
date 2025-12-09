@@ -10,7 +10,7 @@ import json
 import sqlite3
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, cast
 
 
 class CitationCache:
@@ -37,7 +37,7 @@ class CitationCache:
         cache.cleanup_expired()
     """
 
-    def __init__(self, db_path: Optional[Path] = None, ttl_hours: int = 24):
+    def __init__(self, db_path: Path | None = None, ttl_hours: int = 24):
         """
         Initialize citation cache
 
@@ -80,7 +80,7 @@ class CitationCache:
             )
             conn.commit()
 
-    def _generate_cache_key(self, query: str, filters: Optional[Dict] = None) -> str:
+    def _generate_cache_key(self, query: str, filters: dict | None = None) -> str:
         """
         Generate cache key from query and filters
 
@@ -91,14 +91,14 @@ class CitationCache:
         Returns:
             SHA-256 hash of query + filters
         """
-        key_data: Dict[str, Any] = {"query": query}
+        key_data: dict[str, Any] = {"query": query}
         if filters:
             key_data["filters"] = filters
 
         key_string = json.dumps(key_data, sort_keys=True)
         return hashlib.sha256(key_string.encode()).hexdigest()
 
-    def get(self, query: str, filters: Optional[Dict] = None) -> Optional[Dict[str, Any]]:
+    def get(self, query: str, filters: dict | None = None) -> dict[str, Any] | None:
         """
         Retrieve cached citation data
 
@@ -147,14 +147,14 @@ class CitationCache:
             )
             conn.commit()
 
-            return cast(Dict[str, Any], json.loads(data_json))
+            return cast(dict[str, Any], json.loads(data_json))
 
     def set(
         self,
         query: str,
-        data: Dict[str, Any],
-        filters: Optional[Dict] = None,
-        ttl_hours: Optional[int] = None,
+        data: dict[str, Any],
+        filters: dict | None = None,
+        ttl_hours: int | None = None,
     ) -> None:
         """
         Store citation data in cache
@@ -191,7 +191,7 @@ class CitationCache:
             )
             conn.commit()
 
-    def delete(self, query: str, filters: Optional[Dict] = None) -> bool:
+    def delete(self, query: str, filters: dict | None = None) -> bool:
         """
         Delete specific cache entry
 
@@ -236,7 +236,7 @@ class CitationCache:
             conn.commit()
             return cursor.rowcount
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         """
         Get cache statistics
 
@@ -271,7 +271,7 @@ class CitationCache:
                 "newest_entry": row[4],
             }
 
-    def get_top_queries(self, limit: int = 10) -> List[Dict[str, Any]]:
+    def get_top_queries(self, limit: int = 10) -> list[dict[str, Any]]:
         """
         Get most frequently accessed queries
 

@@ -12,10 +12,11 @@ Pipelines:
 
 import logging
 import uuid
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any
 
 from .base import (
     AgentBase,
@@ -67,10 +68,10 @@ class OrchestrationStep:
 
     agent_type: str
     task: str
-    input_mapping: Dict[str, str] = field(default_factory=dict)
+    input_mapping: dict[str, str] = field(default_factory=dict)
     output_key: str = ""
     checkpoint_required: bool = False
-    condition: Optional[Callable[[Dict[str, Any]], bool]] = None
+    condition: Callable[[dict[str, Any]], bool] | None = None
 
     def __post_init__(self) -> None:
         """Set default output key if not provided."""
@@ -96,12 +97,12 @@ class PipelineResult:
 
     pipeline_id: str = field(default_factory=lambda: str(uuid.uuid4())[:8])
     status: PipelineStatus = PipelineStatus.PENDING
-    steps_completed: List[str] = field(default_factory=list)
-    step_results: Dict[str, AgentResult] = field(default_factory=dict)
-    aggregated_checkpoints: List[Checkpoint] = field(default_factory=list)
+    steps_completed: list[str] = field(default_factory=list)
+    step_results: dict[str, AgentResult] = field(default_factory=dict)
+    aggregated_checkpoints: list[Checkpoint] = field(default_factory=list)
     total_duration_seconds: float = 0.0
-    final_output: Optional[Dict[str, Any]] = None
-    errors: List[str] = field(default_factory=list)
+    final_output: dict[str, Any] | None = None
+    errors: list[str] = field(default_factory=list)
     created_at: datetime = field(default_factory=datetime.now)
 
 
@@ -234,8 +235,8 @@ class AgentOrchestrator:
     def __init__(
         self,
         autonomy_mode: AutonomyMode = AutonomyMode.CAUTIOUS,
-        case_context: Optional[CaseContext] = None,
-        config: Optional[PipelineConfig] = None,
+        case_context: CaseContext | None = None,
+        config: PipelineConfig | None = None,
     ):
         """
         Initialize the orchestrator.
@@ -248,9 +249,9 @@ class AgentOrchestrator:
         self.autonomy_mode = autonomy_mode
         self.case_context = case_context
         self.config = config or PipelineConfig(autonomy_mode=autonomy_mode)
-        self.step_results: Dict[str, AgentResult] = {}
-        self._agents: Dict[str, AgentBase] = {}
-        self._pipeline_history: List[PipelineResult] = []
+        self.step_results: dict[str, AgentResult] = {}
+        self._agents: dict[str, AgentBase] = {}
+        self._pipeline_history: list[PipelineResult] = []
 
         logger.info(
             f"AgentOrchestrator initialized (mode={autonomy_mode.value}, "
@@ -308,9 +309,9 @@ class AgentOrchestrator:
 
     def _resolve_input_mapping(
         self,
-        mapping: Dict[str, str],
-        step_results: Dict[str, AgentResult],
-    ) -> Dict[str, Any]:
+        mapping: dict[str, str],
+        step_results: dict[str, AgentResult],
+    ) -> dict[str, Any]:
         """
         Resolve input mapping from previous step outputs.
 
@@ -359,8 +360,8 @@ class AgentOrchestrator:
 
     def _aggregate_checkpoints(
         self,
-        step_results: Dict[str, AgentResult],
-    ) -> List[Checkpoint]:
+        step_results: dict[str, AgentResult],
+    ) -> list[Checkpoint]:
         """
         Aggregate checkpoints from all completed steps.
 
@@ -388,8 +389,8 @@ class AgentOrchestrator:
 
     async def execute_pipeline(
         self,
-        steps: List[OrchestrationStep],
-        initial_inputs: Optional[Dict[str, Any]] = None,
+        steps: list[OrchestrationStep],
+        initial_inputs: dict[str, Any] | None = None,
     ) -> PipelineResult:
         """
         Execute a multi-agent pipeline with data passing.
@@ -403,7 +404,7 @@ class AgentOrchestrator:
         """
         result = PipelineResult(status=PipelineStatus.IN_PROGRESS)
         start_time = datetime.now()
-        step_results: Dict[str, AgentResult] = {}
+        step_results: dict[str, AgentResult] = {}
 
         logger.info(f"Starting pipeline {result.pipeline_id} with {len(steps)} steps")
 
@@ -489,7 +490,7 @@ class AgentOrchestrator:
         self,
         agent: AgentBase,
         step: OrchestrationStep,
-        inputs: Dict[str, Any],
+        inputs: dict[str, Any],
     ) -> AgentResult:
         """
         Execute a single pipeline step.
@@ -551,8 +552,8 @@ class AgentOrchestrator:
 
     def _create_final_output(
         self,
-        step_results: Dict[str, AgentResult],
-    ) -> Dict[str, Any]:
+        step_results: dict[str, AgentResult],
+    ) -> dict[str, Any]:
         """
         Create aggregated final output from all steps.
 
@@ -562,7 +563,7 @@ class AgentOrchestrator:
         Returns:
             Dict with summarized output
         """
-        output: Dict[str, Any] = {
+        output: dict[str, Any] = {
             "summary": {},
             "deliverables": {},
             "metrics": {},
@@ -594,7 +595,7 @@ class AgentOrchestrator:
     async def research_to_strategy(
         self,
         research_query: str,
-        case_facts: Union[Dict, CaseFacts],
+        case_facts: dict | CaseFacts,
         jurisdiction: Jurisdiction = Jurisdiction.FEDERAL,
         language: Language = Language.DE,
     ) -> PipelineResult:
@@ -641,10 +642,10 @@ class AgentOrchestrator:
 
     async def strategy_to_draft(
         self,
-        strategy: Union[Dict, Any],
-        document_type: Union[str, DocumentType],
-        case_facts: Optional[Union[Dict, CaseFacts]] = None,
-        parties: Optional[List[LegalParty]] = None,
+        strategy: dict | Any,
+        document_type: str | DocumentType,
+        case_facts: dict | CaseFacts | None = None,
+        parties: list[LegalParty] | None = None,
         jurisdiction: Jurisdiction = Jurisdiction.FEDERAL,
         language: Language = Language.DE,
     ) -> PipelineResult:
@@ -691,9 +692,9 @@ class AgentOrchestrator:
     async def full_pipeline(
         self,
         query: str,
-        case_facts: Union[Dict, CaseFacts],
-        document_type: Union[str, DocumentType],
-        parties: Optional[List[LegalParty]] = None,
+        case_facts: dict | CaseFacts,
+        document_type: str | DocumentType,
+        parties: list[LegalParty] | None = None,
         jurisdiction: Jurisdiction = Jurisdiction.FEDERAL,
         language: Language = Language.DE,
     ) -> PipelineResult:
@@ -760,11 +761,11 @@ class AgentOrchestrator:
     # Pipeline Management
     # =========================================================================
 
-    def get_pipeline_history(self) -> List[PipelineResult]:
+    def get_pipeline_history(self) -> list[PipelineResult]:
         """Get history of executed pipelines."""
         return self._pipeline_history.copy()
 
-    def get_latest_result(self) -> Optional[PipelineResult]:
+    def get_latest_result(self) -> PipelineResult | None:
         """Get the most recent pipeline result."""
         return self._pipeline_history[-1] if self._pipeline_history else None
 
@@ -781,7 +782,7 @@ class AgentOrchestrator:
     async def resume_from_checkpoint(
         self,
         pipeline_id: str,
-        checkpoint_response: Dict[str, Any],
+        checkpoint_response: dict[str, Any],
     ) -> PipelineResult:
         """
         Resume a paused pipeline after checkpoint approval.
@@ -817,11 +818,11 @@ class AgentOrchestrator:
     # Utility Methods
     # =========================================================================
 
-    def get_supported_pipelines(self) -> List[str]:
+    def get_supported_pipelines(self) -> list[str]:
         """Get list of supported pipeline templates."""
         return list(PIPELINE_TEMPLATES.keys())
 
-    def get_pipeline_template(self, name: str) -> List[OrchestrationStep]:
+    def get_pipeline_template(self, name: str) -> list[OrchestrationStep]:
         """Get a pipeline template by name."""
         if name not in PIPELINE_TEMPLATES:
             raise ValueError(f"Unknown pipeline: {name}")

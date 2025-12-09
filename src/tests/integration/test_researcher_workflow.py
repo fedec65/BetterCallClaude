@@ -11,7 +11,7 @@ Tests the complete research workflow from question to research memo:
 """
 
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import pytest
 
@@ -45,11 +45,11 @@ class MockMCPClient(MCPClient):
 
     def __init__(
         self,
-        bge_results: Optional[List[Dict[str, Any]]] = None,
-        cantonal_results: Optional[List[Dict[str, Any]]] = None,
-        entscheidsuche_results: Optional[List[Dict[str, Any]]] = None,
-        verification_responses: Optional[Dict[str, Dict[str, Any]]] = None,
-        raise_on_source: Optional[str] = None,
+        bge_results: list[dict[str, Any]] | None = None,
+        cantonal_results: list[dict[str, Any]] | None = None,
+        entscheidsuche_results: list[dict[str, Any]] | None = None,
+        verification_responses: dict[str, dict[str, Any]] | None = None,
+        raise_on_source: str | None = None,
     ):
         """
         Initialize mock client.
@@ -66,9 +66,9 @@ class MockMCPClient(MCPClient):
         self.entscheidsuche_results = entscheidsuche_results or []
         self.verification_responses = verification_responses or {}
         self.raise_on_source = raise_on_source
-        self.calls: List[Dict[str, Any]] = []
+        self.calls: list[dict[str, Any]] = []
 
-    async def call(self, server: str, method: str, params: Dict[str, Any]) -> Dict[str, Any]:
+    async def call(self, server: str, method: str, params: dict[str, Any]) -> dict[str, Any]:
         """Record call and return mock response."""
         self.calls.append(
             {
@@ -90,7 +90,7 @@ class MockMCPClient(MCPClient):
         else:
             return {"results": [], "total": 0}
 
-    def _get_search_response(self, server: str) -> Dict[str, Any]:
+    def _get_search_response(self, server: str) -> dict[str, Any]:
         """Get search response based on server."""
         if server == "bge-search":
             return {"results": self.bge_results, "total": len(self.bge_results)}
@@ -104,7 +104,7 @@ class MockMCPClient(MCPClient):
         else:
             return {"results": [], "total": 0}
 
-    def _get_verification_response(self, citation: str) -> Dict[str, Any]:
+    def _get_verification_response(self, citation: str) -> dict[str, Any]:
         """Get verification response for a citation."""
         if citation in self.verification_responses:
             return self.verification_responses[citation]
@@ -122,7 +122,7 @@ class MockMCPClient(MCPClient):
 
 
 @pytest.fixture
-def sample_bge_results() -> List[Dict[str, Any]]:
+def sample_bge_results() -> list[dict[str, Any]]:
     """Sample BGE search results."""
     return [
         {
@@ -151,7 +151,7 @@ def sample_bge_results() -> List[Dict[str, Any]]:
 
 
 @pytest.fixture
-def sample_cantonal_results() -> List[Dict[str, Any]]:
+def sample_cantonal_results() -> list[dict[str, Any]]:
     """Sample cantonal search results."""
     return [
         {
@@ -188,8 +188,8 @@ def sample_case_context() -> CaseContext:
 
 @pytest.fixture
 def mock_mcp_client(
-    sample_bge_results: List[Dict[str, Any]],
-    sample_cantonal_results: List[Dict[str, Any]],
+    sample_bge_results: list[dict[str, Any]],
+    sample_cantonal_results: list[dict[str, Any]],
 ) -> MockMCPClient:
     """Create mock MCP client with sample data."""
     return MockMCPClient(
@@ -379,7 +379,7 @@ class TestWorkflowSteps:
     async def test_search_step_aggregates_results(
         self,
         mock_mcp_client: MockMCPClient,
-        sample_bge_results: List[Dict[str, Any]],
+        sample_bge_results: list[dict[str, Any]],
     ) -> None:
         """Test SEARCH step aggregates results from multiple sources."""
         agent = ResearcherAgent(

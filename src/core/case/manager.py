@@ -15,7 +15,7 @@ import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from .storage import CaseStorage, JSONFileCaseStorage
 
@@ -46,10 +46,10 @@ class Party:
 
     name: str
     role: str  # client, plaintiff, defendant, opposing, related
-    contact: Optional[str] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    contact: str | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "name": self.name,
             "role": self.role,
@@ -58,7 +58,7 @@ class Party:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "Party":
+    def from_dict(cls, data: dict[str, Any]) -> "Party":
         return cls(
             name=data.get("name", ""),
             role=data.get("role", "related"),
@@ -75,9 +75,9 @@ class Deadline:
     due_date: datetime
     description: str = ""
     completed: bool = False
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "name": self.name,
             "due_date": self.due_date.isoformat(),
@@ -87,7 +87,7 @@ class Deadline:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "Deadline":
+    def from_dict(cls, data: dict[str, Any]) -> "Deadline":
         due_date = data.get("due_date", "")
         if isinstance(due_date, str):
             due_date = datetime.fromisoformat(due_date.replace("Z", "+00:00"))
@@ -107,9 +107,9 @@ class Milestone:
     name: str
     date: datetime
     description: str = ""
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "name": self.name,
             "date": self.date.isoformat(),
@@ -118,7 +118,7 @@ class Milestone:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "Milestone":
+    def from_dict(cls, data: dict[str, Any]) -> "Milestone":
         date = data.get("date", "")
         if isinstance(date, str):
             date = datetime.fromisoformat(date.replace("Z", "+00:00"))
@@ -136,11 +136,11 @@ class LegalIssue:
 
     description: str
     legal_area: str  # e.g., OR, ZGB, StGB
-    relevant_articles: List[str] = field(default_factory=list)
+    relevant_articles: list[str] = field(default_factory=list)
     status: str = "open"  # open, resolved, superseded
     notes: str = ""
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "description": self.description,
             "legal_area": self.legal_area,
@@ -150,7 +150,7 @@ class LegalIssue:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "LegalIssue":
+    def from_dict(cls, data: dict[str, Any]) -> "LegalIssue":
         return cls(
             description=data.get("description", ""),
             legal_area=data.get("legal_area", ""),
@@ -169,9 +169,9 @@ class AgentExecution:
     task: str
     outcome: str  # success, partial, failed
     summary: str = ""
-    audit_log_id: Optional[str] = None
+    audit_log_id: str | None = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "agent_id": self.agent_id,
             "timestamp": self.timestamp.isoformat(),
@@ -182,7 +182,7 @@ class AgentExecution:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "AgentExecution":
+    def from_dict(cls, data: dict[str, Any]) -> "AgentExecution":
         timestamp = data.get("timestamp", "")
         if isinstance(timestamp, str):
             timestamp = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
@@ -205,9 +205,9 @@ class Finding:
     timestamp: datetime = field(default_factory=datetime.utcnow)
     category: str = "general"  # general, precedent, risk, opportunity
     confidence: float = 1.0
-    citations: List[str] = field(default_factory=list)
+    citations: list[str] = field(default_factory=list)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "content": self.content,
             "source": self.source,
@@ -218,7 +218,7 @@ class Finding:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "Finding":
+    def from_dict(cls, data: dict[str, Any]) -> "Finding":
         timestamp = data.get("timestamp", "")
         if isinstance(timestamp, str):
             timestamp = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
@@ -240,9 +240,9 @@ class DocumentRef:
     path: str
     document_type: str  # brief, contract, correspondence, evidence, research
     added_at: datetime = field(default_factory=datetime.utcnow)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "name": self.name,
             "path": self.path,
@@ -252,7 +252,7 @@ class DocumentRef:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "DocumentRef":
+    def from_dict(cls, data: dict[str, Any]) -> "DocumentRef":
         added_at = data.get("added_at", "")
         if isinstance(added_at, str):
             added_at = datetime.fromisoformat(added_at.replace("Z", "+00:00"))
@@ -286,35 +286,35 @@ class ManagedCaseContext:
 
     # Jurisdiction
     jurisdiction_federal: bool = True
-    jurisdiction_cantons: List[str] = field(default_factory=list)
-    languages: List[str] = field(default_factory=lambda: ["DE"])
+    jurisdiction_cantons: list[str] = field(default_factory=list)
+    languages: list[str] = field(default_factory=lambda: ["DE"])
 
     # Parties
-    parties: List[Party] = field(default_factory=list)
+    parties: list[Party] = field(default_factory=list)
 
     # Timeline
     created_at: datetime = field(default_factory=datetime.utcnow)
     updated_at: datetime = field(default_factory=datetime.utcnow)
-    opened_at: Optional[datetime] = None
-    closed_at: Optional[datetime] = None
-    deadlines: List[Deadline] = field(default_factory=list)
-    milestones: List[Milestone] = field(default_factory=list)
+    opened_at: datetime | None = None
+    closed_at: datetime | None = None
+    deadlines: list[Deadline] = field(default_factory=list)
+    milestones: list[Milestone] = field(default_factory=list)
 
     # Facts and Issues
-    facts: List[str] = field(default_factory=list)
-    legal_issues: List[LegalIssue] = field(default_factory=list)
+    facts: list[str] = field(default_factory=list)
+    legal_issues: list[LegalIssue] = field(default_factory=list)
 
     # Agent Work
-    agent_history: List[AgentExecution] = field(default_factory=list)
-    findings: List[Finding] = field(default_factory=list)
-    documents: List[DocumentRef] = field(default_factory=list)
+    agent_history: list[AgentExecution] = field(default_factory=list)
+    findings: list[Finding] = field(default_factory=list)
+    documents: list[DocumentRef] = field(default_factory=list)
 
     # Metadata
-    tags: List[str] = field(default_factory=list)
+    tags: list[str] = field(default_factory=list)
     notes: str = ""
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Serialize case context to dictionary for storage."""
         return {
             "case_id": self.case_id,
@@ -348,12 +348,12 @@ class ManagedCaseContext:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "ManagedCaseContext":
+    def from_dict(cls, data: dict[str, Any]) -> "ManagedCaseContext":
         """Deserialize case context from dictionary."""
         jurisdiction = data.get("jurisdiction", {})
 
         # Parse datetime fields
-        def parse_dt(value: Any) -> Optional[datetime]:
+        def parse_dt(value: Any) -> datetime | None:
             if value is None:
                 return None
             if isinstance(value, datetime):
@@ -389,7 +389,7 @@ class ManagedCaseContext:
             metadata=data.get("metadata", {}),
         )
 
-    def to_agent_context(self) -> Dict[str, Any]:
+    def to_agent_context(self) -> dict[str, Any]:
         """
         Convert to lightweight context for agent consumption.
 
@@ -454,7 +454,7 @@ class CaseManager:
 
     def __init__(
         self,
-        storage: Optional[CaseStorage] = None,
+        storage: CaseStorage | None = None,
         default_firm_id: str = "default",
     ):
         """
@@ -466,10 +466,10 @@ class CaseManager:
         """
         self.storage = storage or JSONFileCaseStorage()
         self.default_firm_id = default_firm_id
-        self._current_case: Optional[ManagedCaseContext] = None
+        self._current_case: ManagedCaseContext | None = None
 
     @property
-    def current_case(self) -> Optional[ManagedCaseContext]:
+    def current_case(self) -> ManagedCaseContext | None:
         """Get the currently active case context."""
         return self._current_case
 
@@ -495,16 +495,16 @@ class CaseManager:
         title: str,
         case_type: CaseType = CaseType.OTHER,
         jurisdiction_federal: bool = True,
-        jurisdiction_cantons: Optional[List[str]] = None,
-        languages: Optional[List[str]] = None,
-        parties: Optional[List[Party]] = None,
-        facts: Optional[List[str]] = None,
-        legal_issues: Optional[List[LegalIssue]] = None,
+        jurisdiction_cantons: list[str] | None = None,
+        languages: list[str] | None = None,
+        parties: list[Party] | None = None,
+        facts: list[str] | None = None,
+        legal_issues: list[LegalIssue] | None = None,
         user_id: str = "anonymous",
-        firm_id: Optional[str] = None,
-        tags: Optional[List[str]] = None,
+        firm_id: str | None = None,
+        tags: list[str] | None = None,
         notes: str = "",
-        metadata: Optional[Dict[str, Any]] = None,
+        metadata: dict[str, Any] | None = None,
     ) -> ManagedCaseContext:
         """
         Create a new case with the provided details.
@@ -559,7 +559,7 @@ class CaseManager:
         logger.info(f"Created case: {case_id} - {title}")
         return case
 
-    async def open_case(self, case_id: str) -> Optional[ManagedCaseContext]:
+    async def open_case(self, case_id: str) -> ManagedCaseContext | None:
         """
         Load and open an existing case.
 
@@ -581,7 +581,7 @@ class CaseManager:
         logger.info(f"Opened case: {case_id}")
         return case
 
-    async def save_case(self, case: Optional[ManagedCaseContext] = None) -> bool:
+    async def save_case(self, case: ManagedCaseContext | None = None) -> bool:
         """
         Save the case to storage.
 
@@ -600,7 +600,7 @@ class CaseManager:
         case.updated_at = datetime.utcnow()
         return await self.storage.save_case(case.case_id, case.to_dict())
 
-    async def close_case(self, case_id: Optional[str] = None, reason: str = "") -> bool:
+    async def close_case(self, case_id: str | None = None, reason: str = "") -> bool:
         """
         Close a case (archive with closure date).
 
@@ -619,7 +619,7 @@ class CaseManager:
             return False
 
         # Load case if not current
-        case: Optional[ManagedCaseContext]
+        case: ManagedCaseContext | None
         if self._current_case and self._current_case.case_id == case_id:
             case = self._current_case
         else:
@@ -641,7 +641,7 @@ class CaseManager:
         logger.info(f"Closed case: {case_id}")
         return success
 
-    async def archive_case(self, case_id: Optional[str] = None) -> bool:
+    async def archive_case(self, case_id: str | None = None) -> bool:
         """
         Archive a case (mark as archived but keep accessible).
 
@@ -669,11 +669,11 @@ class CaseManager:
 
     async def list_cases(
         self,
-        firm_id: Optional[str] = None,
-        status: Optional[CaseStatus] = None,
+        firm_id: str | None = None,
+        status: CaseStatus | None = None,
         limit: int = 100,
         offset: int = 0,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         List cases with optional filtering.
 
@@ -694,7 +694,7 @@ class CaseManager:
             offset=offset,
         )
 
-    async def generate_summary(self, case_id: Optional[str] = None) -> Dict[str, Any]:
+    async def generate_summary(self, case_id: str | None = None) -> dict[str, Any]:
         """
         Generate a case status overview.
 
@@ -704,7 +704,7 @@ class CaseManager:
         Returns:
             Summary dictionary
         """
-        case: Optional[ManagedCaseContext]
+        case: ManagedCaseContext | None
         if case_id is None and self._current_case:
             case = self._current_case
         else:
@@ -744,7 +744,7 @@ class CaseManager:
 
     async def export_case(
         self,
-        case_id: Optional[str] = None,
+        case_id: str | None = None,
         format: str = "json",
         include_audit: bool = False,
     ) -> str:
@@ -759,7 +759,7 @@ class CaseManager:
         Returns:
             Exported case data as string
         """
-        case: Optional[ManagedCaseContext]
+        case: ManagedCaseContext | None
         if case_id is None and self._current_case:
             case = self._current_case
         else:
@@ -831,7 +831,7 @@ class CaseManager:
     # Case Content Modification Methods
     # -------------------------------------------------------------------------
 
-    async def add_party(self, case_id: Optional[str], party: Party) -> bool:
+    async def add_party(self, case_id: str | None, party: Party) -> bool:
         """Add a party to a case."""
         case = await self._get_case(case_id)
         if case is None:
@@ -840,7 +840,7 @@ class CaseManager:
         case.parties.append(party)
         return await self.save_case(case)
 
-    async def add_fact(self, case_id: Optional[str], fact: str) -> bool:
+    async def add_fact(self, case_id: str | None, fact: str) -> bool:
         """Add a fact to a case."""
         case = await self._get_case(case_id)
         if case is None:
@@ -849,7 +849,7 @@ class CaseManager:
         case.facts.append(fact)
         return await self.save_case(case)
 
-    async def add_legal_issue(self, case_id: Optional[str], issue: LegalIssue) -> bool:
+    async def add_legal_issue(self, case_id: str | None, issue: LegalIssue) -> bool:
         """Add a legal issue to a case."""
         case = await self._get_case(case_id)
         if case is None:
@@ -858,7 +858,7 @@ class CaseManager:
         case.legal_issues.append(issue)
         return await self.save_case(case)
 
-    async def add_deadline(self, case_id: Optional[str], deadline: Deadline) -> bool:
+    async def add_deadline(self, case_id: str | None, deadline: Deadline) -> bool:
         """Add a deadline to a case."""
         case = await self._get_case(case_id)
         if case is None:
@@ -867,7 +867,7 @@ class CaseManager:
         case.deadlines.append(deadline)
         return await self.save_case(case)
 
-    async def add_finding(self, case_id: Optional[str], finding: Finding) -> bool:
+    async def add_finding(self, case_id: str | None, finding: Finding) -> bool:
         """Add a finding from agent work."""
         case = await self._get_case(case_id)
         if case is None:
@@ -876,7 +876,7 @@ class CaseManager:
         case.findings.append(finding)
         return await self.save_case(case)
 
-    async def add_document(self, case_id: Optional[str], document: DocumentRef) -> bool:
+    async def add_document(self, case_id: str | None, document: DocumentRef) -> bool:
         """Add a document reference to a case."""
         case = await self._get_case(case_id)
         if case is None:
@@ -885,9 +885,7 @@ class CaseManager:
         case.documents.append(document)
         return await self.save_case(case)
 
-    async def record_agent_execution(
-        self, case_id: Optional[str], execution: AgentExecution
-    ) -> bool:
+    async def record_agent_execution(self, case_id: str | None, execution: AgentExecution) -> bool:
         """Record an agent execution on a case."""
         case = await self._get_case(case_id)
         if case is None:
@@ -896,7 +894,7 @@ class CaseManager:
         case.agent_history.append(execution)
         return await self.save_case(case)
 
-    async def _get_case(self, case_id: Optional[str]) -> Optional[ManagedCaseContext]:
+    async def _get_case(self, case_id: str | None) -> ManagedCaseContext | None:
         """Get case by ID or return current case."""
         if case_id is None and self._current_case:
             return self._current_case

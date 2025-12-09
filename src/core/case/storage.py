@@ -11,7 +11,7 @@ import os
 from abc import ABC, abstractmethod
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +28,7 @@ class CaseStorage(ABC):
     """
 
     @abstractmethod
-    async def save_case(self, case_id: str, data: Dict[str, Any]) -> bool:
+    async def save_case(self, case_id: str, data: dict[str, Any]) -> bool:
         """
         Save case data to storage.
 
@@ -42,7 +42,7 @@ class CaseStorage(ABC):
         pass
 
     @abstractmethod
-    async def load_case(self, case_id: str) -> Optional[Dict[str, Any]]:
+    async def load_case(self, case_id: str) -> dict[str, Any] | None:
         """
         Load case data from storage.
 
@@ -70,11 +70,11 @@ class CaseStorage(ABC):
     @abstractmethod
     async def list_cases(
         self,
-        firm_id: Optional[str] = None,
-        status: Optional[str] = None,
+        firm_id: str | None = None,
+        status: str | None = None,
         limit: int = 100,
         offset: int = 0,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         List cases with optional filtering.
 
@@ -135,18 +135,18 @@ class JSONFileCaseStorage(CaseStorage):
         safe_id = "".join(c if c.isalnum() or c in "-_" else "_" for c in case_id)
         return self.storage_dir / f"{safe_id}.json"
 
-    def _load_index(self) -> Dict[str, Dict[str, Any]]:
+    def _load_index(self) -> dict[str, dict[str, Any]]:
         """Load the case index."""
         try:
             if self.index_file.exists():
                 with open(self.index_file, encoding="utf-8") as f:
-                    result: Dict[str, Dict[str, Any]] = json.load(f)
+                    result: dict[str, dict[str, Any]] = json.load(f)
                     return result
         except (OSError, json.JSONDecodeError) as e:
             logger.error(f"Failed to load case index: {e}")
         return {}
 
-    def _save_index(self, index: Dict[str, Dict[str, Any]]) -> None:
+    def _save_index(self, index: dict[str, dict[str, Any]]) -> None:
         """Save the case index."""
         try:
             with open(self.index_file, "w", encoding="utf-8") as f:
@@ -154,7 +154,7 @@ class JSONFileCaseStorage(CaseStorage):
         except OSError as e:
             logger.error(f"Failed to save case index: {e}")
 
-    async def save_case(self, case_id: str, data: Dict[str, Any]) -> bool:
+    async def save_case(self, case_id: str, data: dict[str, Any]) -> bool:
         """Save case data to JSON file."""
         try:
             case_file = self._get_case_file(case_id)
@@ -184,7 +184,7 @@ class JSONFileCaseStorage(CaseStorage):
             logger.error(f"Failed to save case {case_id}: {e}")
             return False
 
-    async def load_case(self, case_id: str) -> Optional[Dict[str, Any]]:
+    async def load_case(self, case_id: str) -> dict[str, Any] | None:
         """Load case data from JSON file."""
         try:
             case_file = self._get_case_file(case_id)
@@ -194,7 +194,7 @@ class JSONFileCaseStorage(CaseStorage):
                 return None
 
             with open(case_file, encoding="utf-8") as f:
-                data: Dict[str, Any] = json.load(f)
+                data: dict[str, Any] = json.load(f)
 
             logger.info(f"Loaded case {case_id} from {case_file}")
             return data
@@ -226,11 +226,11 @@ class JSONFileCaseStorage(CaseStorage):
 
     async def list_cases(
         self,
-        firm_id: Optional[str] = None,
-        status: Optional[str] = None,
+        firm_id: str | None = None,
+        status: str | None = None,
         limit: int = 100,
         offset: int = 0,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """List cases with optional filtering."""
         index = self._load_index()
         cases = list(index.values())
@@ -253,8 +253,8 @@ class JSONFileCaseStorage(CaseStorage):
         return case_file.exists()
 
     async def search_cases(
-        self, query: str, firm_id: Optional[str] = None, limit: int = 20
-    ) -> List[Dict[str, Any]]:
+        self, query: str, firm_id: str | None = None, limit: int = 20
+    ) -> list[dict[str, Any]]:
         """
         Search cases by title.
 

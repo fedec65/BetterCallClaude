@@ -42,6 +42,16 @@ python_functions = "test_*"
 
 [tool.ruff]
 line-length = 100
+exclude = [
+    ".git",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".venv",
+    "build",
+    "dist",
+]
+
+[tool.ruff.lint]
 select = [
     "E",   # pycodestyle errors
     "W",   # pycodestyle warnings
@@ -52,14 +62,6 @@ select = [
     "UP",  # pyupgrade
 ]
 ignore = []
-exclude = [
-    ".git",
-    ".mypy_cache",
-    ".pytest_cache",
-    ".venv",
-    "build",
-    "dist",
-]
 
 [tool.coverage.run]
 source = ["src"]

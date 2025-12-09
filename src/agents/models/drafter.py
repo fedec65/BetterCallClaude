@@ -13,7 +13,7 @@ Dokumentmodelle / Modèles de documents / Modelli di documenti
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from src.agents.models.shared import Jurisdiction, Language, LegalParty
 
@@ -62,7 +62,7 @@ class DocumentType(Enum):
     )
 
     @property
-    def display_name(self) -> Dict[str, str]:
+    def display_name(self) -> dict[str, str]:
         """Return document type name in multiple languages."""
         names = {
             DocumentType.KLAGESCHRIFT: {
@@ -247,7 +247,7 @@ class DocumentSectionType(Enum):
     UNTERSCHRIFTEN = "unterschriften"  # Signatures
 
     @property
-    def display_name(self) -> Dict[str, str]:
+    def display_name(self) -> dict[str, str]:
         """Return section name in multiple languages."""
         names = {
             DocumentSectionType.RUBRUM: {
@@ -366,11 +366,11 @@ class DocumentMetadata:
     document_type: DocumentType
     language: Language
     jurisdiction: Jurisdiction
-    case_reference: Optional[str] = None
-    court: Optional[str] = None
-    date_created: Optional[str] = None
-    author: Optional[str] = None
-    client_reference: Optional[str] = None
+    case_reference: str | None = None
+    court: str | None = None
+    date_created: str | None = None
+    author: str | None = None
+    client_reference: str | None = None
     version: str = "1.0"
 
     def __post_init__(self) -> None:
@@ -378,7 +378,7 @@ class DocumentMetadata:
         if self.court is None and self.document_type.requires_court:
             self.court = self.jurisdiction.court_name.get(self.language.value, "")
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Serialize metadata to dictionary."""
         return {
             "document_type": self.document_type.value,
@@ -411,10 +411,10 @@ class Citation:
     citation_text: str
     source_type: str = "unknown"  # bge, cantonal, doctrine, legislation
     is_verified: bool = False
-    url: Optional[str] = None
+    url: str | None = None
     relevance: str = ""
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Serialize citation to dictionary."""
         return {
             "citation_text": self.citation_text,
@@ -445,9 +445,9 @@ class DocumentSection:
     section_type: str
     title: str
     content: str
-    citations: List[Citation] = field(default_factory=list)
-    footnotes: List[str] = field(default_factory=list)
-    subsections: List["DocumentSection"] = field(default_factory=list)
+    citations: list[Citation] = field(default_factory=list)
+    footnotes: list[str] = field(default_factory=list)
+    subsections: list["DocumentSection"] = field(default_factory=list)
     order: int = 0
 
     @property
@@ -466,7 +466,7 @@ class DocumentSection:
             count += subsection.citation_count
         return count
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Serialize section to dictionary."""
         return {
             "section_type": self.section_type,
@@ -501,13 +501,13 @@ class LegalDocument:
     """
 
     metadata: DocumentMetadata
-    sections: List[DocumentSection] = field(default_factory=list)
+    sections: list[DocumentSection] = field(default_factory=list)
     full_text: str = ""
     word_count: int = 0
     page_estimate: int = 0
-    citations_used: List[Citation] = field(default_factory=list)
-    checkpoints_requested: List[str] = field(default_factory=list)
-    parties: List[LegalParty] = field(default_factory=list)
+    citations_used: list[Citation] = field(default_factory=list)
+    checkpoints_requested: list[str] = field(default_factory=list)
+    parties: list[LegalParty] = field(default_factory=list)
     bilingual_version: Optional["LegalDocument"] = None
     created_at: datetime = field(default_factory=datetime.utcnow)
 
@@ -525,7 +525,7 @@ class LegalDocument:
         return self.word_count > 5000
 
     @property
-    def unverified_citations(self) -> List[Citation]:
+    def unverified_citations(self) -> list[Citation]:
         """Return list of unverified citations."""
         return [c for c in self.citations_used if not c.is_verified]
 
@@ -534,7 +534,7 @@ class LegalDocument:
         """Check if document has unverified citations."""
         return len(self.unverified_citations) > 0
 
-    def get_section(self, section_type: str) -> Optional[DocumentSection]:
+    def get_section(self, section_type: str) -> DocumentSection | None:
         """Get section by type."""
         for section in self.sections:
             if section.section_type == section_type:
@@ -562,7 +562,7 @@ class LegalDocument:
         self.full_text = "\n".join(parts)
         return self.full_text
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Serialize document to dictionary."""
         return {
             "metadata": self.metadata.to_dict(),

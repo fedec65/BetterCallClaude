@@ -12,7 +12,7 @@ Supports Swiss legal citation formats:
 import json
 import logging
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from ..protocol import MCPClient, MCPInvocationError
 
@@ -26,9 +26,9 @@ class CitationValidationResult:
     valid: bool
     citation_type: str  # "bge", "statutory", or "unknown"
     normalized: str  # Normalized citation format
-    components: Dict[str, Any]  # Parsed components
-    errors: List[str]  # Validation errors
-    warnings: List[str]  # Non-critical warnings
+    components: dict[str, Any]  # Parsed components
+    errors: list[str]  # Validation errors
+    warnings: list[str]  # Non-critical warnings
 
 
 @dataclass
@@ -39,7 +39,7 @@ class FormattedCitation:
     formatted: str
     language: str
     citation_type: str
-    full_reference: Optional[str]  # Full name if requested
+    full_reference: str | None  # Full name if requested
 
 
 @dataclass
@@ -50,8 +50,8 @@ class ConvertedCitation:
     source_language: str
     target_language: str
     converted: str
-    full_reference: Optional[str]
-    all_translations: Dict[str, str]
+    full_reference: str | None
+    all_translations: dict[str, str]
 
 
 @dataclass
@@ -61,9 +61,9 @@ class ParsedCitation:
     original: str
     citation_type: str
     language: str
-    components: Dict[str, Any]
+    components: dict[str, Any]
     is_valid: bool
-    suggestions: List[str]
+    suggestions: list[str]
 
 
 class LegalCitationsAdapter:
@@ -98,8 +98,8 @@ class LegalCitationsAdapter:
 
     def __init__(
         self,
-        command: List[str],
-        env: Optional[Dict[str, str]] = None,
+        command: list[str],
+        env: dict[str, str] | None = None,
         timeout: int = 30,
     ) -> None:
         """
@@ -310,7 +310,7 @@ class LegalCitationsAdapter:
             logger.error(f"Citation parsing failed: {e}")
             raise
 
-    async def verify(self, citation: str) -> Dict[str, Any]:
+    async def verify(self, citation: str) -> dict[str, Any]:
         """
         Verify a citation and return verification result.
 
@@ -365,9 +365,9 @@ class LegalCitationsAdapter:
         self,
         statute: str,
         article: str,
-        paragraph: Optional[str] = None,
+        paragraph: str | None = None,
         language: str = "de",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Get the text of a statutory provision from Fedlex.
 
@@ -390,7 +390,7 @@ class LegalCitationsAdapter:
         Raises:
             MCPInvocationError: If retrieval fails
         """
-        params: Dict[str, Any] = {
+        params: dict[str, Any] = {
             "statute": statute.upper(),
             "article": article,
             "language": language.lower(),
@@ -405,7 +405,7 @@ class LegalCitationsAdapter:
             content = result.get("content", [])
             if content and isinstance(content, list):
                 text_content = content[0].get("text", "{}")
-                data: Dict[str, Any] = json.loads(text_content)
+                data: dict[str, Any] = json.loads(text_content)
                 return data
             return dict(result)
 
@@ -418,7 +418,7 @@ class LegalCitationsAdapter:
         text: str,
         include_statutes: bool = True,
         include_decisions: bool = True,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Extract legal citations from a text document.
 
@@ -456,7 +456,7 @@ class LegalCitationsAdapter:
             content = result.get("content", [])
             if content and isinstance(content, list):
                 text_content = content[0].get("text", "{}")
-                data: Dict[str, Any] = json.loads(text_content)
+                data: dict[str, Any] = json.loads(text_content)
                 return data
             return dict(result)
 
@@ -469,7 +469,7 @@ class LegalCitationsAdapter:
         text: str,
         target_language: str = "de",
         full_statute_names: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Standardize all citations in a document to consistent format.
 
@@ -506,7 +506,7 @@ class LegalCitationsAdapter:
             content = result.get("content", [])
             if content and isinstance(content, list):
                 text_content = content[0].get("text", "{}")
-                data: Dict[str, Any] = json.loads(text_content)
+                data: dict[str, Any] = json.loads(text_content)
                 return data
             return dict(result)
 
@@ -518,7 +518,7 @@ class LegalCitationsAdapter:
         self,
         citation1: str,
         citation2: str,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Compare two citations to determine if they refer to the same source.
 
@@ -549,7 +549,7 @@ class LegalCitationsAdapter:
             content = result.get("content", [])
             if content and isinstance(content, list):
                 text_content = content[0].get("text", "{}")
-                data: Dict[str, Any] = json.loads(text_content)
+                data: dict[str, Any] = json.loads(text_content)
                 return data
             return dict(result)
 

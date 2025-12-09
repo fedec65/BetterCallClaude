@@ -12,7 +12,7 @@ import importlib
 import inspect
 import pkgutil
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from .base import BaseCommand, CommandCategory
 
@@ -40,10 +40,10 @@ class CommandRegistry:
 
     def __init__(self) -> None:
         """Initialize empty command registry"""
-        self._commands: Dict[str, BaseCommand] = {}
-        self._aliases: Dict[str, str] = {}
+        self._commands: dict[str, BaseCommand] = {}
+        self._aliases: dict[str, str] = {}
 
-    def register(self, command: BaseCommand, aliases: Optional[List[str]] = None) -> None:
+    def register(self, command: BaseCommand, aliases: list[str] | None = None) -> None:
         """
         Register a command instance
 
@@ -68,7 +68,7 @@ class CommandRegistry:
                     raise ValueError(f"Alias '{alias}' already registered")
                 self._aliases[alias] = name
 
-    def discover_commands(self, package_path: Optional[Path] = None) -> int:
+    def discover_commands(self, package_path: Path | None = None) -> int:
         """
         Auto-discover and register all commands in package
 
@@ -122,8 +122,8 @@ class CommandRegistry:
         return discovered_count
 
     async def execute(
-        self, command_name: str, args: Optional[Dict[str, Any]] = None
-    ) -> Dict[str, Any]:
+        self, command_name: str, args: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         """
         Execute a registered command
 
@@ -168,7 +168,7 @@ class CommandRegistry:
                 "command": command_name,
             }
 
-    def get_command(self, command_name: str) -> Optional[BaseCommand]:
+    def get_command(self, command_name: str) -> BaseCommand | None:
         """
         Get command instance by name or alias
 
@@ -184,7 +184,7 @@ class CommandRegistry:
 
         return self._commands.get(command_name)
 
-    def get_command_help(self, command_name: str) -> Optional[str]:
+    def get_command_help(self, command_name: str) -> str | None:
         """
         Get help text for specific command
 
@@ -200,7 +200,7 @@ class CommandRegistry:
 
         return command.get_help()
 
-    def list_commands(self, category: Optional[CommandCategory] = None) -> List[Dict[str, str]]:
+    def list_commands(self, category: CommandCategory | None = None) -> list[dict[str, str]]:
         """
         List all registered commands
 
@@ -224,7 +224,7 @@ class CommandRegistry:
 
         return commands
 
-    def list_categories(self) -> List[str]:
+    def list_categories(self) -> list[str]:
         """
         Get list of all command categories in use
 
@@ -237,7 +237,7 @@ class CommandRegistry:
 
         return sorted(categories)
 
-    def get_commands_by_category(self) -> Dict[str, List[Dict[str, str]]]:
+    def get_commands_by_category(self) -> dict[str, list[dict[str, str]]]:
         """
         Get commands organized by category
 

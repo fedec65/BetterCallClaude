@@ -11,7 +11,7 @@ Example: BGE 147 V 321
 import logging
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from ..protocol import MCPClient, MCPInvocationError
 
@@ -30,8 +30,8 @@ class BGEDecision:
     date: datetime  # Decision date
     language: str  # DE, FR, or IT
     summary: str  # Decision summary
-    legal_areas: List[str]  # Legal area classifications
-    full_text_url: Optional[str] = None  # Link to full decision text
+    legal_areas: list[str]  # Legal area classifications
+    full_text_url: str | None = None  # Link to full decision text
 
 
 @dataclass
@@ -40,9 +40,9 @@ class BGESearchResult:
 
     query: str
     total_results: int
-    decisions: List[BGEDecision]
+    decisions: list[BGEDecision]
     search_time_ms: float
-    metadata: Dict[str, Any]
+    metadata: dict[str, Any]
 
 
 class BGESearchAdapter:
@@ -70,8 +70,8 @@ class BGESearchAdapter:
 
     def __init__(
         self,
-        command: List[str],
-        env: Optional[Dict[str, str]] = None,
+        command: list[str],
+        env: dict[str, str] | None = None,
         timeout: int = 30,
     ) -> None:
         """
@@ -97,11 +97,11 @@ class BGESearchAdapter:
     async def search(
         self,
         query: str,
-        language: Optional[str] = None,
-        date_from: Optional[str] = None,
-        date_to: Optional[str] = None,
-        chambers: Optional[List[str]] = None,
-        legal_areas: Optional[List[str]] = None,
+        language: str | None = None,
+        date_from: str | None = None,
+        date_to: str | None = None,
+        chambers: list[str] | None = None,
+        legal_areas: list[str] | None = None,
         limit: int = 10,
     ) -> BGESearchResult:
         """
@@ -158,7 +158,7 @@ class BGESearchAdapter:
             logger.error(f"BGE search failed: {e}")
             raise
 
-    async def get_decision(self, citation: str) -> Optional[BGEDecision]:
+    async def get_decision(self, citation: str) -> BGEDecision | None:
         """
         Retrieve specific BGE decision by citation
 
@@ -182,7 +182,7 @@ class BGESearchAdapter:
             logger.error(f"BGE decision retrieval failed: {e}")
             raise
 
-    async def validate_citation(self, citation: str) -> Dict[str, Any]:
+    async def validate_citation(self, citation: str) -> dict[str, Any]:
         """
         Validate BGE citation format
 
@@ -209,7 +209,7 @@ class BGESearchAdapter:
             logger.error(f"Citation validation failed: {e}")
             return {"valid": False, "error": str(e)}
 
-    def _parse_decision(self, data: Dict[str, Any]) -> BGEDecision:
+    def _parse_decision(self, data: dict[str, Any]) -> BGEDecision:
         """Parse decision data from MCP server response"""
         # Parse date
         date_str = data.get("date", "")

@@ -17,7 +17,7 @@ import logging
 import uuid
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from .base import (
     ActionType,
@@ -54,11 +54,11 @@ class CaseAnalysis:
     """Results of case facts analysis."""
 
     case_id: str
-    legal_issues: List[str]
-    key_facts: List[str]
-    disputed_matters: List[str]
-    evidence_assessment: Dict[str, str]
-    jurisdictional_analysis: Dict[str, Any]
+    legal_issues: list[str]
+    key_facts: list[str]
+    disputed_matters: list[str]
+    evidence_assessment: dict[str, str]
+    jurisdictional_analysis: dict[str, Any]
     preliminary_position: str
     confidence_score: float
 
@@ -73,12 +73,12 @@ class StrategistDeliverable:
 
     recommendation: StrategyRecommendation
     case_analysis: CaseAnalysis
-    alternative_strategies: List[Dict[str, Any]]
-    next_steps: List[str]
-    warnings: List[str]
-    metadata: Dict[str, Any]
+    alternative_strategies: list[dict[str, Any]]
+    next_steps: list[str]
+    warnings: list[str]
+    metadata: dict[str, Any]
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Serialize deliverable to dictionary."""
         return {
             "recommendation": self.recommendation.to_dict(),
@@ -196,10 +196,10 @@ class StrategistAgent(AgentBase):
     async def execute(
         self,
         task: str,
-        case_facts: Optional[CaseFacts] = None,
+        case_facts: CaseFacts | None = None,
         jurisdiction: Jurisdiction = Jurisdiction.FEDERAL,
         language: Language = Language.DE,
-        research_findings: Optional[Dict[str, Any]] = None,
+        research_findings: dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> AgentResult[StrategistDeliverable]:
         """
@@ -619,7 +619,7 @@ class StrategistAgent(AgentBase):
         analysis: CaseAnalysis,
         risk: RiskAssessment,
         cost: CostEstimate,
-        opponent: Optional[OpponentProfile],
+        opponent: OpponentProfile | None,
         jurisdiction: Jurisdiction = Jurisdiction.FEDERAL,
         language: Language = Language.DE,
     ) -> StrategyRecommendation:
@@ -701,7 +701,7 @@ class StrategistAgent(AgentBase):
     # MEDIUM PRIORITY METHODS
     # =========================================================================
 
-    async def analyze_opponent(self, opponent_info: Dict[str, Any]) -> Optional[OpponentProfile]:
+    async def analyze_opponent(self, opponent_info: dict[str, Any]) -> OpponentProfile | None:
         """
         Analyze opposing party's likely strategy and profile.
 
@@ -732,7 +732,7 @@ class StrategistAgent(AgentBase):
         self,
         strategy: StrategyType,
         jurisdiction: Jurisdiction = Jurisdiction.FEDERAL,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         Generate procedural timeline with milestones.
 
@@ -790,7 +790,7 @@ class StrategistAgent(AgentBase):
         analysis: CaseAnalysis,
         risk: RiskAssessment,
         cost: CostEstimate,
-        opponent: Optional[OpponentProfile],
+        opponent: OpponentProfile | None,
     ) -> StrategyType:
         """Determine optimal strategy considering all factors."""
         # Start with initial determination
@@ -838,7 +838,7 @@ class StrategistAgent(AgentBase):
         strategy: StrategyType,
         analysis: CaseAnalysis,
         language: Language,
-    ) -> List[str]:
+    ) -> list[str]:
         """Generate recommended actions based on strategy."""
         actions_by_strategy = {
             StrategyType.AGGRESSIVE: {
@@ -925,7 +925,7 @@ class StrategistAgent(AgentBase):
         cost: CostEstimate,
         jurisdiction: Jurisdiction,
         language: Language,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Generate alternative strategy options."""
         return [
             {
@@ -951,7 +951,7 @@ class StrategistAgent(AgentBase):
         analysis: CaseAnalysis,
         risk: RiskAssessment,
         language: Language,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Generate alternative strategy summaries for recommendation."""
         return [
             {
@@ -973,7 +973,7 @@ class StrategistAgent(AgentBase):
         risk: RiskAssessment,
         cost: CostEstimate,
         language: Language,
-    ) -> List[str]:
+    ) -> list[str]:
         """Generate warnings based on risk and cost analysis."""
         warnings = []
 

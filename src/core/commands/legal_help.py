@@ -5,7 +5,7 @@ This module implements the /legal:help command for displaying available
 commands and their usage information.
 """
 
-from typing import Any, Dict, Optional
+from typing import Any
 
 from .base import BaseCommand, CommandCategory, CommandMetadata
 
@@ -64,7 +64,7 @@ class LegalHelpCommand(BaseCommand):
             help_text="Show detailed information including arguments and examples",
         )
 
-    async def execute(self, args: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, args: dict[str, Any]) -> dict[str, Any]:
         """
         Execute help command
 
@@ -97,7 +97,7 @@ class LegalHelpCommand(BaseCommand):
         else:
             return self._generate_general_help(category_filter, verbose)
 
-    def _generate_command_help(self, command_name: str, verbose: bool) -> Dict[str, Any]:
+    def _generate_command_help(self, command_name: str, verbose: bool) -> dict[str, Any]:
         """
         Generate detailed help for specific command
 
@@ -128,9 +128,7 @@ For now, use /legal:help to see all available commands.
             "metadata": {"verbose": verbose},
         }
 
-    def _generate_general_help(
-        self, category_filter: Optional[str], verbose: bool
-    ) -> Dict[str, Any]:
+    def _generate_general_help(self, category_filter: str | None, verbose: bool) -> dict[str, Any]:
         """
         Generate general help listing all commands
 

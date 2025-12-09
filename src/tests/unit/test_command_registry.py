@@ -4,7 +4,7 @@ Unit tests for Command Registry System
 Tests the CommandRegistry, BaseCommand, and command discovery functionality.
 """
 
-from typing import Any, Dict
+from typing import Any
 
 import pytest
 
@@ -66,7 +66,7 @@ class MockCommand(BaseCommand):
         super().__init__(metadata)
         self.add_argument("query", str, required=True)
 
-    async def execute(self, args: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, args: dict[str, Any]) -> dict[str, Any]:
         return {"success": True, "query": args.get("query")}
 
 
@@ -103,7 +103,7 @@ class TestBaseCommand:
     def test_validate_arguments_failure(self) -> None:
         """Test argument validation fails with invalid args"""
         cmd = MockCommand()
-        args: Dict[str, Any] = {}  # Missing required "query"
+        args: dict[str, Any] = {}  # Missing required "query"
 
         is_valid, error = cmd.validate_arguments(args)
 
@@ -266,7 +266,7 @@ class TestCommandRegistry:
                 )
                 super().__init__(metadata)
 
-            async def execute(self, args: Dict[str, Any]) -> Dict[str, Any]:
+            async def execute(self, args: dict[str, Any]) -> dict[str, Any]:
                 return {"success": True}
 
         cmd2 = AnotherMockCommand()
@@ -298,7 +298,7 @@ class TestCommandRegistry:
                 )
                 super().__init__(metadata)
 
-            async def execute(self, args: Dict[str, Any]) -> Dict[str, Any]:
+            async def execute(self, args: dict[str, Any]) -> dict[str, Any]:
                 raise RuntimeError("Intentional failure")
 
         registry = CommandRegistry()

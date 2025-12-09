@@ -7,7 +7,6 @@ mapping, and user confirmation workflow for CAUTIOUS mode.
 
 import re
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
 
 from src.agents.models.shared import Language
 
@@ -16,7 +15,7 @@ from src.agents.models.shared import Language
 # =============================================================================
 
 # Common words and patterns that strongly indicate each language
-LANGUAGE_MARKERS: Dict[Language, Dict[str, List[str]]] = {
+LANGUAGE_MARKERS: dict[Language, dict[str, list[str]]] = {
     Language.DE: {
         "articles": ["der", "die", "das", "dem", "den", "ein", "eine", "einer"],
         "conjunctions": ["und", "oder", "aber", "sondern", "denn", "weil"],
@@ -119,11 +118,11 @@ class LanguageDetectionResult:
 
     detected_language: Language
     confidence: float
-    scores: Dict[Language, float]
-    markers_found: Dict[Language, List[str]]
+    scores: dict[Language, float]
+    markers_found: dict[Language, list[str]]
     needs_confirmation: bool
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         """Convert to dictionary."""
         return {
             "detected_language": self.detected_language.value,
@@ -177,7 +176,7 @@ def detect_language_confidence(
         return LanguageDetectionResult(
             detected_language=Language.DE,  # Default to German
             confidence=0.0,
-            scores={lang: 0.0 for lang in Language},
+            scores=dict.fromkeys(Language, 0.0),
             markers_found={lang: [] for lang in Language},
             needs_confirmation=True,
         )
@@ -190,12 +189,12 @@ def detect_language_confidence(
     # Also check original case for legal references
     original_words = re.findall(r"\b[\w.]+\b", text)
 
-    scores: Dict[Language, float] = {}
-    markers_found: Dict[Language, List[str]] = {}
+    scores: dict[Language, float] = {}
+    markers_found: dict[Language, list[str]] = {}
 
     for lang, marker_groups in LANGUAGE_MARKERS.items():
         lang_score = 0.0
-        found_markers: List[str] = []
+        found_markers: list[str] = []
 
         for marker_type, markers in marker_groups.items():
             weight = MARKER_WEIGHTS.get(marker_type, 1.0)
@@ -256,7 +255,7 @@ def detect_language_confidence(
 
 def confirm_language_with_user(
     detected: LanguageDetectionResult,
-) -> Tuple[Language, bool]:
+) -> tuple[Language, bool]:
     """
     Generate confirmation prompt for CAUTIOUS mode.
 
@@ -278,7 +277,7 @@ def confirm_language_with_user(
 # Legal Terminology
 # =============================================================================
 
-LEGAL_TERMINOLOGY: Dict[str, Dict[Language, str]] = {
+LEGAL_TERMINOLOGY: dict[str, dict[Language, str]] = {
     # Parties
     "plaintiff": {
         Language.DE: "Kläger",
@@ -392,7 +391,7 @@ LEGAL_TERMINOLOGY: Dict[str, Dict[Language, str]] = {
 def get_legal_terminology(
     term: str,
     language: Language,
-    fallback: Optional[str] = None,
+    fallback: str | None = None,
 ) -> str:
     """
     Get legal term in specified language.
@@ -453,7 +452,7 @@ def get_language_code(language: Language) -> str:
     return language.value
 
 
-def get_language_name(language: Language, in_language: Optional[Language] = None) -> str:
+def get_language_name(language: Language, in_language: Language | None = None) -> str:
     """
     Get language name in specified language.
 

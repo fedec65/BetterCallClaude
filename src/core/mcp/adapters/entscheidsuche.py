@@ -8,7 +8,7 @@ federal and cantonal courts through MCP server integration.
 import logging
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from ..protocol import MCPClient, MCPInvocationError
 
@@ -22,15 +22,15 @@ class CourtDecision:
     decision_id: str  # Unique decision identifier
     court_name: str  # Court name
     court_level: str  # federal, cantonal, district, municipal
-    canton: Optional[str]  # Canton code (for cantonal/lower courts)
+    canton: str | None  # Canton code (for cantonal/lower courts)
     title: str  # Decision title
     date: datetime  # Decision date
     language: str  # DE, FR, IT, or RM
     summary: str  # Decision summary
-    legal_areas: List[str]  # Legal area classifications
+    legal_areas: list[str]  # Legal area classifications
     reference_number: str  # Court's own reference number
-    related_decisions: List[str] = field(default_factory=list)  # Related decision IDs
-    full_text_url: Optional[str] = None  # Link to full text
+    related_decisions: list[str] = field(default_factory=list)  # Related decision IDs
+    full_text_url: str | None = None  # Link to full text
 
 
 @dataclass
@@ -39,10 +39,10 @@ class EntscheidausucheSearchResult:
 
     query: str
     total_results: int
-    decisions: List[CourtDecision]
-    facets: Dict[str, List[Dict[str, Any]]]  # Search facets (courts, areas, dates)
+    decisions: list[CourtDecision]
+    facets: dict[str, list[dict[str, Any]]]  # Search facets (courts, areas, dates)
     search_time_ms: float
-    metadata: Dict[str, Any]
+    metadata: dict[str, Any]
 
 
 class EntscheidausucheAdapter:
@@ -71,8 +71,8 @@ class EntscheidausucheAdapter:
 
     def __init__(
         self,
-        command: List[str],
-        env: Optional[Dict[str, str]] = None,
+        command: list[str],
+        env: dict[str, str] | None = None,
         timeout: int = 30,
     ) -> None:
         """
@@ -100,12 +100,12 @@ class EntscheidausucheAdapter:
     async def search(
         self,
         query: str,
-        court_level: Optional[str] = None,
-        canton: Optional[str] = None,
-        language: Optional[str] = None,
-        date_from: Optional[str] = None,
-        date_to: Optional[str] = None,
-        legal_areas: Optional[List[str]] = None,
+        court_level: str | None = None,
+        canton: str | None = None,
+        language: str | None = None,
+        date_from: str | None = None,
+        date_to: str | None = None,
+        legal_areas: list[str] | None = None,
         limit: int = 10,
     ) -> EntscheidausucheSearchResult:
         """
@@ -166,7 +166,7 @@ class EntscheidausucheAdapter:
             logger.error(f"Entscheidsuche search failed: {e}")
             raise
 
-    async def get_decision(self, decision_id: str) -> Optional[CourtDecision]:
+    async def get_decision(self, decision_id: str) -> CourtDecision | None:
         """
         Retrieve specific decision by ID
 
@@ -190,7 +190,7 @@ class EntscheidausucheAdapter:
             logger.error(f"Decision retrieval failed: {e}")
             raise
 
-    async def get_related_decisions(self, decision_id: str, limit: int = 5) -> List[CourtDecision]:
+    async def get_related_decisions(self, decision_id: str, limit: int = 5) -> list[CourtDecision]:
         """
         Find related decisions (cited, citing, similar)
 
@@ -220,7 +220,7 @@ class EntscheidausucheAdapter:
             logger.error(f"Related decisions retrieval failed: {e}")
             raise
 
-    def _parse_decision(self, data: Dict[str, Any]) -> CourtDecision:
+    def _parse_decision(self, data: dict[str, Any]) -> CourtDecision:
         """Parse decision data from MCP server response"""
         # Parse date
         date_str = data.get("date", "")
@@ -247,10 +247,10 @@ class EntscheidausucheAdapter:
     async def analyze_precedent_success_rate(
         self,
         legal_area: str,
-        claim_type: Optional[str] = None,
-        court_level: Optional[str] = None,
-        canton: Optional[str] = None,
-    ) -> Dict[str, Any]:
+        claim_type: str | None = None,
+        court_level: str | None = None,
+        canton: str | None = None,
+    ) -> dict[str, Any]:
         """
         Analyze precedent success rates for a legal area
 
@@ -273,7 +273,7 @@ class EntscheidausucheAdapter:
         Raises:
             MCPInvocationError: If analysis fails
         """
-        params: Dict[str, Any] = {"legalArea": legal_area}
+        params: dict[str, Any] = {"legalArea": legal_area}
 
         if claim_type:
             params["claimType"] = claim_type
@@ -292,11 +292,11 @@ class EntscheidausucheAdapter:
 
     async def find_similar_cases(
         self,
-        decision_id: Optional[str] = None,
-        fact_pattern: Optional[str] = None,
-        legal_area: Optional[str] = None,
+        decision_id: str | None = None,
+        fact_pattern: str | None = None,
+        legal_area: str | None = None,
         limit: int = 10,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Find similar cases based on decision ID or fact pattern
 
@@ -324,7 +324,7 @@ class EntscheidausucheAdapter:
         if not decision_id and not fact_pattern:
             raise ValueError("Either decision_id or fact_pattern must be provided")
 
-        params: Dict[str, Any] = {"limit": limit}
+        params: dict[str, Any] = {"limit": limit}
 
         if decision_id:
             params["decisionId"] = decision_id
@@ -345,10 +345,10 @@ class EntscheidausucheAdapter:
         self,
         statute: str,
         article: str,
-        paragraph: Optional[str] = None,
-        language: Optional[str] = None,
+        paragraph: str | None = None,
+        language: str | None = None,
         limit: int = 10,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Get court interpretations of a statutory provision
 
@@ -376,7 +376,7 @@ class EntscheidausucheAdapter:
         Raises:
             MCPInvocationError: If retrieval fails
         """
-        params: Dict[str, Any] = {
+        params: dict[str, Any] = {
             "statute": statute.upper(),
             "article": article,
             "limit": limit,

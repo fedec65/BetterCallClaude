@@ -9,7 +9,7 @@ import logging
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -33,9 +33,9 @@ class PersonaSpec:
     name: str
     category: PersonaCategory
     description: str
-    expertise_areas: List[str]
+    expertise_areas: list[str]
     prompt_template: str
-    mcp_servers: List[str]
+    mcp_servers: list[str]
     priority: int = 0  # Higher priority personas activated first
 
 
@@ -69,7 +69,7 @@ class PersonaActivator:
         prompt = activator.get_combined_prompt(personas)
     """
 
-    def __init__(self, persona_dir: Optional[Path] = None) -> None:
+    def __init__(self, persona_dir: Path | None = None) -> None:
         """
         Initialize persona activator
 
@@ -81,9 +81,9 @@ class PersonaActivator:
             persona_dir = Path.cwd() / ".claude" / "personas"
 
         self.persona_dir = Path(persona_dir)
-        self._personas: Dict[str, PersonaSpec] = {}
-        self._command_personas: Dict[str, List[str]] = {}
-        self._active_personas: Set[str] = set()
+        self._personas: dict[str, PersonaSpec] = {}
+        self._command_personas: dict[str, list[str]] = {}
+        self._active_personas: set[str] = set()
 
     def register_persona(
         self,
@@ -91,9 +91,9 @@ class PersonaActivator:
         name: str,
         category: PersonaCategory,
         description: str,
-        expertise_areas: List[str],
+        expertise_areas: list[str],
         prompt_template: str,
-        mcp_servers: Optional[List[str]] = None,
+        mcp_servers: list[str] | None = None,
         priority: int = 0,
     ) -> None:
         """
@@ -123,7 +123,7 @@ class PersonaActivator:
         self._personas[persona_id] = persona
         logger.info(f"Registered persona: {persona_id} ({name})")
 
-    def register_command_personas(self, command_name: str, persona_ids: List[str]) -> None:
+    def register_command_personas(self, command_name: str, persona_ids: list[str]) -> None:
         """
         Register personas to auto-activate for specific command
 
@@ -170,7 +170,7 @@ class PersonaActivator:
             return True
         return False
 
-    def activate_for_command(self, command_name: str) -> List[PersonaSpec]:
+    def activate_for_command(self, command_name: str) -> list[PersonaSpec]:
         """
         Activate personas registered for specific command
 
@@ -197,7 +197,7 @@ class PersonaActivator:
         logger.info(f"Activated {len(activated)} personas for command: {command_name}")
         return activated
 
-    def get_active_personas(self) -> List[PersonaSpec]:
+    def get_active_personas(self) -> list[PersonaSpec]:
         """
         Get all currently active personas
 
@@ -210,7 +210,7 @@ class PersonaActivator:
         active.sort(key=lambda p: p.priority, reverse=True)
         return active
 
-    def get_combined_prompt(self, personas: Optional[List[PersonaSpec]] = None) -> str:
+    def get_combined_prompt(self, personas: list[PersonaSpec] | None = None) -> str:
         """
         Generate combined prompt from active personas
 
@@ -239,7 +239,7 @@ class PersonaActivator:
 
         return "\n".join(prompt_parts)
 
-    def get_required_mcp_servers(self, personas: Optional[List[PersonaSpec]] = None) -> List[str]:
+    def get_required_mcp_servers(self, personas: list[PersonaSpec] | None = None) -> list[str]:
         """
         Get list of MCP servers required by active personas
 
@@ -341,7 +341,7 @@ class PersonaActivator:
         logger.info("Loaded 2 default personas")
         return 2
 
-    def get_persona_stats(self) -> Dict[str, Any]:
+    def get_persona_stats(self) -> dict[str, Any]:
         """
         Get statistics about registered and active personas
 

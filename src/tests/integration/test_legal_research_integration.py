@@ -9,7 +9,7 @@ ConnectionManager to MCP adapters. Verifies:
 - Result formatting and metadata
 """
 
-from typing import Any, Dict
+from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -124,7 +124,7 @@ class TestLegalResearchIntegration:
 
         with patch.object(MCPConnectionManager, "execute", new_callable=AsyncMock) as mock_execute:
             # Mock responses from both sources
-            def execute_side_effect(*args: Any, **kwargs: Any) -> Dict[str, Any]:
+            def execute_side_effect(*args: Any, **kwargs: Any) -> dict[str, Any]:
                 server_id = kwargs.get("server_id")
                 if server_id == "bge_search":
                     return {
@@ -234,7 +234,7 @@ class TestErrorHandlingAndRecovery:
 
         with patch.object(MCPConnectionManager, "execute", new_callable=AsyncMock) as mock_execute:
 
-            def execute_with_bge_error(*args: Any, **kwargs: Any) -> Dict[str, Any]:
+            def execute_with_bge_error(*args: Any, **kwargs: Any) -> dict[str, Any]:
                 server_id = kwargs.get("server_id")
                 if server_id == "bge_search":
                     raise Exception("BGE server unavailable")

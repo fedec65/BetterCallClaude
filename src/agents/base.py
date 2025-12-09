@@ -17,7 +17,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, Generic, List, Optional, TypeVar, cast
+from typing import Any, Generic, TypeVar, cast
 
 logger = logging.getLogger(__name__)
 
@@ -72,8 +72,8 @@ class Party:
 
     name: str
     role: str  # e.g., "client", "plaintiff", "defendant"
-    contact: Optional[str] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    contact: str | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -89,16 +89,16 @@ class CaseContext:
     title: str
     case_type: str  # litigation, corporate, contract, regulatory, other
     jurisdiction_federal: bool = True
-    jurisdiction_cantons: List[str] = field(default_factory=list)
-    languages: List[str] = field(default_factory=lambda: ["DE"])
-    parties: List[Party] = field(default_factory=list)
-    facts: List[str] = field(default_factory=list)
-    legal_issues: List[str] = field(default_factory=list)
-    agent_history: List[str] = field(default_factory=list)
-    findings: Dict[str, Any] = field(default_factory=dict)
+    jurisdiction_cantons: list[str] = field(default_factory=list)
+    languages: list[str] = field(default_factory=lambda: ["DE"])
+    parties: list[Party] = field(default_factory=list)
+    facts: list[str] = field(default_factory=list)
+    legal_issues: list[str] = field(default_factory=list)
+    agent_history: list[str] = field(default_factory=list)
+    findings: dict[str, Any] = field(default_factory=dict)
     created_at: datetime = field(default_factory=datetime.utcnow)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Serialize case context to dictionary."""
         return {
             "case_id": self.case_id,
@@ -128,20 +128,20 @@ class AgentAction:
     timestamp: datetime
     action_type: ActionType
     description: str
-    inputs: Dict[str, Any]
-    outputs: Dict[str, Any]
+    inputs: dict[str, Any]
+    outputs: dict[str, Any]
     duration_ms: int
-    sub_agent_id: Optional[str] = None
+    sub_agent_id: str | None = None
 
     @classmethod
     def create(
         cls,
         action_type: ActionType,
         description: str,
-        inputs: Dict[str, Any],
-        outputs: Dict[str, Any],
+        inputs: dict[str, Any],
+        outputs: dict[str, Any],
         duration_ms: int,
-        sub_agent_id: Optional[str] = None,
+        sub_agent_id: str | None = None,
     ) -> "AgentAction":
         """Factory method to create an action with auto-generated ID and timestamp."""
         return cls(
@@ -163,11 +163,11 @@ class Checkpoint:
     checkpoint_id: str
     timestamp: datetime
     checkpoint_type: str  # auto, user, pre_external, pre_subagent
-    state: Dict[str, Any]
+    state: dict[str, Any]
     description: str
 
     @classmethod
-    def create(cls, checkpoint_type: str, state: Dict[str, Any], description: str) -> "Checkpoint":
+    def create(cls, checkpoint_type: str, state: dict[str, Any], description: str) -> "Checkpoint":
         """Factory method to create a checkpoint."""
         return cls(
             checkpoint_id=str(uuid.uuid4()),
@@ -190,16 +190,16 @@ class AgentAuditLog:
     agent_id: str
     agent_version: str
     autonomy_mode: AutonomyMode
-    actions: List[AgentAction]
-    sources_accessed: List[str]
-    documents_read: List[str]
-    documents_written: List[str]
+    actions: list[AgentAction]
+    sources_accessed: list[str]
+    documents_read: list[str]
+    documents_written: list[str]
     outcome: AgentOutcome
-    deliverables: List[str]
-    errors: List[Dict[str, Any]]
-    checkpoints: List[Checkpoint]
+    deliverables: list[str]
+    errors: list[dict[str, Any]]
+    checkpoints: list[Checkpoint]
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Serialize audit log to dictionary for storage."""
         return {
             "log_id": self.log_id,
@@ -251,13 +251,13 @@ class AgentResult(Generic[T]):
 
     success: bool
     outcome: AgentOutcome
-    deliverable: Optional[T]
-    partial_results: Optional[T]
-    error_message: Optional[str]
+    deliverable: T | None
+    partial_results: T | None
+    error_message: str | None
     audit_log: AgentAuditLog
     execution_time_ms: int
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Serialize result to dictionary."""
         return {
             "success": self.success,
@@ -295,7 +295,7 @@ class AgentBase(ABC):
     def __init__(
         self,
         autonomy_mode: AutonomyMode = AutonomyMode.BALANCED,
-        case_context: Optional[CaseContext] = None,
+        case_context: CaseContext | None = None,
         user_id: str = "anonymous",
         firm_id: str = "default",
     ):
@@ -314,14 +314,14 @@ class AgentBase(ABC):
         self.firm_id = firm_id
 
         # Execution state
-        self._actions: List[AgentAction] = []
-        self._checkpoints: List[Checkpoint] = []
-        self._sources_accessed: List[str] = []
-        self._documents_read: List[str] = []
-        self._documents_written: List[str] = []
-        self._errors: List[Dict[str, Any]] = []
-        self._start_time: Optional[datetime] = None
-        self._current_state: Dict[str, Any] = {}
+        self._actions: list[AgentAction] = []
+        self._checkpoints: list[Checkpoint] = []
+        self._sources_accessed: list[str] = []
+        self._documents_read: list[str] = []
+        self._documents_written: list[str] = []
+        self._errors: list[dict[str, Any]] = []
+        self._start_time: datetime | None = None
+        self._current_state: dict[str, Any] = {}
 
     @property
     @abstractmethod
@@ -402,7 +402,7 @@ class AgentBase(ABC):
         logger.warning(f"Checkpoint not found: {checkpoint_id}")
         return False
 
-    def get_latest_checkpoint(self) -> Optional[Checkpoint]:
+    def get_latest_checkpoint(self) -> Checkpoint | None:
         """Get the most recent checkpoint."""
         return self._checkpoints[-1] if self._checkpoints else None
 
@@ -414,10 +414,10 @@ class AgentBase(ABC):
         self,
         action_type: ActionType,
         description: str,
-        inputs: Dict[str, Any],
-        outputs: Dict[str, Any],
+        inputs: dict[str, Any],
+        outputs: dict[str, Any],
         duration_ms: int,
-        sub_agent_id: Optional[str] = None,
+        sub_agent_id: str | None = None,
     ) -> AgentAction:
         """Record an action in the audit log."""
         action = AgentAction.create(
@@ -431,7 +431,7 @@ class AgentBase(ABC):
         self._actions.append(action)
         return action
 
-    def _sanitize_inputs(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
+    def _sanitize_inputs(self, inputs: dict[str, Any]) -> dict[str, Any]:
         """
         Sanitize inputs for audit logging.
 
@@ -450,7 +450,7 @@ class AgentBase(ABC):
 
         return sanitized
 
-    def _summarize_outputs(self, outputs: Dict[str, Any]) -> Dict[str, Any]:
+    def _summarize_outputs(self, outputs: dict[str, Any]) -> dict[str, Any]:
         """
         Summarize outputs for audit logging.
 
@@ -478,7 +478,7 @@ class AgentBase(ABC):
         self,
         agent_class: type,
         task: str,
-        autonomy_override: Optional[AutonomyMode] = None,
+        autonomy_override: AutonomyMode | None = None,
         **kwargs: Any,
     ) -> AgentResult[Any]:
         """
@@ -528,7 +528,7 @@ class AgentBase(ABC):
     # -------------------------------------------------------------------------
 
     async def request_user_confirmation(
-        self, message: str, options: Optional[List[str]] = None
+        self, message: str, options: list[str] | None = None
     ) -> str:
         """
         Request confirmation from user based on autonomy mode.
@@ -565,7 +565,7 @@ class AgentBase(ABC):
     # Audit Log Generation
     # -------------------------------------------------------------------------
 
-    def _create_audit_log(self, outcome: AgentOutcome, deliverables: List[str]) -> AgentAuditLog:
+    def _create_audit_log(self, outcome: AgentOutcome, deliverables: list[str]) -> AgentAuditLog:
         """Generate complete audit log for the execution."""
         return AgentAuditLog(
             log_id=str(uuid.uuid4()),
@@ -612,7 +612,7 @@ class AgentBase(ABC):
             self.autonomy_mode = AutonomyMode.CAUTIOUS
             logger.info("Escalated to cautious mode after error")
 
-    def _create_partial_result(self, partial_data: Any) -> Dict[str, Any]:
+    def _create_partial_result(self, partial_data: Any) -> dict[str, Any]:
         """Create a partial result package when execution fails midway."""
         latest_checkpoint = self.get_latest_checkpoint()
         return {

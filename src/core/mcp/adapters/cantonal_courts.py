@@ -8,7 +8,7 @@ through MCP server integration, handling cantonal variations and multi-lingual s
 import logging
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from ..protocol import MCPClient, MCPInvocationError
 
@@ -53,8 +53,8 @@ class CantonalCourt:
     canton: str  # 2-letter canton code
     name: str  # Court name
     court_type: str  # supreme, appellate, district, etc.
-    languages: List[str]  # Official languages for this court
-    website_url: Optional[str] = None
+    languages: list[str]  # Official languages for this court
+    website_url: str | None = None
 
 
 @dataclass
@@ -68,10 +68,10 @@ class CantonalDecision:
     date: datetime
     language: str
     summary: str
-    legal_areas: List[str]
+    legal_areas: list[str]
     case_number: str  # Canton-specific case numbering
-    parties: Optional[Dict[str, str]] = None  # Plaintiff, defendant info
-    full_text_url: Optional[str] = None
+    parties: dict[str, str] | None = None  # Plaintiff, defendant info
+    full_text_url: str | None = None
 
 
 @dataclass
@@ -79,12 +79,12 @@ class CantonalSearchResult:
     """Results from cantonal courts search"""
 
     query: str
-    cantons_searched: List[str]
+    cantons_searched: list[str]
     total_results: int
-    decisions: List[CantonalDecision]
-    by_canton: Dict[str, int]  # Result count per canton
+    decisions: list[CantonalDecision]
+    by_canton: dict[str, int]  # Result count per canton
     search_time_ms: float
-    metadata: Dict[str, Any]
+    metadata: dict[str, Any]
 
 
 class CantonalCourtsAdapter:
@@ -120,8 +120,8 @@ class CantonalCourtsAdapter:
 
     def __init__(
         self,
-        command: List[str],
-        env: Optional[Dict[str, str]] = None,
+        command: list[str],
+        env: dict[str, str] | None = None,
         timeout: int = 30,
     ) -> None:
         """
@@ -149,12 +149,12 @@ class CantonalCourtsAdapter:
     async def search(
         self,
         query: str,
-        cantons: Optional[List[str]] = None,
-        court_type: Optional[str] = None,
-        language: Optional[str] = None,
-        date_from: Optional[str] = None,
-        date_to: Optional[str] = None,
-        legal_areas: Optional[List[str]] = None,
+        cantons: list[str] | None = None,
+        court_type: str | None = None,
+        language: str | None = None,
+        date_from: str | None = None,
+        date_to: str | None = None,
+        legal_areas: list[str] | None = None,
         limit: int = 10,
     ) -> CantonalSearchResult:
         """
@@ -228,7 +228,7 @@ class CantonalCourtsAdapter:
             logger.error(f"Cantonal courts search failed: {e}")
             raise
 
-    async def get_decision(self, decision_id: str, canton: str) -> Optional[CantonalDecision]:
+    async def get_decision(self, decision_id: str, canton: str) -> CantonalDecision | None:
         """
         Retrieve specific cantonal decision
 
@@ -256,7 +256,7 @@ class CantonalCourtsAdapter:
             logger.error(f"Cantonal decision retrieval failed: {e}")
             raise
 
-    async def list_courts(self, canton: Optional[str] = None) -> List[CantonalCourt]:
+    async def list_courts(self, canton: str | None = None) -> list[CantonalCourt]:
         """
         List available cantonal courts
 
@@ -296,7 +296,7 @@ class CantonalCourtsAdapter:
             logger.error(f"Court listing failed: {e}")
             raise
 
-    def _parse_decision(self, data: Dict[str, Any]) -> CantonalDecision:
+    def _parse_decision(self, data: dict[str, Any]) -> CantonalDecision:
         """Parse decision data from MCP server response"""
         # Parse date
         date_str = data.get("date", "")
