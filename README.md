@@ -6,10 +6,19 @@
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Languages](https://img.shields.io/badge/languages-DE%20%7C%20FR%20%7C%20IT%20%7C%20EN-orange.svg)]()
 [![Claude Code](https://img.shields.io/badge/built%20with-Claude%20Code-purple.svg)](https://claude.ai/code)
+[![Claude Desktop](https://img.shields.io/badge/works%20with-Claude%20Desktop-blueviolet.svg)](https://claude.ai/download)
 [![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue.svg)]()
 [![TypeScript](https://img.shields.io/badge/typescript-5.7+-blue.svg)]()
 
 > Transform Swiss legal research and case strategy with AI-powered precision. Built for solo practitioners and medium-sized law firms specializing in corporate law and litigation.
+
+### 🚀 One-Line Installation
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/fedec65/BetterCallClaude/main/install.sh | bash
+```
+
+**Works with both Claude Code CLI and Claude Desktop** — the installer auto-configures everything!
 
 ---
 
@@ -190,27 +199,55 @@ BetterCallClaude is a comprehensive legal intelligence framework that provides S
 
 ### Quick Install (Recommended)
 
-Install BetterCallClaude globally for all your projects with a single command:
+Install BetterCallClaude globally with a single command — **no configuration required**:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/fedec65/BetterCallClaude/main/install.sh | bash
 ```
 
-The interactive installer will guide you through:
-- 📍 **Installation scope** - Global (all projects) or local (current project only)
-- 📂 **MCP server location** - Choose where to install MCP servers
-- 🐍 **Python environment** - Virtual environment, system Python, or skip
-- 💾 **Backup creation** - Preserve existing Claude settings
+That's it! The interactive installer handles everything automatically.
 
-**What gets installed:**
-- ✅ Framework cloned to `~/.claude/bettercallclaude/`
-- ✅ Command symlinks in `~/.claude/commands/`
-- ✅ MCP servers built and configured
-- ✅ Settings merged with your existing `settings.json`
-- ✅ `bettercallclaude` CLI for easy management
-- ✅ Works with both **Claude Code CLI** and **Claude Code Desktop**
+### Works With Both Claude Environments
 
-After installation, start Claude Code and type `/legal:help` to see all available commands.
+| Environment | Support | How to Use |
+|-------------|---------|------------|
+| **Claude Code CLI** | ✅ Full Support | Run `claude` in terminal, then `/legal:help` |
+| **Claude Desktop** | ✅ Full Support | Open Claude Desktop app, MCP servers auto-loaded |
+
+The installer automatically:
+- 🔍 Detects your Claude environment (CLI, Desktop, or both)
+- ⚙️ Configures MCP servers for your setup
+- 🔗 Creates command symlinks accessible from anywhere
+- 💾 Backs up your existing settings before changes
+
+### What Gets Installed
+
+```
+~/.claude/
+├── bettercallclaude/          # Framework installation
+├── commands/                   # Slash commands (symlinked)
+├── settings.json              # Updated with MCP servers
+└── settings.local.json        # Your existing settings (backed up)
+```
+
+**Components:**
+- ✅ 30+ legal slash commands (`/legal:research`, `/legal:strategy`, etc.)
+- ✅ 14 specialized legal agents (`@researcher`, `@compliance`, etc.)
+- ✅ 2 MCP servers (entscheidsuche, legal-citations)
+- ✅ `bettercallclaude` CLI for updates and management
+
+### After Installation
+
+**Claude Code CLI:**
+```bash
+claude
+# Then type: /legal:help
+```
+
+**Claude Desktop:**
+1. Open the Claude Desktop app
+2. MCP servers are automatically available
+3. Type `/legal:help` to see all commands
 
 ### Installation Options
 
