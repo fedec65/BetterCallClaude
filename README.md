@@ -1,6 +1,6 @@
 # BetterCallClaude: Legal Intelligence Framework for Swiss Lawyers
 
-[![Version](https://img.shields.io/badge/version-1.3.2-blue.svg)](https://github.com/fedec65/bettercallclaude)
+[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/fedec65/bettercallclaude)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Languages](https://img.shields.io/badge/languages-DE%20%7C%20FR%20%7C%20IT%20%7C%20EN-orange.svg)]()
 [![Claude Code](https://img.shields.io/badge/built%20with-Claude%20Code-purple.svg)](https://claude.ai/code)
@@ -33,24 +33,26 @@ BetterCallClaude is a comprehensive legal intelligence framework designed to pro
   * **Multi-lingual precision** in German, French, Italian, and English.
   * **Privacy-First Architecture** with local LLM support for attorney-client privilege (*Anwaltsgeheimnis*).
 
-### What's New in v1.3.2
+### What's New in v2.0.0
 
-  * 🆕 **Intelligent Legal Proxy (`/legal`)**: Single entry point with automatic intent detection.
-  * 🆕 **Hybrid Orchestration**: Routes queries seamlessly between autonomous agents and guided workflows.
-  * 🆕 **Interactive Dialogue**: Agents now request clarification and confirm checkpoints for complex workflows.
+  * 🆕 **PipelineBuilder API**: Fluent builder pattern for creating custom multi-agent workflows with `add_step()`, `add_parallel_group()`, `add_conditional_step()`, and `add_router()`.
+  * 🆕 **Dynamic Agent Registry**: Auto-discovers all 14 agents (3 Python + 11 Command-based) with unified metadata.
+  * 🆕 **Parallel Execution**: Run independent agents concurrently for faster complex analyses.
+  * 🆕 **Conditional Routing**: Execute different pipeline paths based on runtime context and intermediate results.
+  * 🆕 **CommandAgentAdapter**: Seamlessly integrates command-file agents with the Python orchestration layer.
 
 -----
 
 ## 📋 Table of Contents
 
-  - [Features & Agent Ecosystem](https://www.google.com/search?q=%23features--agent-ecosystem)
-  - [Supported Jurisdictions](https://www.google.com/search?q=%23supported-jurisdictions)
-  - [Privacy & Ollama Integration](https://www.google.com/search?q=%23privacy--ollama-integration)
-  - [Quick Start](https://www.google.com/search?q=%23quick-start)
-  - [Command Reference](https://www.google.com/search?q=%23command-reference)
-  - [Architecture & MCP](https://www.google.com/search?q=%23architecture--mcp)
-  - [Configuration](https://www.google.com/search?q=%23configuration)
-  - [Development](https://www.google.com/search?q=%23development)
+  - [Features & Agent Ecosystem](#features--agent-ecosystem)
+  - [Supported Jurisdictions](#supported-jurisdictions)
+  - [Privacy & Ollama Integration](#privacy--ollama-integration)
+  - [Quick Start](#quick-start)
+  - [Command Reference](#command-reference)
+  - [Architecture & MCP](#architecture--mcp)
+  - [Configuration](#configuration)
+  - [Development](#development)
 
 -----
 
@@ -70,25 +72,56 @@ The framework operates through three distinct expert personas:
 
 BetterCallClaude utilizes a specialized swarm of 14+ agents. You can route to these specifically (e.g., `@compliance`) or let the `/legal` proxy route for you.
 
-#### Core Pipeline Agents
+#### Core Pipeline Agents (Python)
 
   * **ResearcherAgent**: Autonomous deep-dive research with MCP integration for court databases.
   * **StrategistAgent**: Litigation strategy, risk assessment, and settlement analysis.
   * **DrafterAgent**: Generates documents adhering to Swiss formatting standards.
-  * **AgentOrchestrator**: Coordinates multi-agent pipelines and manages checkpoints.
+  * **AgentOrchestrator v2.0**: Coordinates multi-agent pipelines with the new PipelineBuilder API, supporting parallel execution, conditional routing, and checkpoint aggregation.
 
-#### Specialized Domain Agents
+#### Specialized Domain Agents (Command-Based)
 
-  * **Citation Specialist (`@citation`)**: Verifies BGE/ATF/DTF references and cross-validates formatting.
-  * **Compliance Officer (`@compliance`)**: Handles FINMA, AML/KYC (GwG), and regulatory compliance.
-  * **Data Protection Specialist (`@data-protection`)**: Expert in GDPR and nDSG/FADP (DPIA workflows).
-  * **Risk Analyst (`@risk`)**: Performs Monte Carlo simulations for damages and case outcomes.
-  * **Procedure Specialist (`@procedure`)**: Calculates deadlines for ZPO/StPO/VwVG/BGG.
-  * **Legal Translator (`@translator`)**: Specialized DE/FR/IT legal terminology (Termdat integration).
-  * **Fiscal Expert (`@fiscal`)**: Tax law, Double Taxation Agreements (DTA), and transfer pricing.
-  * **Corporate Specialist (`@corporate`)**: M\&A, shareholder agreements, and commercial contracts.
-  * **Real Estate Expert (`@realestate`)**: Property transactions, *Grundbuch*, and *Lex Koller*.
-  * **Cantonal Expert (`@cantonal`)**: Comparative law across 26 cantons and fee calculations.
+All 11 command-based agents are auto-discovered from `.claude/commands/agent:*.md` and seamlessly integrated via the `CommandAgentAdapter`:
+
+  * **Citation Validator**: Verifies BGE/ATF/DTF references and cross-validates formatting.
+  * **Contract Analyzer**: Analyzes contract terms and identifies risks.
+  * **Deadline Tracker**: Tracks legal deadlines and limitation periods.
+  * **Document Formatter**: Formats legal documents to Swiss standards.
+  * **Jurisdiction Advisor**: Advises on jurisdiction selection.
+  * **Opponent Analyzer**: Analyzes opposing counsel patterns.
+  * **Precedent Finder**: Finds relevant legal precedents.
+  * **Risk Assessor**: Comprehensive risk assessment.
+  * **Settlement Calculator**: Calculates settlement values.
+  * **Statute Interpreter**: Interprets statutory provisions.
+  * **Timeline Builder**: Builds case timelines.
+
+#### PipelineBuilder API (v2.0)
+
+Build custom multi-agent workflows programmatically:
+
+```python
+from src.agents import PipelineBuilder, PipelineStep, PipelineExecutor
+
+# Create a custom pipeline with parallel validation
+pipeline = (
+    PipelineBuilder("contract_review")
+    .add_step("researcher", "Research Art. 97 OR precedents", output_key="research")
+    .with_timeout(120)
+    .add_parallel_group([
+        PipelineStep("citation_validator", "Verify all citations", output_key="citations"),
+        PipelineStep("risk_assessor", "Assess contract risks", output_key="risks"),
+    ])
+    .add_conditional_step(
+        condition=lambda ctx: ctx.get("risks", {}).get("level") == "high",
+        step=PipelineStep("strategist", "Deep strategy analysis"),
+        else_step=PipelineStep("drafter", "Quick summary"),
+    )
+    .build()
+)
+
+# Execute with the orchestrator
+result = await executor.execute(pipeline, {"contract": "..."})
+```
 
 -----
 
@@ -178,8 +211,21 @@ Access specific agents via `/agent:<name>` or the shorthand `@<name>` inside the
 | Agent | CLI Command | Context Options |
 | :--- | :--- | :--- |
 | **Researcher** | `/agent:researcher` | `--depth`, `--focus`, `--canton` |
-| **Orchestrator** | `/agent:orchestrator` | `--workflow`, `--checkpoints` |
+| **Orchestrator** | `/agent:orchestrator` | `--pipeline`, `--mode`, `--parallel`, `--steps` |
 | **Specialists** | `/agent:compliance`, `/agent:risk`, etc. | *Domain specific* |
+
+#### Orchestrator v2.0 Examples
+
+```bash
+# Full pipeline: Research → Strategy → Draft
+/agent:orchestrator --pipeline full "Contract breach under Art. 97 OR"
+
+# Parallel analysis with synthesis
+/agent:orchestrator --parallel "risk_assessor,deadline_tracker,citation_validator" --then strategist
+
+# Custom multi-agent sequence
+/agent:orchestrator --steps "researcher,citation_validator,strategist,drafter" --task "Full verified analysis"
+```
 
 -----
 
@@ -254,9 +300,9 @@ bettercallclaude doctor # System health check
 
 ## 🎯 Roadmap (Future)
 
-  * **v2.0**: Integration with European Law (EU regulations, ECHR).
-  * **Integrations**: Connectors for commercial databases (Swisslex, Weblaw).
-  * **Argumentation**: Advanced logic chains for appellate briefs.
+  * **European Law**: Integration with EU regulations and ECHR jurisprudence.
+  * **Database Connectors**: Swisslex, Weblaw, and other commercial legal databases.
+  * **Argumentation Engine**: Advanced logic chains for appellate briefs.
   * **Citation Network**: Visual graphs of precedent relationships.
 
 -----

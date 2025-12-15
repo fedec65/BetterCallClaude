@@ -45,6 +45,19 @@ from src.agents.orchestrator import (
     PipelineResult,
     PipelineStatus,
 )
+from src.agents.pipeline_builder import (
+    ConditionalStep,
+    ParallelGroup,
+    Pipeline,
+    PipelineBuilder,
+    PipelineExecutionResult,
+    PipelineExecutor,
+    PipelineStep,
+    RouterStep,
+    StepType,
+    create_full_case_pipeline,
+    create_research_pipeline,
+)
 from src.agents.researcher import (
     LegalDomain,
     ResearchDepth,
@@ -79,6 +92,18 @@ __all__ = [
     "OrchestrationStep",
     "PipelineResult",
     "PipelineStatus",
+    # Pipeline Builder (NEW v2.0)
+    "ConditionalStep",
+    "ParallelGroup",
+    "Pipeline",
+    "PipelineBuilder",
+    "PipelineExecutionResult",
+    "PipelineExecutor",
+    "PipelineStep",
+    "RouterStep",
+    "StepType",
+    "create_full_case_pipeline",
+    "create_research_pipeline",
     # Shared Models
     "CaseFacts",
     "Jurisdiction",

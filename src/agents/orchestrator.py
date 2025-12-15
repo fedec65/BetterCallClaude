@@ -4,11 +4,18 @@ BetterCallClaude Agent Orchestrator
 Multi-agent pipeline coordinator for complex legal workflows.
 Chains Research → Strategy → Draft with data passing and checkpoint management.
 
+Supports:
+- Python agents: researcher, strategist, drafter (built-in)
+- Command agents: All 11 command-based agents via CommandAgentAdapter
+
 Pipelines:
 - research_to_strategy: Research findings → Strategy recommendations
 - strategy_to_draft: Strategy → Legal document drafting
 - full_pipeline: Complete Research → Strategy → Draft chain
+- custom_pipeline: Any combination of registered agents
 """
+
+from __future__ import annotations
 
 import logging
 import uuid
@@ -16,7 +23,9 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any
+from functools import cached_property
+from pathlib import Path
+from typing import TYPE_CHECKING, Any
 
 from .base import (
     AgentBase,
@@ -32,6 +41,10 @@ from .models.shared import (
     Language,
     LegalParty,
 )
+
+if TYPE_CHECKING:
+    from .command_adapter import CommandAgentAdapter
+    from .registry import AgentRegistry
 
 logger = logging.getLogger(__name__)
 
@@ -206,6 +219,11 @@ class AgentOrchestrator:
     Coordinates execution of Research → Strategy → Draft pipelines
     with data passing, checkpoint management, and error handling.
 
+    Supports all 14 agents:
+    - Python agents (built-in): researcher, strategist, drafter
+    - Command agents (via adapter): analyzer, auditor, briefer, compliance, consultant,
+      discovery, evaluator, mediator, negotiator, optimizer, reviewer
+
     Example usage:
         orchestrator = AgentOrchestrator(
             autonomy_mode=AutonomyMode.CAUTIOUS,
@@ -219,24 +237,26 @@ class AgentOrchestrator:
             document_type="klageschrift"
         )
 
-        # Partial pipeline
-        result = await orchestrator.research_to_strategy(
-            research_query="Swiss contract law precedents",
-            case_facts={"summary": "..."}
-        )
+        # Custom pipeline with any agents
+        result = await orchestrator.execute_pipeline([
+            OrchestrationStep(agent_type="researcher", task="..."),
+            OrchestrationStep(agent_type="analyzer", task="..."),
+            OrchestrationStep(agent_type="evaluator", task="..."),
+        ])
     """
 
     # Orchestrator version
-    VERSION = "1.2.0"
+    VERSION = "2.0.0"
 
-    # Supported agent types
-    AGENT_TYPES = ["researcher", "strategist", "drafter"]
+    # Legacy: Hardcoded Python agent types (for backward compatibility)
+    _PYTHON_AGENT_TYPES = ["researcher", "strategist", "drafter"]
 
     def __init__(
         self,
         autonomy_mode: AutonomyMode = AutonomyMode.CAUTIOUS,
         case_context: CaseContext | None = None,
         config: PipelineConfig | None = None,
+        commands_dir: Path | str | None = None,
     ):
         """
         Initialize the orchestrator.
@@ -245,6 +265,7 @@ class AgentOrchestrator:
             autonomy_mode: Default autonomy level for agents
             case_context: Shared case context across agents
             config: Pipeline configuration options
+            commands_dir: Directory containing command files (for command-based agents)
         """
         self.autonomy_mode = autonomy_mode
         self.case_context = case_context
@@ -252,11 +273,69 @@ class AgentOrchestrator:
         self.step_results: dict[str, AgentResult] = {}
         self._agents: dict[str, AgentBase] = {}
         self._pipeline_history: list[PipelineResult] = []
+        self._registry: AgentRegistry | None = None
+        self._commands_dir = Path(commands_dir) if commands_dir else None
 
         logger.info(
             f"AgentOrchestrator initialized (mode={autonomy_mode.value}, "
             f"version={self.VERSION})"
         )
+
+    # =========================================================================
+    # Registry Integration (NEW)
+    # =========================================================================
+
+    @cached_property
+    def registry(self) -> AgentRegistry:
+        """
+        Get or create the agent registry.
+
+        Returns:
+            AgentRegistry instance with all discovered agents
+        """
+        from .registry import AgentRegistry
+
+        if self._registry is None:
+            self._registry = AgentRegistry(commands_dir=self._commands_dir)
+            logger.info(f"Registry initialized with {len(self._registry)} agents")
+        return self._registry
+
+    @property
+    def AGENT_TYPES(self) -> list[str]:
+        """
+        Get list of all supported agent types (dynamic).
+
+        Returns both Python and command-based agents.
+        """
+        # Get from registry if available
+        try:
+            return [desc.agent_id for desc in self.registry.list_agents()]
+        except Exception:
+            # Fall back to Python agents if registry fails
+            return self._PYTHON_AGENT_TYPES.copy()
+
+    def get_agent_info(self, agent_type: str) -> dict[str, Any]:
+        """
+        Get detailed information about an agent.
+
+        Args:
+            agent_type: Agent type identifier
+
+        Returns:
+            Dict with agent metadata
+        """
+        descriptor = self.registry.get_agent(agent_type)
+        if descriptor:
+            return {
+                "agent_id": descriptor.agent_id,
+                "name": descriptor.name,
+                "version": descriptor.version,
+                "description": descriptor.description,
+                "agent_type": descriptor.agent_type,
+                "category": descriptor.category.value,
+                "is_python_agent": descriptor.agent_type == "python",
+            }
+        return {}
 
     # =========================================================================
     # Agent Management
@@ -266,42 +345,104 @@ class AgentOrchestrator:
         """
         Get or create an agent instance.
 
+        Supports both built-in Python agents and command-based agents via the registry.
+
         Args:
-            agent_type: Type of agent (researcher, strategist, drafter)
+            agent_type: Type of agent (e.g., researcher, strategist, drafter, analyzer, etc.)
 
         Returns:
-            AgentBase instance
+            AgentBase instance (Python agent or CommandAgentAdapter)
+
+        Raises:
+            ValueError: If agent type is unknown or not registered
         """
         if agent_type in self._agents:
             return self._agents[agent_type]
 
+        agent: AgentBase
+
+        # First, try built-in Python agents (fast path)
+        if agent_type in self._PYTHON_AGENT_TYPES:
+            agent = self._create_python_agent(agent_type)
+        else:
+            # Try to get from registry (command-based agents)
+            agent = self._create_command_agent(agent_type)
+
+        self._agents[agent_type] = agent
+        return agent
+
+    def _create_python_agent(self, agent_type: str) -> AgentBase:
+        """
+        Create a built-in Python agent instance.
+
+        Args:
+            agent_type: Type of Python agent (researcher, strategist, drafter)
+
+        Returns:
+            Python AgentBase instance
+        """
         # Lazy import to avoid circular dependencies
         if agent_type == "researcher":
             from .researcher import ResearcherAgent
 
-            agent: AgentBase = ResearcherAgent(
+            return ResearcherAgent(
                 autonomy_mode=self.autonomy_mode,
                 case_context=self.case_context,
             )
         elif agent_type == "strategist":
             from .strategist import StrategistAgent
 
-            agent = StrategistAgent(
+            return StrategistAgent(
                 autonomy_mode=self.autonomy_mode,
                 case_context=self.case_context,
             )
         elif agent_type == "drafter":
             from .drafter import DrafterAgent
 
-            agent = DrafterAgent(
+            return DrafterAgent(
                 autonomy_mode=self.autonomy_mode,
                 case_context=self.case_context,
             )
         else:
-            raise ValueError(f"Unknown agent type: {agent_type}")
+            raise ValueError(f"Unknown Python agent type: {agent_type}")
 
-        self._agents[agent_type] = agent
-        return agent
+    def _create_command_agent(self, agent_type: str) -> AgentBase:
+        """
+        Create a command-based agent via CommandAgentAdapter.
+
+        Args:
+            agent_type: Type of command agent (e.g., analyzer, evaluator, etc.)
+
+        Returns:
+            CommandAgentAdapter instance wrapping the command-based agent
+
+        Raises:
+            ValueError: If agent type is not found in registry
+        """
+        from .command_adapter import CommandAgentAdapter
+
+        # Look up in registry
+        descriptor = self.registry.get_agent(agent_type)
+        if descriptor is None:
+            raise ValueError(
+                f"Unknown agent type: {agent_type}. "
+                f"Available agents: {', '.join(self.AGENT_TYPES)}"
+            )
+
+        # Check if it's actually a command-based agent
+        if descriptor.agent_type != "command":
+            raise ValueError(
+                f"Agent '{agent_type}' is not a command-based agent "
+                f"(type: {descriptor.agent_type})"
+            )
+
+        # Create adapter from descriptor
+        logger.info(f"Creating CommandAgentAdapter for '{agent_type}'")
+        return CommandAgentAdapter.from_descriptor(
+            descriptor=descriptor,
+            autonomy_mode=self.autonomy_mode,
+            case_context=self.case_context,
+        )
 
     # =========================================================================
     # Data Passing Utilities
@@ -495,6 +636,9 @@ class AgentOrchestrator:
         """
         Execute a single pipeline step.
 
+        Supports both Python agents (researcher, strategist, drafter) and
+        command-based agents (via CommandAgentAdapter).
+
         Args:
             agent: Agent instance to execute
             step: Step definition
@@ -548,7 +692,46 @@ class AgentOrchestrator:
                 },
             )
         else:
-            raise ValueError(f"Unknown agent type: {step.agent_type}")
+            # Command-based agents - use generic execution interface
+            return await self._execute_command_agent_step(agent, step, inputs)
+
+    async def _execute_command_agent_step(
+        self,
+        agent: AgentBase,
+        step: OrchestrationStep,
+        inputs: dict[str, Any],
+    ) -> AgentResult:
+        """
+        Execute a step using a command-based agent.
+
+        Command-based agents have a simpler interface: they receive the task
+        and all inputs as keyword arguments.
+
+        Args:
+            agent: CommandAgentAdapter instance
+            step: Step definition
+            inputs: Resolved inputs for the step
+
+        Returns:
+            AgentResult from command execution
+        """
+        # Prepare execution kwargs with common parameters
+        exec_kwargs: dict[str, Any] = {
+            "task": step.task,
+            "language": inputs.get("language", self.config.language),
+            "jurisdiction": inputs.get("jurisdiction", self.config.jurisdiction),
+        }
+
+        # Add any additional inputs from previous steps
+        for key, value in inputs.items():
+            if key not in exec_kwargs:
+                exec_kwargs[key] = value
+
+        logger.debug(
+            f"Executing command agent '{step.agent_type}' with keys: {list(exec_kwargs.keys())}"
+        )
+
+        return await agent.execute(**exec_kwargs)
 
     def _create_final_output(
         self,
