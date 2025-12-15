@@ -7,11 +7,88 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [2.0.0] - 2025-01-24
+## [2.0.0] - 2024-12-15
 
-### 🚀 Major Release: Database Layer & Performance Infrastructure
+### 🚀 Major Release: PipelineBuilder API & Dynamic Agent Registry
 
-This release represents a complete foundation overhaul with enterprise-grade database infrastructure, comprehensive test coverage, and performance benchmarking.
+This release introduces the powerful PipelineBuilder API for custom multi-agent workflows, dynamic agent discovery, and parallel execution capabilities.
+
+### Added
+
+#### PipelineBuilder API
+- **Fluent Builder Pattern**: Create custom multi-agent workflows with chainable methods
+  - `add_step()` - Add sequential pipeline steps
+  - `add_parallel_group()` - Run agents concurrently
+  - `add_conditional_step()` - Branch based on runtime conditions
+  - `add_router()` - Dynamic routing to different agents
+  - `with_timeout()` - Set step-level timeouts
+  - `with_checkpoint()` - Add checkpoint markers
+  - `with_input_mapping()` - Configure data flow between steps
+  - `build()` - Compile pipeline for execution
+
+#### Dynamic Agent Registry
+- **Auto-Discovery**: Automatically discovers all agents from:
+  - Python agent classes in `src/agents/`
+  - Command files in `.claude/commands/agent:*.md`
+- **Unified Metadata**: Consistent `AgentDescriptor` for all 14 agent types
+- **CommandAgentAdapter**: Seamlessly integrates command-file agents with Python orchestration
+
+#### Parallel Execution
+- **Concurrent Agent Execution**: Run independent agents simultaneously
+- **Merge Strategies**: `all`, `first_success`, `majority` result aggregation
+- **Performance Gains**: Significant speed improvements for complex pipelines
+
+#### Conditional Routing
+- **Runtime Branching**: Execute different paths based on context
+- **Router Steps**: Dynamic agent selection based on intermediate results
+- **Condition Functions**: Lambda-based decision logic
+
+#### Pipeline Execution
+- **PipelineExecutor**: Execute compiled pipelines with full context management
+- **PipelineExecutionResult**: Detailed execution results with timing and status
+- **Checkpoint Aggregation**: Collect checkpoints across all pipeline steps
+
+#### Convenience Functions
+- `create_research_pipeline()` - Pre-built research workflow
+- `create_full_case_pipeline()` - Complete case analysis workflow
+
+#### New Exports
+```python
+from src.agents import (
+    PipelineBuilder,
+    PipelineExecutor,
+    PipelineStep,
+    PipelineExecutionResult,
+    Pipeline,
+    ConditionalStep,
+    ParallelGroup,
+    RouterStep,
+    StepType,
+    create_research_pipeline,
+    create_full_case_pipeline,
+)
+```
+
+### Changed
+- **Agent Command Naming**: Standardized to colon-separated format (`agent:*.md`)
+- **Registry Architecture**: Unified discovery for Python and command-based agents
+- **Documentation**: Comprehensive update to README.md with v2.0.0 features
+
+### Fixed
+- E2E test assertions for `pipeline_id` (now UUID-based)
+- Test compatibility with Vitest migration for MCP servers
+
+### Backward Compatibility
+- **Fully Backward Compatible**: All v1.x orchestrator code continues to work unchanged
+- **14 Agents Supported**: 3 Python agents + 11 Command-based agents
+
+---
+
+## [1.5.0] - 2025-01-24
+
+### Database Layer & Performance Infrastructure
+
+This release adds enterprise-grade database infrastructure, comprehensive test coverage, and performance benchmarking.
 
 ### Added
 

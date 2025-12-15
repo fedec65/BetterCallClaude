@@ -20,7 +20,7 @@ set -e
 # Configuration & Defaults
 # ============================================================================
 
-VERSION="1.3.2"
+VERSION="2.0.0"
 REPO_URL="https://github.com/fedec65/BetterCallClaude.git"
 REPO_RAW_URL="https://raw.githubusercontent.com/fedec65/BetterCallClaude/main"
 SUPPORT_EMAIL="federico@cesconi.com"
