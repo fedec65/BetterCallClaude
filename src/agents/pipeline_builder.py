@@ -51,7 +51,7 @@ from datetime import datetime
 from enum import Enum
 from typing import TYPE_CHECKING, Any
 
-from .base import AgentResult, AutonomyMode, CaseContext
+from .base import AgentResult
 from .models.shared import Jurisdiction, Language
 
 if TYPE_CHECKING:
@@ -649,9 +649,7 @@ class PipelineExecutor:
         Returns:
             List of AgentResult from all steps
         """
-        logger.info(
-            f"Executing parallel group '{group.group_id}' with {len(group.steps)} steps"
-        )
+        logger.info(f"Executing parallel group '{group.group_id}' with {len(group.steps)} steps")
 
         async def execute_with_semaphore(step: PipelineStep) -> AgentResult:
             async with self._semaphore:
@@ -670,9 +668,9 @@ class PipelineExecutor:
             results = await asyncio.gather(*tasks, return_exceptions=True)
 
         # Handle results based on merge strategy
-        valid_results: list[AgentResult] = []
+        valid_results: list[AgentResult[Any]] = []
         for i, r in enumerate(results):
-            if isinstance(r, Exception):
+            if isinstance(r, BaseException):
                 logger.error(f"Parallel step {group.steps[i].step_id} failed: {r}")
                 if group.merge_strategy != "first_success":
                     raise r

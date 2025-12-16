@@ -13,7 +13,6 @@ Architecture:
 import asyncio
 import logging
 import re
-import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -21,7 +20,6 @@ from typing import Any
 
 from .base import (
     ActionType,
-    AgentAuditLog,
     AgentBase,
     AgentOutcome,
     AgentResult,
@@ -304,7 +302,9 @@ class CommandParser:
                 elif indent > 0 and current_section and ":" in line:
                     key = line.split(":")[0].strip()
                     value = line.split(":", 1)[1].strip()
-                    config[current_section][key] = value
+                    section = config[current_section]
+                    if isinstance(section, dict):
+                        section[key] = value
 
         return config
 
@@ -801,9 +801,7 @@ class CommandAgentAdapter(AgentBase):
             logger.error(f"Command agent execution failed: {e}", exc_info=True)
             self._handle_error(e, recoverable=False)
 
-            execution_time_ms = int(
-                (datetime.utcnow() - self._start_time).total_seconds() * 1000
-            )
+            execution_time_ms = int((datetime.utcnow() - self._start_time).total_seconds() * 1000)
 
             audit_log = self._create_audit_log(AgentOutcome.FAILED, [])
 

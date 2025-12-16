@@ -12,8 +12,7 @@ Tests:
 - Convenience functions
 """
 
-import asyncio
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
@@ -30,15 +29,12 @@ from src.agents.pipeline_builder import (
     ParallelGroup,
     Pipeline,
     PipelineBuilder,
-    PipelineExecutionResult,
     PipelineExecutor,
     PipelineStep,
     RouterStep,
-    StepType,
     create_full_case_pipeline,
     create_research_pipeline,
 )
-
 
 # =============================================================================
 # Fixtures
@@ -207,7 +203,10 @@ class TestConditionalStep:
 
     def test_basic_conditional(self) -> None:
         """Test basic conditional step."""
-        condition = lambda ctx: ctx.get("needs_analysis", False)
+
+        def condition(ctx: dict) -> bool:
+            return bool(ctx.get("needs_analysis", False))
+
         step = PipelineStep(agent_type="analyzer", task="Analyze")
 
         conditional = ConditionalStep(
@@ -223,7 +222,10 @@ class TestConditionalStep:
 
     def test_conditional_with_else(self) -> None:
         """Test conditional with else branch."""
-        condition = lambda ctx: ctx.get("complex", False)
+
+        def condition(ctx: dict) -> bool:
+            return bool(ctx.get("complex", False))
+
         if_step = PipelineStep(agent_type="analyzer", task="Deep analyze")
         else_step = PipelineStep(agent_type="researcher", task="Quick research")
 
@@ -238,7 +240,10 @@ class TestConditionalStep:
 
     def test_condition_evaluation(self) -> None:
         """Test that condition evaluation works."""
-        condition = lambda ctx: ctx.get("value", 0) > 5
+
+        def condition(ctx: dict) -> bool:
+            value: int = ctx.get("value", 0)
+            return value > 5
 
         conditional = ConditionalStep(
             condition=condition,
@@ -260,7 +265,10 @@ class TestRouterStep:
 
     def test_router_step_creation(self) -> None:
         """Test router step creation."""
-        router_fn = lambda ctx: ctx.get("route", "default")
+
+        def router_fn(ctx: dict) -> str:
+            return str(ctx.get("route", "default"))
+
         routes = {
             "research": PipelineStep(agent_type="researcher", task="Research"),
             "analyze": PipelineStep(agent_type="analyzer", task="Analyze"),
@@ -280,7 +288,9 @@ class TestRouterStep:
 
     def test_router_function_evaluation(self) -> None:
         """Test router function returns correct route."""
-        router_fn = lambda ctx: "complex" if ctx.get("complexity", 0) > 5 else "simple"
+
+        def router_fn(ctx: dict) -> str:
+            return "complex" if ctx.get("complexity", 0) > 5 else "simple"
 
         router = RouterStep(
             router_fn=router_fn,
@@ -315,7 +325,7 @@ class TestPipeline:
 
     def test_pipeline_with_steps(self) -> None:
         """Test pipeline with steps."""
-        steps = [
+        steps: list[PipelineStep | ParallelGroup | ConditionalStep | RouterStep] = [
             PipelineStep(agent_type="researcher", task="Research"),
             PipelineStep(agent_type="strategist", task="Strategize"),
         ]
@@ -379,12 +389,7 @@ class TestPipelineBuilder:
 
     def test_step_with_checkpoint(self) -> None:
         """Test adding checkpoint to step."""
-        pipeline = (
-            PipelineBuilder()
-            .add_step("strategist", "Strategy")
-            .with_checkpoint()
-            .build()
-        )
+        pipeline = PipelineBuilder().add_step("strategist", "Strategy").with_checkpoint().build()
 
         step = pipeline.steps[0]
         assert isinstance(step, PipelineStep)
@@ -392,12 +397,7 @@ class TestPipelineBuilder:
 
     def test_step_with_timeout(self) -> None:
         """Test adding timeout to step."""
-        pipeline = (
-            PipelineBuilder()
-            .add_step("researcher", "Research")
-            .with_timeout(120)
-            .build()
-        )
+        pipeline = PipelineBuilder().add_step("researcher", "Research").with_timeout(120).build()
 
         step = pipeline.steps[0]
         assert isinstance(step, PipelineStep)
@@ -405,12 +405,7 @@ class TestPipelineBuilder:
 
     def test_step_with_retry(self) -> None:
         """Test adding retry count to step."""
-        pipeline = (
-            PipelineBuilder()
-            .add_step("researcher", "Research")
-            .with_retry(3)
-            .build()
-        )
+        pipeline = PipelineBuilder().add_step("researcher", "Research").with_retry(3).build()
 
         step = pipeline.steps[0]
         assert isinstance(step, PipelineStep)
@@ -439,7 +434,9 @@ class TestPipelineBuilder:
 
     def test_conditional_step(self) -> None:
         """Test adding conditional step."""
-        condition = lambda ctx: ctx.get("deep_analysis", False)
+
+        def condition(ctx: dict) -> bool:
+            return bool(ctx.get("deep_analysis", False))
 
         pipeline = (
             PipelineBuilder()
@@ -458,7 +455,10 @@ class TestPipelineBuilder:
 
     def test_conditional_step_with_else(self) -> None:
         """Test conditional step with else branch."""
-        condition = lambda ctx: ctx.get("complexity", 0) > 5
+
+        def condition(ctx: dict) -> bool:
+            complexity: int = ctx.get("complexity", 0)
+            return complexity > 5
 
         pipeline = (
             PipelineBuilder()
@@ -476,7 +476,9 @@ class TestPipelineBuilder:
 
     def test_router_step(self) -> None:
         """Test adding router step."""
-        router_fn = lambda ctx: ctx.get("route", "default")
+
+        def router_fn(ctx: dict) -> str:
+            return str(ctx.get("route", "default"))
 
         pipeline = (
             PipelineBuilder()
@@ -544,10 +546,12 @@ class TestPipelineBuilder:
         pipeline = (
             PipelineBuilder("complex_pipeline", "Complex workflow")
             .add_step("researcher", "Initial research")
-            .add_parallel_group([
-                PipelineStep(agent_type="analyzer", task="Analyze 1"),
-                PipelineStep(agent_type="evaluator", task="Evaluate 1"),
-            ])
+            .add_parallel_group(
+                [
+                    PipelineStep(agent_type="analyzer", task="Analyze 1"),
+                    PipelineStep(agent_type="evaluator", task="Evaluate 1"),
+                ]
+            )
             .add_conditional_step(
                 condition=lambda ctx: ctx.get("risk", 0) > 5,
                 step=PipelineStep(agent_type="reviewer", task="Risk review"),
@@ -624,10 +628,12 @@ class TestPipelineExecutor:
         """Test executing a parallel group."""
         pipeline = (
             PipelineBuilder()
-            .add_parallel_group([
-                PipelineStep(agent_type="researcher", task="Research 1"),
-                PipelineStep(agent_type="analyzer", task="Analyze 1"),
-            ])
+            .add_parallel_group(
+                [
+                    PipelineStep(agent_type="researcher", task="Research 1"),
+                    PipelineStep(agent_type="analyzer", task="Analyze 1"),
+                ]
+            )
             .build()
         )
 
@@ -828,9 +834,7 @@ class TestConvenienceFunctions:
         # researcher + strategist + drafter = 3
         assert len(pipeline.steps) == 3
 
-        step_types = [
-            s.agent_type for s in pipeline.steps if isinstance(s, PipelineStep)
-        ]
+        step_types = [s.agent_type for s in pipeline.steps if isinstance(s, PipelineStep)]
         assert "researcher" in step_types
         assert "strategist" in step_types
         assert "drafter" in step_types
@@ -845,9 +849,7 @@ class TestConvenienceFunctions:
         # researcher + analyzer + strategist + drafter = 4
         assert len(pipeline.steps) == 4
 
-        step_types = [
-            s.agent_type for s in pipeline.steps if isinstance(s, PipelineStep)
-        ]
+        step_types = [s.agent_type for s in pipeline.steps if isinstance(s, PipelineStep)]
         assert "analyzer" in step_types
 
 
@@ -863,19 +865,23 @@ class TestPipelineBuilderIntegration:
         """Test building a complete workflow pipeline."""
         pipeline = (
             PipelineBuilder("legal_workflow", "Complete legal case workflow")
-            .with_initial_inputs({
-                "query": "Contract dispute",
-                "jurisdiction": Jurisdiction.FEDERAL,
-                "language": Language.DE,
-            })
+            .with_initial_inputs(
+                {
+                    "query": "Contract dispute",
+                    "jurisdiction": Jurisdiction.FEDERAL,
+                    "language": Language.DE,
+                }
+            )
             # Phase 1: Research
             .add_step("researcher", "Research precedents and law")
             .with_timeout(300)
             # Phase 2: Parallel analysis
-            .add_parallel_group([
-                PipelineStep(agent_type="analyzer", task="Contract analysis"),
-                PipelineStep(agent_type="evaluator", task="Risk evaluation"),
-            ])
+            .add_parallel_group(
+                [
+                    PipelineStep(agent_type="analyzer", task="Contract analysis"),
+                    PipelineStep(agent_type="evaluator", task="Risk evaluation"),
+                ]
+            )
             # Phase 3: Conditional review
             .add_conditional_step(
                 condition=lambda ctx: ctx.get("risk_level", 0) > 7,
@@ -883,10 +889,12 @@ class TestPipelineBuilderIntegration:
             )
             # Phase 4: Strategy with checkpoint
             .add_step("strategist", "Develop strategy")
-            .with_input_mapping({
-                "research": "researcher_output",
-                "analysis": "analyzer_output",
-            })
+            .with_input_mapping(
+                {
+                    "research": "researcher_output",
+                    "analysis": "analyzer_output",
+                }
+            )
             .with_checkpoint()
             # Phase 5: Draft
             .add_step("drafter", "Draft legal document")
@@ -927,9 +935,7 @@ class TestPipelineBuilderIntegration:
             PipelineBuilder("branching_workflow")
             .add_step("researcher", "Initial research")
             .add_router(
-                router_fn=lambda ctx: (
-                    "complex" if ctx.get("complexity", 0) > 5 else "simple"
-                ),
+                router_fn=lambda ctx: ("complex" if ctx.get("complexity", 0) > 5 else "simple"),
                 task="Process based on complexity",
                 routes={
                     "complex": PipelineStep(

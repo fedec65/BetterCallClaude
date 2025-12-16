@@ -7,13 +7,14 @@ through the AgentRegistry and CommandAgentAdapter.
 
 from __future__ import annotations
 
+from collections.abc import Generator
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.agents.base import AgentResult, AutonomyMode, CaseContext, Checkpoint
+from src.agents.base import AutonomyMode, CaseContext
 from src.agents.command_adapter import CommandAgentAdapter
 from src.agents.orchestrator import (
     AgentOrchestrator,
@@ -86,18 +87,25 @@ def python_descriptor() -> AgentDescriptor:
 
 
 @pytest.fixture
-def mock_registry(command_descriptor: AgentDescriptor, python_descriptor: AgentDescriptor):
+def mock_registry(
+    command_descriptor: AgentDescriptor, python_descriptor: AgentDescriptor
+) -> Generator[None, None, None]:
     """Create a mock registry with test agents."""
-    with patch("src.agents.orchestrator.AgentOrchestrator.registry", new_callable=lambda: property(
-        lambda self: MagicMock(
-            list_agents=MagicMock(return_value=[python_descriptor, command_descriptor]),
-            get_agent=MagicMock(side_effect=lambda x: {
-                "researcher": python_descriptor,
-                "compliance": command_descriptor,
-            }.get(x)),
-            __len__=MagicMock(return_value=2),
-        )
-    )):
+    with patch(
+        "src.agents.orchestrator.AgentOrchestrator.registry",
+        new_callable=lambda: property(
+            lambda self: MagicMock(
+                list_agents=MagicMock(return_value=[python_descriptor, command_descriptor]),
+                get_agent=MagicMock(
+                    side_effect=lambda x: {
+                        "researcher": python_descriptor,
+                        "compliance": command_descriptor,
+                    }.get(x)
+                ),
+                __len__=MagicMock(return_value=2),
+            )
+        ),
+    ):
         yield
 
 
@@ -190,8 +198,7 @@ class TestRegistryIntegration:
 
         # Get any available command agent
         command_agents = [
-            a for a in orchestrator.AGENT_TYPES
-            if a not in ["researcher", "strategist", "drafter"]
+            a for a in orchestrator.AGENT_TYPES if a not in ["researcher", "strategist", "drafter"]
         ]
 
         if command_agents:
@@ -245,8 +252,7 @@ class TestAgentCreation:
 
         # Get any available command agent
         command_agents = [
-            a for a in orchestrator.AGENT_TYPES
-            if a not in ["researcher", "strategist", "drafter"]
+            a for a in orchestrator.AGENT_TYPES if a not in ["researcher", "strategist", "drafter"]
         ]
 
         if command_agents:
@@ -328,8 +334,7 @@ class TestCommandAgentCreation:
 
         # Get any available command agent
         command_agents = [
-            a for a in orchestrator.AGENT_TYPES
-            if a not in ["researcher", "strategist", "drafter"]
+            a for a in orchestrator.AGENT_TYPES if a not in ["researcher", "strategist", "drafter"]
         ]
 
         if command_agents:
@@ -551,7 +556,7 @@ class TestInputResolution:
         mock_result = MagicMock()
         mock_result.deliverable = {"findings": ["finding1", "finding2"]}
 
-        step_results = {"research_output": mock_result}
+        step_results: dict[str, Any] = {"research_output": mock_result}
         mapping = {"research": "research_output.findings"}
 
         resolved = orchestrator._resolve_input_mapping(mapping, step_results)
@@ -562,7 +567,7 @@ class TestInputResolution:
         """Test resolving mapping with missing step."""
         orchestrator = AgentOrchestrator()
 
-        step_results = {}
+        step_results: dict[str, Any] = {}
         mapping = {"research": "nonexistent.findings"}
 
         resolved = orchestrator._resolve_input_mapping(mapping, step_results)
@@ -617,8 +622,7 @@ class TestCommandAgentIntegration:
 
         # Get available command agents
         command_agents = [
-            a for a in orchestrator.AGENT_TYPES
-            if a not in ["researcher", "strategist", "drafter"]
+            a for a in orchestrator.AGENT_TYPES if a not in ["researcher", "strategist", "drafter"]
         ]
 
         if command_agents:
@@ -642,9 +646,7 @@ class TestCommandAgentIntegration:
             assert steps[0].agent_type == "researcher"
             assert steps[1].agent_type == command_agents[0]
 
-    def test_command_agent_preserves_context(
-        self, sample_case_context: CaseContext
-    ) -> None:
+    def test_command_agent_preserves_context(self, sample_case_context: CaseContext) -> None:
         """Test that command agents receive case context."""
         orchestrator = AgentOrchestrator(
             autonomy_mode=AutonomyMode.AUTONOMOUS,
@@ -653,8 +655,7 @@ class TestCommandAgentIntegration:
 
         # Get any available command agent
         command_agents = [
-            a for a in orchestrator.AGENT_TYPES
-            if a not in ["researcher", "strategist", "drafter"]
+            a for a in orchestrator.AGENT_TYPES if a not in ["researcher", "strategist", "drafter"]
         ]
 
         if command_agents:

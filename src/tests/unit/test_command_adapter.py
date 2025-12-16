@@ -22,7 +22,6 @@ from src.agents.command_adapter import (
 )
 from src.agents.registry import AgentCategory, AgentDescriptor
 
-
 # =============================================================================
 # Test Fixtures
 # =============================================================================
@@ -283,9 +282,7 @@ class TestCommandParser:
         assert result.workflow_steps[2]["name"] == "ANALYZE"
         assert result.workflow_steps[3]["name"] == "REPORT"
 
-    def test_parse_content_extracts_workflow_substeps(
-        self, sample_command_content: str
-    ) -> None:
+    def test_parse_content_extracts_workflow_substeps(self, sample_command_content: str) -> None:
         """Test that parser extracts workflow sub-steps."""
         result = CommandParser.parse_content(sample_command_content, "agent:test")
 
@@ -294,9 +291,7 @@ class TestCommandParser:
         assert len(discover_step.get("sub_steps", [])) == 3
         assert "Find test files" in discover_step["sub_steps"]
 
-    def test_parse_content_extracts_autonomy_modes(
-        self, sample_command_content: str
-    ) -> None:
+    def test_parse_content_extracts_autonomy_modes(self, sample_command_content: str) -> None:
         """Test that parser extracts autonomy modes."""
         result = CommandParser.parse_content(sample_command_content, "agent:test")
 
@@ -306,34 +301,26 @@ class TestCommandParser:
 
         assert result.autonomy_modes["cautious"]["behavior"] is not None
 
-    def test_parse_content_extracts_usage_examples(
-        self, sample_command_content: str
-    ) -> None:
+    def test_parse_content_extracts_usage_examples(self, sample_command_content: str) -> None:
         """Test that parser extracts usage examples."""
         result = CommandParser.parse_content(sample_command_content, "agent:test")
 
         assert len(result.usage_examples) >= 1
 
-    def test_parse_content_extracts_config_options(
-        self, sample_command_content: str
-    ) -> None:
+    def test_parse_content_extracts_config_options(self, sample_command_content: str) -> None:
         """Test that parser extracts configuration options."""
         result = CommandParser.parse_content(sample_command_content, "agent:test")
 
         assert "test_config" in result.config_options
 
-    def test_parse_content_extracts_integrations(
-        self, sample_command_content: str
-    ) -> None:
+    def test_parse_content_extracts_integrations(self, sample_command_content: str) -> None:
         """Test that parser extracts integrations."""
         result = CommandParser.parse_content(sample_command_content, "agent:test")
 
         assert "researcher" in result.integrations
         assert "drafter" in result.integrations
 
-    def test_parse_content_extracts_output_format(
-        self, sample_command_content: str
-    ) -> None:
+    def test_parse_content_extracts_output_format(self, sample_command_content: str) -> None:
         """Test that parser extracts output format template."""
         result = CommandParser.parse_content(sample_command_content, "agent:test")
 
@@ -394,9 +381,7 @@ class TestParsedCommand:
 class TestExecutionBridge:
     """Tests for ExecutionBridge class."""
 
-    def test_execution_bridge_initialization(
-        self, sample_command_content: str
-    ) -> None:
+    def test_execution_bridge_initialization(self, sample_command_content: str) -> None:
         """Test ExecutionBridge initialization."""
         parsed = CommandParser.parse_content(sample_command_content, "agent:test")
         bridge = ExecutionBridge(parsed)
@@ -404,9 +389,7 @@ class TestExecutionBridge:
         assert bridge.command == parsed
 
     @pytest.mark.asyncio
-    async def test_execute_returns_success(
-        self, sample_command_content: str
-    ) -> None:
+    async def test_execute_returns_success(self, sample_command_content: str) -> None:
         """Test successful execution."""
         parsed = CommandParser.parse_content(sample_command_content, "agent:test")
         bridge = ExecutionBridge(parsed)
@@ -422,9 +405,7 @@ class TestExecutionBridge:
         assert result["steps_completed"] == 4  # 4 workflow steps
 
     @pytest.mark.asyncio
-    async def test_execute_includes_execution_time(
-        self, sample_command_content: str
-    ) -> None:
+    async def test_execute_includes_execution_time(self, sample_command_content: str) -> None:
         """Test that execution time is recorded."""
         parsed = CommandParser.parse_content(sample_command_content, "agent:test")
         bridge = ExecutionBridge(parsed)
@@ -514,9 +495,7 @@ class TestCommandAgentAdapter:
     ) -> None:
         """Test agent_id property."""
         parsed = CommandParser.parse_content(sample_command_content, "agent:test")
-        adapter = CommandAgentAdapter(
-            descriptor=sample_descriptor, parsed_command=parsed
-        )
+        adapter = CommandAgentAdapter(descriptor=sample_descriptor, parsed_command=parsed)
 
         assert adapter.agent_id == "agent_test"
 
@@ -525,15 +504,11 @@ class TestCommandAgentAdapter:
     ) -> None:
         """Test agent_version property."""
         parsed = CommandParser.parse_content(sample_command_content, "agent:test")
-        adapter = CommandAgentAdapter(
-            descriptor=sample_descriptor, parsed_command=parsed
-        )
+        adapter = CommandAgentAdapter(descriptor=sample_descriptor, parsed_command=parsed)
 
         assert adapter.agent_version == "1.0.0"
 
-    def test_adapter_descriptor_property(
-        self, sample_descriptor: AgentDescriptor
-    ) -> None:
+    def test_adapter_descriptor_property(self, sample_descriptor: AgentDescriptor) -> None:
         """Test descriptor property."""
         adapter = CommandAgentAdapter(descriptor=sample_descriptor)
 
@@ -544,9 +519,7 @@ class TestCommandAgentAdapter:
     ) -> None:
         """Test parsed_command property."""
         parsed = CommandParser.parse_content(sample_command_content, "agent:test")
-        adapter = CommandAgentAdapter(
-            descriptor=sample_descriptor, parsed_command=parsed
-        )
+        adapter = CommandAgentAdapter(descriptor=sample_descriptor, parsed_command=parsed)
 
         assert adapter.parsed_command == parsed
 
@@ -555,9 +528,7 @@ class TestCommandAgentAdapter:
     ) -> None:
         """Test workflow_steps property."""
         parsed = CommandParser.parse_content(sample_command_content, "agent:test")
-        adapter = CommandAgentAdapter(
-            descriptor=sample_descriptor, parsed_command=parsed
-        )
+        adapter = CommandAgentAdapter(descriptor=sample_descriptor, parsed_command=parsed)
 
         assert len(adapter.workflow_steps) == 4
 
@@ -566,9 +537,7 @@ class TestCommandAgentAdapter:
     ) -> None:
         """Test supported_autonomy_modes property."""
         parsed = CommandParser.parse_content(sample_command_content, "agent:test")
-        adapter = CommandAgentAdapter(
-            descriptor=sample_descriptor, parsed_command=parsed
-        )
+        adapter = CommandAgentAdapter(descriptor=sample_descriptor, parsed_command=parsed)
 
         modes = adapter.supported_autonomy_modes
         assert AutonomyMode.CAUTIOUS in modes
@@ -581,9 +550,7 @@ class TestCommandAgentAdapter:
     ) -> None:
         """Test successful execution through adapter."""
         parsed = CommandParser.parse_content(sample_command_content, "agent:test")
-        adapter = CommandAgentAdapter(
-            descriptor=sample_descriptor, parsed_command=parsed
-        )
+        adapter = CommandAgentAdapter(descriptor=sample_descriptor, parsed_command=parsed)
 
         result = await adapter.execute("Run all tests")
 
@@ -597,9 +564,7 @@ class TestCommandAgentAdapter:
     ) -> None:
         """Test that execution creates audit log."""
         parsed = CommandParser.parse_content(sample_command_content, "agent:test")
-        adapter = CommandAgentAdapter(
-            descriptor=sample_descriptor, parsed_command=parsed
-        )
+        adapter = CommandAgentAdapter(descriptor=sample_descriptor, parsed_command=parsed)
 
         result = await adapter.execute("Run tests")
 
@@ -632,9 +597,7 @@ class TestCommandAgentAdapter:
     ) -> None:
         """Test that execution time is recorded."""
         parsed = CommandParser.parse_content(sample_command_content, "agent:test")
-        adapter = CommandAgentAdapter(
-            descriptor=sample_descriptor, parsed_command=parsed
-        )
+        adapter = CommandAgentAdapter(descriptor=sample_descriptor, parsed_command=parsed)
 
         result = await adapter.execute("Run tests")
 
@@ -646,9 +609,7 @@ class TestCommandAgentAdapter:
     ) -> None:
         """Test task validation."""
         parsed = CommandParser.parse_content(sample_command_content, "agent:test")
-        adapter = CommandAgentAdapter(
-            descriptor=sample_descriptor, parsed_command=parsed
-        )
+        adapter = CommandAgentAdapter(descriptor=sample_descriptor, parsed_command=parsed)
 
         is_valid, reason = await adapter.validate_task("Run validation tests")
 
@@ -660,9 +621,7 @@ class TestCommandAgentAdapter:
     ) -> None:
         """Test get_capabilities method."""
         parsed = CommandParser.parse_content(sample_command_content, "agent:test")
-        adapter = CommandAgentAdapter(
-            descriptor=sample_descriptor, parsed_command=parsed
-        )
+        adapter = CommandAgentAdapter(descriptor=sample_descriptor, parsed_command=parsed)
 
         capabilities = adapter.get_capabilities()
 
@@ -675,9 +634,7 @@ class TestCommandAgentAdapter:
     ) -> None:
         """Test get_integration_points method."""
         parsed = CommandParser.parse_content(sample_command_content, "agent:test")
-        adapter = CommandAgentAdapter(
-            descriptor=sample_descriptor, parsed_command=parsed
-        )
+        adapter = CommandAgentAdapter(descriptor=sample_descriptor, parsed_command=parsed)
 
         integrations = adapter.get_integration_points()
 
@@ -698,9 +655,7 @@ class TestCommandAgentAdapterFactories:
         assert adapter.agent_id == "agent_test"
         assert adapter.autonomy_mode == AutonomyMode.CAUTIOUS
 
-    def test_from_command_file(
-        self, temp_commands_dir: tempfile.TemporaryDirectory
-    ) -> None:
+    def test_from_command_file(self, temp_commands_dir: tempfile.TemporaryDirectory) -> None:
         """Test from_command_file factory method."""
         file_path = Path(temp_commands_dir.name) / "agent:test.md"
         adapter = CommandAgentAdapter.from_command_file(file_path)
@@ -737,9 +692,7 @@ class TestCommandAgentAdapterFactories:
 class TestFactoryFunctions:
     """Tests for module-level factory functions."""
 
-    def test_create_command_adapter(
-        self, temp_commands_dir: tempfile.TemporaryDirectory
-    ) -> None:
+    def test_create_command_adapter(self, temp_commands_dir: tempfile.TemporaryDirectory) -> None:
         """Test create_command_adapter function."""
         adapter = create_command_adapter(
             name="test",
@@ -830,9 +783,7 @@ class TestCommandAdapterIntegration:
     ) -> None:
         """Test that adapter creates checkpoints during execution."""
         parsed = CommandParser.parse_content(sample_command_content, "agent:test")
-        adapter = CommandAgentAdapter(
-            descriptor=sample_descriptor, parsed_command=parsed
-        )
+        adapter = CommandAgentAdapter(descriptor=sample_descriptor, parsed_command=parsed)
 
         result = await adapter.execute("Run tests")
 
@@ -847,12 +798,11 @@ class TestCommandAdapterIntegration:
         file_path = Path(temp_commands_dir.name) / "agent:test.md"
 
         for mode in [AutonomyMode.CAUTIOUS, AutonomyMode.BALANCED, AutonomyMode.AUTONOMOUS]:
-            adapter = CommandAgentAdapter.from_command_file(
-                file_path, autonomy_mode=mode
-            )
+            adapter = CommandAgentAdapter.from_command_file(file_path, autonomy_mode=mode)
             result = await adapter.execute("Run tests")
 
             assert result.success is True
+            assert result.deliverable is not None
             assert result.deliverable["autonomy_mode"] == mode.value
 
     @pytest.mark.asyncio
@@ -867,4 +817,5 @@ class TestCommandAdapterIntegration:
 
         assert result.success is False
         assert result.outcome == AgentOutcome.FAILED
+        assert result.error_message is not None
         assert "execution bridge" in result.error_message.lower()

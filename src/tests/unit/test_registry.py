@@ -6,9 +6,6 @@ Tests the AgentRegistry, AgentDescriptor, and related classes from src/agents/re
 
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from unittest.mock import patch
-
-import pytest
 
 from src.agents.registry import (
     AgentCapability,
@@ -20,7 +17,6 @@ from src.agents.registry import (
     get_registry,
     refresh_registry,
 )
-
 
 # =============================================================================
 # AgentCategory Tests
@@ -48,7 +44,15 @@ class TestAgentCategory:
 
     def test_all_categories_exist(self) -> None:
         """Test that all expected categories exist."""
-        expected = {"research", "strategy", "drafting", "analysis", "compliance", "specialized", "utility"}
+        expected = {
+            "research",
+            "strategy",
+            "drafting",
+            "analysis",
+            "compliance",
+            "specialized",
+            "utility",
+        }
         actual = {c.value for c in AgentCategory}
         assert actual == expected
 
@@ -369,7 +373,8 @@ class TestAgentRegistryDiscovery:
         with TemporaryDirectory() as tmpdir:
             # Create a mock command file
             cmd_file = Path(tmpdir) / "agent:test.md"
-            cmd_file.write_text("""# /agent:test - Test Agent
+            cmd_file.write_text(
+                """# /agent:test - Test Agent
 
 **Version**: 1.0.0
 **Domain**: Testing
@@ -378,7 +383,8 @@ A test agent for unit testing.
 
 ## What This Agent Does
 - **testing**: Runs tests
-""")
+"""
+            )
 
             registry = AgentRegistry(commands_dir=tmpdir)
 
@@ -560,7 +566,8 @@ class TestCommandFileParsing:
         """Test parsing a well-formed command file."""
         with TemporaryDirectory() as tmpdir:
             cmd_file = Path(tmpdir) / "agent:complete.md"
-            cmd_file.write_text("""# /agent:complete - Complete Test Agent
+            cmd_file.write_text(
+                """# /agent:complete - Complete Test Agent
 
 **Version**: 2.5.0
 **Domain**: Complete Testing
@@ -571,7 +578,8 @@ This is a comprehensive test agent.
 ## What This Agent Does
 - **analysis**: Analyzes data thoroughly
 - **reporting**: Generates detailed reports
-""")
+"""
+            )
 
             registry = AgentRegistry(commands_dir=tmpdir)
             agent = registry.get_agent("complete")
@@ -587,10 +595,12 @@ This is a comprehensive test agent.
         """Test parsing a minimal command file."""
         with TemporaryDirectory() as tmpdir:
             cmd_file = Path(tmpdir) / "agent:minimal.md"
-            cmd_file.write_text("""# Minimal Agent
+            cmd_file.write_text(
+                """# Minimal Agent
 
 A minimal agent without standard formatting.
-""")
+"""
+            )
 
             registry = AgentRegistry(commands_dir=tmpdir)
             agent = registry.get_agent("minimal")
@@ -634,7 +644,7 @@ class TestGlobalRegistry:
 
     def test_refresh_registry(self) -> None:
         """Test that refresh_registry creates new instance."""
-        old_registry = get_registry()
+        _old_registry = get_registry()
         new_registry = refresh_registry()
 
         # After refresh, get_registry should return the new instance

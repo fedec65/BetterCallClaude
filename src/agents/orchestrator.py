@@ -43,7 +43,6 @@ from .models.shared import (
 )
 
 if TYPE_CHECKING:
-    from .command_adapter import CommandAgentAdapter
     from .registry import AgentRegistry
 
 logger = logging.getLogger(__name__)

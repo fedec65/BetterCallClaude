@@ -10,10 +10,9 @@ Tests the complete workflow from:
 These tests verify that all components work together correctly.
 """
 
-import asyncio
 from datetime import datetime
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
@@ -24,24 +23,18 @@ from src.agents.base import (
     AutonomyMode,
     CaseContext,
 )
-from src.agents.command_adapter import CommandAgentAdapter
 from src.agents.models.shared import Jurisdiction, Language
-from src.agents.orchestrator import AgentOrchestrator, PipelineConfig, PipelineStatus
+from src.agents.orchestrator import AgentOrchestrator
 from src.agents.pipeline_builder import (
-    ConditionalStep,
-    ParallelGroup,
     Pipeline,
     PipelineBuilder,
     PipelineExecutionResult,
     PipelineExecutor,
     PipelineStep,
-    RouterStep,
-    StepType,
     create_full_case_pipeline,
     create_research_pipeline,
 )
-from src.agents.registry import AgentCategory, AgentDescriptor, AgentRegistry
-
+from src.agents.registry import AgentRegistry
 
 # =============================================================================
 # Fixtures
@@ -63,7 +56,8 @@ def temp_commands_dir(tmp_path: Path) -> Path:
 
     for filename, description in test_agents:
         agent_file = commands_dir / filename
-        agent_file.write_text(f"""# {filename.replace('.md', '')}
+        agent_file.write_text(
+            f"""# {filename.replace('.md', '')}
 
 {description}
 
@@ -77,7 +71,8 @@ def temp_commands_dir(tmp_path: Path) -> Path:
 
 ## Output
 Returns processed results.
-""")
+"""
+        )
 
     return tmp_path
 
@@ -142,7 +137,9 @@ def mock_agent_result(mock_audit_log: AgentAuditLog) -> AgentResult:
 
 
 @pytest.fixture
-def mock_orchestrator(sample_case_context: CaseContext, mock_agent_result: AgentResult):
+def mock_orchestrator(
+    sample_case_context: CaseContext, mock_agent_result: AgentResult[dict]
+) -> MagicMock:
     """Create a mock orchestrator for pipeline execution tests."""
     orchestrator = MagicMock(spec=AgentOrchestrator)
     orchestrator.execute_step = AsyncMock(return_value=mock_agent_result)
@@ -157,19 +154,19 @@ def mock_orchestrator(sample_case_context: CaseContext, mock_agent_result: Agent
 class TestRegistryDiscovery:
     """Test agent registry discovery functionality."""
 
-    def test_discovers_command_agents(self, registry_with_agents: AgentRegistry):
+    def test_discovers_command_agents(self, registry_with_agents: AgentRegistry) -> None:
         """Test that registry discovers command agents from files."""
         agents = registry_with_agents.list_agents()
         # Should find the test agents we created
         assert len(agents) >= 0  # May find 0 if discovery has issues with test dir
 
-    def test_registry_initialization(self, temp_commands_dir: Path):
+    def test_registry_initialization(self, temp_commands_dir: Path) -> None:
         """Test that registry initializes correctly."""
         commands_dir = temp_commands_dir / ".claude" / "commands"
         registry = AgentRegistry(commands_dir=str(commands_dir), auto_discover=False)
         assert registry is not None
 
-    def test_get_nonexistent_agent_returns_none(self, registry_with_agents: AgentRegistry):
+    def test_get_nonexistent_agent_returns_none(self, registry_with_agents: AgentRegistry) -> None:
         """Test that getting a non-existent agent returns None."""
         agent = registry_with_agents.get_agent("definitely_does_not_exist_xyz")
         assert agent is None
@@ -178,7 +175,7 @@ class TestRegistryDiscovery:
 class TestPipelineBuilderE2E:
     """Test PipelineBuilder end-to-end functionality."""
 
-    def test_build_simple_pipeline(self):
+    def test_build_simple_pipeline(self) -> None:
         """Test building a simple sequential pipeline."""
         pipeline = (
             PipelineBuilder("test_simple")
@@ -190,15 +187,17 @@ class TestPipelineBuilderE2E:
         assert pipeline.name == "test_simple"
         assert len(pipeline.steps) == 2
 
-    def test_build_pipeline_with_parallel_group(self):
+    def test_build_pipeline_with_parallel_group(self) -> None:
         """Test building a pipeline with parallel execution."""
         pipeline = (
             PipelineBuilder("test_parallel")
             .add_step("researcher", "Initial research", output_key="research")
-            .add_parallel_group([
-                PipelineStep("validator1", "Validate citations", output_key="valid1"),
-                PipelineStep("validator2", "Validate references", output_key="valid2"),
-            ])
+            .add_parallel_group(
+                [
+                    PipelineStep("validator1", "Validate citations", output_key="valid1"),
+                    PipelineStep("validator2", "Validate references", output_key="valid2"),
+                ]
+            )
             .add_step("drafter", "Final draft", output_key="draft")
             .build()
         )
@@ -207,7 +206,7 @@ class TestPipelineBuilderE2E:
         # Should have 3 steps: initial, parallel group, final
         assert len(pipeline.steps) == 3
 
-    def test_build_pipeline_with_conditional(self):
+    def test_build_pipeline_with_conditional(self) -> None:
         """Test building a pipeline with conditional steps."""
         pipeline = (
             PipelineBuilder("test_conditional")
@@ -216,7 +215,7 @@ class TestPipelineBuilderE2E:
                 condition=lambda ctx: ctx.get("confidence", 0) > 0.7,
                 step=PipelineStep("fast_path", "Quick analysis"),
                 else_step=PipelineStep("slow_path", "Detailed analysis"),
-                condition_name="confidence_check"
+                condition_name="confidence_check",
             )
             .build()
         )
@@ -224,7 +223,7 @@ class TestPipelineBuilderE2E:
         assert pipeline.name == "test_conditional"
         assert len(pipeline.steps) == 2
 
-    def test_build_pipeline_with_router(self):
+    def test_build_pipeline_with_router(self) -> None:
         """Test building a pipeline with dynamic routing."""
         pipeline = (
             PipelineBuilder("test_router")
@@ -236,7 +235,7 @@ class TestPipelineBuilderE2E:
                     "contract": PipelineStep("contract_handler", "Handle contract"),
                     "litigation": PipelineStep("litigation_handler", "Handle litigation"),
                 },
-                default_route="contract"
+                default_route="contract",
             )
             .build()
         )
@@ -244,7 +243,7 @@ class TestPipelineBuilderE2E:
         assert pipeline.name == "test_router"
         assert len(pipeline.steps) == 2
 
-    def test_build_pipeline_with_all_features(self, sample_case_context: CaseContext):
+    def test_build_pipeline_with_all_features(self, sample_case_context: CaseContext) -> None:
         """Test building a complex pipeline with all features."""
         pipeline = (
             PipelineBuilder("comprehensive_test")
@@ -252,10 +251,12 @@ class TestPipelineBuilderE2E:
             .add_step("researcher", "Initial research", output_key="research")
             .with_timeout(60)
             # Parallel group
-            .add_parallel_group([
-                PipelineStep("validator", "Validate", output_key="valid"),
-                PipelineStep("analyzer", "Analyze", output_key="analysis"),
-            ])
+            .add_parallel_group(
+                [
+                    PipelineStep("validator", "Validate", output_key="valid"),
+                    PipelineStep("analyzer", "Analyze", output_key="analysis"),
+                ]
+            )
             # Conditional step
             .add_conditional_step(
                 condition=lambda ctx: True,
@@ -269,7 +270,7 @@ class TestPipelineBuilderE2E:
                 routes={
                     "default": PipelineStep("final", "Final step"),
                 },
-                default_route="default"
+                default_route="default",
             )
             .build()
         )
@@ -286,9 +287,9 @@ class TestPipelineExecutorE2E:
     async def test_execute_simple_pipeline(
         self,
         mock_orchestrator: MagicMock,
-        mock_agent_result: AgentResult,
+        mock_agent_result: AgentResult[dict],
         sample_case_context: CaseContext,
-    ):
+    ) -> None:
         """Test executing a simple pipeline."""
         pipeline = (
             PipelineBuilder("simple_exec")
@@ -309,15 +310,17 @@ class TestPipelineExecutorE2E:
     async def test_execute_parallel_pipeline(
         self,
         mock_orchestrator: MagicMock,
-        mock_agent_result: AgentResult,
-    ):
+        mock_agent_result: AgentResult[dict],
+    ) -> None:
         """Test executing a pipeline with parallel steps."""
         pipeline = (
             PipelineBuilder("parallel_exec")
-            .add_parallel_group([
-                PipelineStep("task1", "Task 1", output_key="t1"),
-                PipelineStep("task2", "Task 2", output_key="t2"),
-            ])
+            .add_parallel_group(
+                [
+                    PipelineStep("task1", "Task 1", output_key="t1"),
+                    PipelineStep("task2", "Task 2", output_key="t2"),
+                ]
+            )
             .build()
         )
 
@@ -332,8 +335,8 @@ class TestPipelineExecutorE2E:
     async def test_execute_conditional_true_branch(
         self,
         mock_orchestrator: MagicMock,
-        mock_agent_result: AgentResult,
-    ):
+        mock_agent_result: AgentResult[dict],
+    ) -> None:
         """Test executing conditional step that takes true branch."""
         pipeline = (
             PipelineBuilder("conditional_exec")
@@ -354,8 +357,8 @@ class TestPipelineExecutorE2E:
     async def test_execute_router_with_routes(
         self,
         mock_orchestrator: MagicMock,
-        mock_agent_result: AgentResult,
-    ):
+        mock_agent_result: AgentResult[dict],
+    ) -> None:
         """Test executing router step."""
         pipeline = (
             PipelineBuilder("router_exec")
@@ -366,7 +369,7 @@ class TestPipelineExecutorE2E:
                     "a": PipelineStep("route_a", "Route A"),
                     "b": PipelineStep("route_b", "Route B"),
                 },
-                default_route="a"
+                default_route="a",
             )
             .build()
         )
@@ -380,7 +383,7 @@ class TestPipelineExecutorE2E:
 class TestConvenienceFunctions:
     """Test convenience functions for creating common pipelines."""
 
-    def test_create_research_pipeline(self):
+    def test_create_research_pipeline(self) -> None:
         """Test creating a research pipeline."""
         pipeline = create_research_pipeline(
             query="Test research query",
@@ -391,7 +394,7 @@ class TestConvenienceFunctions:
         assert isinstance(pipeline, Pipeline)
         assert len(pipeline.steps) > 0
 
-    def test_create_full_case_pipeline(self):
+    def test_create_full_case_pipeline(self) -> None:
         """Test creating a full case pipeline."""
         pipeline = create_full_case_pipeline(
             query="Test case query",
@@ -411,8 +414,8 @@ class TestIntegrationScenarios:
     async def test_legal_research_workflow(
         self,
         mock_orchestrator: MagicMock,
-        mock_agent_result: AgentResult,
-    ):
+        mock_agent_result: AgentResult[dict],
+    ) -> None:
         """Test a typical legal research workflow."""
         # Build the workflow
         pipeline = (
@@ -443,16 +446,20 @@ class TestIntegrationScenarios:
     async def test_document_review_workflow(
         self,
         mock_orchestrator: MagicMock,
-        mock_agent_result: AgentResult,
-    ):
+        mock_agent_result: AgentResult[dict],
+    ) -> None:
         """Test a document review workflow with parallel validation."""
         pipeline = (
             PipelineBuilder("document_review")
             .add_step("analyzer", "Initial document analysis", output_key="analysis")
-            .add_parallel_group([
-                PipelineStep("citation_validator", "Validate citations", output_key="citations"),
-                PipelineStep("risk_assessor", "Assess risks", output_key="risks"),
-            ])
+            .add_parallel_group(
+                [
+                    PipelineStep(
+                        "citation_validator", "Validate citations", output_key="citations"
+                    ),
+                    PipelineStep("risk_assessor", "Assess risks", output_key="risks"),
+                ]
+            )
             .add_step("reviewer", "Final review", output_key="review")
             .build()
         )
@@ -468,17 +475,19 @@ class TestIntegrationScenarios:
     async def test_batch_processing_workflow(
         self,
         mock_orchestrator: MagicMock,
-        mock_agent_result: AgentResult,
-    ):
+        mock_agent_result: AgentResult[dict],
+    ) -> None:
         """Test batch processing with multiple items."""
         # Create pipeline for batch processing
         pipeline = (
             PipelineBuilder("batch_process")
-            .add_parallel_group([
-                PipelineStep("processor1", "Process batch 1", output_key="batch1"),
-                PipelineStep("processor2", "Process batch 2", output_key="batch2"),
-                PipelineStep("processor3", "Process batch 3", output_key="batch3"),
-            ])
+            .add_parallel_group(
+                [
+                    PipelineStep("processor1", "Process batch 1", output_key="batch1"),
+                    PipelineStep("processor2", "Process batch 2", output_key="batch2"),
+                    PipelineStep("processor3", "Process batch 3", output_key="batch3"),
+                ]
+            )
             .add_step("aggregator", "Aggregate results", output_key="final")
             .build()
         )
@@ -497,10 +506,10 @@ class TestErrorHandling:
         self,
         sample_case_context: CaseContext,
         mock_audit_log: AgentAuditLog,
-    ):
+    ) -> None:
         """Test that pipeline handles step failures gracefully."""
         # Create orchestrator that fails
-        failed_result = AgentResult(
+        failed_result: AgentResult[None] = AgentResult(
             success=False,
             outcome=AgentOutcome.FAILED,
             deliverable=None,
@@ -531,8 +540,8 @@ class TestErrorHandling:
     async def test_router_handles_missing_route(
         self,
         mock_orchestrator: MagicMock,
-        mock_agent_result: AgentResult,
-    ):
+        mock_agent_result: AgentResult[dict],
+    ) -> None:
         """Test that router handles missing routes with default."""
         pipeline = (
             PipelineBuilder("router_missing")
@@ -542,7 +551,7 @@ class TestErrorHandling:
                 routes={
                     "valid": PipelineStep("valid_route", "Valid route"),
                 },
-                default_route="valid"  # Should fall back to this
+                default_route="valid",  # Should fall back to this
             )
             .build()
         )

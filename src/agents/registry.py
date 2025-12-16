@@ -14,12 +14,11 @@ Architecture:
 import importlib
 import logging
 import re
+from collections.abc import Iterator
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
 from typing import Any, Literal
-
-import yaml
 
 logger = logging.getLogger(__name__)
 
@@ -306,17 +305,25 @@ class AgentRegistry:
 
         for agent_id, config in self.PYTHON_AGENTS.items():
             try:
+                name: str = str(config.get("class", agent_id.title()))
+                module_path: str = str(config["module"])
+                class_name: str = str(config["class"])
+                description: str = str(config["description"])
+                category: AgentCategory = config["category"]  # type: ignore[assignment]
+                capabilities: list[AgentCapability] = config.get("capabilities", [])  # type: ignore[assignment]
+                tags: list[str] = config.get("tags", [])  # type: ignore[assignment]
+
                 descriptor = AgentDescriptor(
                     agent_id=agent_id,
-                    name=config.get("class", agent_id.title()),
-                    version=self._get_python_agent_version(config["module"], config["class"]),
-                    description=config["description"],
+                    name=name,
+                    version=self._get_python_agent_version(module_path, class_name),
+                    description=description,
                     agent_type="python",
-                    category=config["category"],
-                    capabilities=config.get("capabilities", []),
-                    tags=config.get("tags", []),
-                    module_path=config["module"],
-                    class_name=config["class"],
+                    category=category,
+                    capabilities=capabilities,
+                    tags=tags,
+                    module_path=module_path,
+                    class_name=class_name,
                     supports_parallel=True,
                     supports_checkpoints=True,
                     supports_sub_agents=True,
@@ -339,7 +346,7 @@ class AgentRegistry:
             agent_class = getattr(module, class_name)
             # Try to get version from class attribute or instance
             if hasattr(agent_class, "VERSION"):
-                return agent_class.VERSION
+                return str(agent_class.VERSION)
             # Create temporary instance to get version property
             # This is a bit hacky but works for our agents
             return "1.0.0"
@@ -534,7 +541,7 @@ class AgentRegistry:
         }
 
         content_lower = content.lower()
-        for tag_group, keywords in tag_patterns.items():
+        for _tag_group, keywords in tag_patterns.items():
             if any(kw in content_lower for kw in keywords):
                 tags.extend(keywords[:2])
 
@@ -626,9 +633,7 @@ class AgentRegistry:
         """
         return [a for a in self._agents.values() if tag.lower() in [t.lower() for t in a.tags]]
 
-    def get_agents_by_type(
-        self, agent_type: Literal["python", "command"]
-    ) -> list[AgentDescriptor]:
+    def get_agents_by_type(self, agent_type: Literal["python", "command"]) -> list[AgentDescriptor]:
         """
         Get agents by implementation type.
 
@@ -705,7 +710,7 @@ class AgentRegistry:
         """Check if agent is registered."""
         return agent_id in self._agents
 
-    def __iter__(self):
+    def __iter__(self) -> "Iterator[AgentDescriptor]":
         """Iterate over agent descriptors."""
         return iter(self._agents.values())
 
