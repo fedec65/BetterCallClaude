@@ -16,7 +16,7 @@
 **Works with both Claude Code CLI and Claude Desktop.**
 
 ```bash
-curl -fsSL [https://raw.githubusercontent.com/fedec65/BetterCallClaude/main/install.sh](https://raw.githubusercontent.com/fedec65/BetterCallClaude/main/install.sh) | bash
+curl -fsSL https://raw.githubusercontent.com/fedec65/BetterCallClaude/main/install.sh | bash
 ````
 
 The installer automatically detects your environment, configures MCP servers, creates symlinks, and backs up existing settings.
