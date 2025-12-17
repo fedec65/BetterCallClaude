@@ -1,7 +1,7 @@
 # BetterCallClaude: Legal Intelligence Framework for Swiss Lawyers
 
 [![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/fedec65/bettercallclaude)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![Languages](https://img.shields.io/badge/languages-DE%20%7C%20FR%20%7C%20IT%20%7C%20EN-orange.svg)]()
 [![Claude Code](https://img.shields.io/badge/built%20with-Claude%20Code-purple.svg)](https://claude.ai/code)
 [![Claude Desktop](https://img.shields.io/badge/works%20with-Claude%20Desktop-blueviolet.svg)](https://claude.ai/download)
@@ -316,6 +316,6 @@ All outputs require professional review. Lawyers maintain full professional resp
 
 ## License
 
-This project is licensed under the **MIT License**.
+This project is licensed under the **AGPL-3.0**.
 
 Built with ❤️ for the Swiss legal community.
