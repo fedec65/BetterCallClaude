@@ -22,7 +22,7 @@ export function buildSearchQuery(
   const {
     language,
     actType,
-    status: _status, // Reserved for future enforcement status filter
+    // status filter not yet implemented - Fedlex uses jolux:inForce vocabulary
     srNumberPrefix,
     limit = 50,
     offset = 0,
