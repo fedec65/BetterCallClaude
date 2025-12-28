@@ -7,6 +7,129 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.0.1] - 2025-12-28
+
+### 🏛️ New MCP Server: Fedlex SPARQL
+
+This release introduces the `fedlex-sparql` MCP server for accessing Swiss Federal Legislation through the LINDAS (Linked Data Service) SPARQL endpoint.
+
+### Added
+
+#### Fedlex SPARQL MCP Server
+- **New MCP Server**: `fedlex-sparql` for Swiss Federal Law access via SPARQL
+- **LINDAS Integration**: Direct connection to `https://ld.admin.ch/query` endpoint
+- **ELI Ontology Support**: European Legislation Identifier standard compliance
+
+#### Five New Tools
+- **`lookup_statute`**: Find federal legislation by SR/RS number or abbreviation
+  - SR number lookup (e.g., "220" for OR/CO)
+  - Abbreviation lookup (e.g., "OR", "ZGB", "StGB")
+  - Multi-lingual support (DE/FR/IT/RM)
+
+- **`get_article`**: Retrieve specific articles from legislation
+  - Article text extraction
+  - Language-specific retrieval
+  - Article listing for a statute
+
+- **`search_legislation`**: Full-text search across federal law
+  - Title and content search
+  - Domain filtering (9 legal domains)
+  - Recently modified acts
+  - Pagination support
+
+- **`find_related`**: Discover legislative relationships
+  - Amending acts (eli:amends)
+  - Cited legislation (eli:cites)
+  - Same-domain legislation
+  - Comprehensive relationship mapping
+
+- **`get_metadata`**: Retrieve comprehensive legislation metadata
+  - Dates (entry in force, publication, modification)
+  - Document type and classification
+  - Available languages
+  - Legal status (in force, repealed)
+
+#### Query Infrastructure
+- **SPARQL Query Builders**: Type-safe query construction
+  - Prefix management (RDF, ELI, Fedlex namespaces)
+  - Injection-safe escaping
+  - Language filter construction
+  - Multi-lingual value extraction
+
+- **Legal Domain Classification**: All 9 SR classification domains
+  - 1: Staat - Volk - Behörden / État - Peuple - Autorités
+  - 2: Privatrecht - Zivilrechtspflege - Vollstreckung
+  - 3: Strafrecht - Strafrechtspflege - Strafvollzug
+  - 4: Schule - Wissenschaft - Kultur
+  - 5: Landesverteidigung
+  - 6: Finanzen
+  - 7: Öffentliche Werke - Energie - Verkehr
+  - 8: Gesundheit - Arbeit - Soziale Sicherheit
+  - 9: Wirtschaft - Technische Zusammenarbeit
+
+#### Test Suite
+- **Unit Tests**: Comprehensive coverage for SPARQL client and query builders
+  - `sparql-client.test.ts`: Escaping, language filters, HTTP execution
+  - `queries.test.ts`: All query builders, prefix handling, security tests
+- **Security Tests**: SPARQL injection prevention validation
+
+#### Type System
+- **Legislation Types**: Full TypeScript definitions
+  - `LegislationInfo`: Core statute information
+  - `ArticleInfo`: Article content and metadata
+  - `RelatedLegislation`: Relationship data
+  - `LegislationMetadata`: Comprehensive metadata
+  - `SearchResult` and `SearchFilters`: Search functionality
+  - `SparqlBindingValue` and `SparqlResponse`: SPARQL response handling
+
+### Technical Details
+
+#### SPARQL Endpoint
+- **URL**: `https://ld.admin.ch/query`
+- **Protocol**: HTTP POST with SPARQL query body
+- **Response**: `application/sparql-results+json`
+
+#### Namespaces Used
+```sparql
+PREFIX eli: <http://data.europa.eu/eli/ontology#>
+PREFIX jolux: <http://data.legilux.public.lu/resource/ontology/jolux#>
+PREFIX fedlex: <https://fedlex.data.admin.ch/vocabulary/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+```
+
+### Changed
+- **Version**: Updated to 2.0.1 across all configuration files
+- **Workspaces**: Added `fedlex-sparql` to npm workspaces in `mcp-servers/package.json`
+
+### Files Added
+```
+mcp-servers/fedlex-sparql/
+├── package.json
+├── tsconfig.json
+├── src/
+│   ├── index.ts              # MCP server entry point
+│   ├── sparql-client.ts      # LINDAS HTTP client
+│   ├── types/
+│   │   └── legislation.ts    # TypeScript interfaces
+│   └── queries/
+│       ├── index.ts          # Barrel exports
+│       ├── prefixes.ts       # SPARQL namespace prefixes
+│       ├── lookup.ts         # Statute lookup queries
+│       ├── articles.ts       # Article retrieval queries
+│       ├── search.ts         # Search queries
+│       ├── related.ts        # Relationship queries
+│       └── metadata.ts       # Metadata queries
+└── tests/
+    ├── sparql-client.test.ts # Client unit tests
+    └── queries.test.ts       # Query builder tests
+```
+
+### Backward Compatibility
+- **Fully Backward Compatible**: No breaking changes from v2.0.0
+- **Additive Only**: New MCP server extends existing capabilities
+
+---
+
 ## [2.0.0] - 2024-12-15
 
 ### 🚀 Major Release: PipelineBuilder API & Dynamic Agent Registry

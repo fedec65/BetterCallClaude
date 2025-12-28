@@ -1,13 +1,14 @@
 {
   "name": "bettercallclaude-mcp-servers",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "MCP servers for BetterCallClaude v2.0 - Swiss legal intelligence",
   "private": true,
   "workspaces": [
     "shared",
     "bge-search",
     "entscheidsuche",
-    "legal-citations"
+    "legal-citations",
+    "fedlex-sparql"
   ],
   "scripts": {
     "build": "npm run build --workspaces",
