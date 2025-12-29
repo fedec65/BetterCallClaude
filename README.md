@@ -21,6 +21,20 @@ curl -fsSL https://raw.githubusercontent.com/fedec65/BetterCallClaude/main/insta
 
 The installer automatically detects your environment, configures MCP servers, creates symlinks, and backs up existing settings.
 
+### Upgrading
+
+To upgrade to the latest version:
+
+```bash
+bettercallclaude update
+```
+
+This will pull the latest changes from GitHub and update your installation. You can check your current version with:
+
+```bash
+bettercallclaude version
+```
+
 -----
 
 ## 🎯 Overview
