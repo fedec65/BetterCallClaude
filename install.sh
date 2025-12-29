@@ -1099,6 +1099,14 @@ cmd_update() {
     else
         if git pull origin main; then
             echo -e "${GREEN}Updated successfully!${NC}"
+
+            # Update VERSION from the newly pulled version.txt
+            if [ -f "$INSTALL_DIR/version.txt" ]; then
+                VERSION=$(cat "$INSTALL_DIR/version.txt" | tr -d '[:space:]')
+            fi
+
+            # Regenerate manifest with new version
+            create_manifest
         else
             echo -e "${RED}Update failed!${NC}"
             echo -e "${YELLOW}This may be due to local changes. Try:${NC}"
