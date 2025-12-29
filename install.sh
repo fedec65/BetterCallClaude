@@ -1097,8 +1097,17 @@ cmd_update() {
     if [ "$current" = "$remote" ]; then
         echo -e "${GREEN}Already up to date!${NC}"
     else
-        git pull origin main
-        echo -e "${GREEN}Updated successfully!${NC}"
+        if git pull origin main; then
+            echo -e "${GREEN}Updated successfully!${NC}"
+        else
+            echo -e "${RED}Update failed!${NC}"
+            echo -e "${YELLOW}This may be due to local changes. Try:${NC}"
+            echo "  cd $INSTALL_DIR && git stash && bettercallclaude update"
+            echo ""
+            echo -e "${YELLOW}Or reset local changes:${NC}"
+            echo "  cd $INSTALL_DIR && git checkout -- . && bettercallclaude update"
+            return 1
+        fi
     fi
 
     cmd_version
