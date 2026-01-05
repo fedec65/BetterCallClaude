@@ -1,6 +1,6 @@
 # BetterCallClaude: Legal Intelligence Framework for Swiss Lawyers
 
-[![Version](https://img.shields.io/badge/version-2.0.1-blue.svg)](https://github.com/fedec65/bettercallclaude)
+[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](https://github.com/fedec65/bettercallclaude)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![Languages](https://img.shields.io/badge/languages-DE%20%7C%20FR%20%7C%20IT%20%7C%20EN-orange.svg)]()
 [![Claude Code](https://img.shields.io/badge/built%20with-Claude%20Code-purple.svg)](https://claude.ai/code)
@@ -46,6 +46,12 @@ BetterCallClaude is a comprehensive legal intelligence framework designed to pro
   * **Multi-jurisdictional expertise** across Federal law and all 26 Swiss cantons.
   * **Multi-lingual precision** in German, French, Italian, and English.
   * **Privacy-First Architecture** with local LLM support for attorney-client privilege (*Anwaltsgeheimnis*).
+
+### What's New in v2.1.0
+
+  * 🆕 **Multi-Agent Communication System**: MessageBus pattern with centralized publish-subscribe routing, MessageEnvelope with correlation IDs for distributed tracing, and comprehensive message history tracking with delivery status.
+  * 🆕 **Structured Logging & Telemetry**: Enterprise-grade monitoring with StructuredLogger (JSON logging with contextual metadata), MetricsCollector (counters, gauges, histograms, timers), and TelemetrySystem (unified interface for logging and metrics with operation tracing).
+  * 🆕 **Swiss Legal Citation Parser**: Multi-lingual parsing engine supporting German (BGE, Art., Abs., lit.), French (ATF, art., al., let.), and Italian (DTF, art., cpv., lett.) legal citations with BGE/ATF/DTF decision parsing, statutory article references, and court decision citations.
 
 ### What's New in v2.0.1
 

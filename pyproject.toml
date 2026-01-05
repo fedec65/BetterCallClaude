@@ -1,3 +1,15 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "adversarial-workflow"
+version = "2.1.0"
+description = "Adversarial workflow for legal document analysis with multi-agent communication"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+
 [tool.black]
 line-length = 100
 target-version = ['py311']
