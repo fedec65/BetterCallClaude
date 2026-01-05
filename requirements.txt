@@ -1,3 +1,14 @@
+# DEPRECATED: This file is maintained for backward compatibility only
+# ⚠️  NEW PROJECTS: Use `pip install -e ".[dev]"` instead
+# ⚠️  CI/CD: Updated to use pyproject.toml in v2.1.0
+#
+# Migration Guide:
+# - Runtime dependencies: See pyproject.toml [project.dependencies]
+# - Development dependencies: See pyproject.toml [project.optional-dependencies.dev]
+# - Install command: `pip install -e ".[dev]"` (editable install with dev extras)
+#
+# This file will be removed in v2.2.0
+#
 # BetterCallClaude v2.0 - Python Backend Dependencies
 # Compatible with Python 3.10-3.13
 
