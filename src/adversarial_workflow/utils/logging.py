@@ -508,9 +508,7 @@ class TelemetrySystem:
         self.logger.info(f"Agent created: {agent_id}", agent_id=agent_id, agent_type=agent_type)
         self.metrics.increment_counter("agents_created", type=agent_type)
 
-    def log_error(
-        self, message: str, error: Exception, agent_id: Optional[str] = None
-    ) -> None:
+    def log_error(self, message: str, error: Exception, agent_id: Optional[str] = None) -> None:
         """Log error with exception details."""
         self.logger.error(
             message,
@@ -558,8 +556,7 @@ class TelemetrySystem:
             "logs": {
                 "total": len(self.logger.log_entries),
                 "by_level": {
-                    level.value: len(self.logger.get_entries(level=level))
-                    for level in LogLevel
+                    level.value: len(self.logger.get_entries(level=level)) for level in LogLevel
                 },
             },
             "metrics": {

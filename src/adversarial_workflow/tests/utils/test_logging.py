@@ -569,7 +569,10 @@ class TestTelemetrySystem:
         telemetry.logger.console_output = False
 
         telemetry.log_message_sent(
-            message_type="REQUEST", sender="agent_001", recipient="agent_002", correlation_id="corr_123"
+            message_type="REQUEST",
+            sender="agent_001",
+            recipient="agent_002",
+            correlation_id="corr_123",
         )
 
         # Check log entry
@@ -588,7 +591,10 @@ class TestTelemetrySystem:
         telemetry.logger.console_output = False
 
         telemetry.log_message_received(
-            message_type="RESPONSE", sender="agent_001", recipient="agent_002", correlation_id="corr_123"
+            message_type="RESPONSE",
+            sender="agent_001",
+            recipient="agent_002",
+            correlation_id="corr_123",
         )
 
         entries = telemetry.logger.get_entries()

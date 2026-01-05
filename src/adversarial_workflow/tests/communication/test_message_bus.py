@@ -439,10 +439,7 @@ class TestMessageHistory:
         bus.send_message(message3)
 
         # Filter by advocate + request type
-        filtered = bus.get_message_history(
-            agent_id="advocate",
-            message_type="request"
-        )
+        filtered = bus.get_message_history(agent_id="advocate", message_type="request")
         assert len(filtered) == 1
         assert filtered[0].message.message_id == message1.message_id
 

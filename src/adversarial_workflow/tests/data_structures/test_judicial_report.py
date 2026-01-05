@@ -113,7 +113,9 @@ class TestRiskAssessment:
 
     def test_probabilities_sum_below_tolerance(self) -> None:
         """Test that probabilities sum too low is rejected."""
-        with pytest.raises(ValueError, match="favorable_probability and unfavorable_probability must sum to 1.0"):
+        with pytest.raises(
+            ValueError, match="favorable_probability and unfavorable_probability must sum to 1.0"
+        ):
             RiskAssessment(
                 favorable_probability=0.40,
                 unfavorable_probability=0.40,  # Sum = 0.80 (too low)
@@ -122,7 +124,9 @@ class TestRiskAssessment:
 
     def test_probabilities_sum_above_tolerance(self) -> None:
         """Test that probabilities sum too high is rejected."""
-        with pytest.raises(ValueError, match="favorable_probability and unfavorable_probability must sum to 1.0"):
+        with pytest.raises(
+            ValueError, match="favorable_probability and unfavorable_probability must sum to 1.0"
+        ):
             RiskAssessment(
                 favorable_probability=0.60,
                 unfavorable_probability=0.60,  # Sum = 1.20 (too high)
@@ -214,7 +218,10 @@ class TestLegalConclusion:
                 "Settlement recommended given litigation risks",
             ],
         )
-        assert conclusion.primary_outcome == "Claim likely to succeed based on preponderance of evidence."
+        assert (
+            conclusion.primary_outcome
+            == "Claim likely to succeed based on preponderance of evidence."
+        )
         assert len(conclusion.alternative_outcomes) == 2
 
     def test_primary_outcome_required(self) -> None:
@@ -363,9 +370,14 @@ class TestJudicialReportSerialization:
         }
 
         report = JudicialReport.from_dict(data)
-        assert report.synthesis.balanced_analysis == "Objective analysis balancing both positions effectively."
+        assert (
+            report.synthesis.balanced_analysis
+            == "Objective analysis balancing both positions effectively."
+        )
         assert report.risk_assessment.favorable_probability == 0.70
-        assert report.legal_conclusion.primary_outcome == "Strong case for success on merits of claim."
+        assert (
+            report.legal_conclusion.primary_outcome == "Strong case for success on merits of claim."
+        )
 
     def test_to_yaml(self) -> None:
         """Test converting JudicialReport to YAML string."""
@@ -413,10 +425,15 @@ legal_conclusion:
 """
 
         report = JudicialReport.from_yaml(yaml_str)
-        assert report.synthesis.balanced_analysis == "Comprehensive analysis balancing all positions."
+        assert (
+            report.synthesis.balanced_analysis == "Comprehensive analysis balancing all positions."
+        )
         assert len(report.synthesis.convergent_points) == 1
         assert report.risk_assessment.favorable_probability == 0.65
-        assert report.legal_conclusion.primary_outcome == "Success probable based on balanced analysis."
+        assert (
+            report.legal_conclusion.primary_outcome
+            == "Success probable based on balanced analysis."
+        )
 
     def test_round_trip_serialization(self) -> None:
         """Test round-trip YAML serialization maintains data integrity."""
@@ -452,10 +469,24 @@ legal_conclusion:
 
         # Verify all data preserved
         assert restored.synthesis.balanced_analysis == original.synthesis.balanced_analysis
-        assert len(restored.synthesis.convergent_points) == len(original.synthesis.convergent_points)
+        assert len(restored.synthesis.convergent_points) == len(
+            original.synthesis.convergent_points
+        )
         assert len(restored.synthesis.divergent_points) == len(original.synthesis.divergent_points)
-        assert restored.risk_assessment.favorable_probability == original.risk_assessment.favorable_probability
-        assert restored.risk_assessment.unfavorable_probability == original.risk_assessment.unfavorable_probability
-        assert restored.risk_assessment.confidence_level == original.risk_assessment.confidence_level
-        assert restored.legal_conclusion.primary_outcome == original.legal_conclusion.primary_outcome
-        assert len(restored.legal_conclusion.alternative_outcomes) == len(original.legal_conclusion.alternative_outcomes)
+        assert (
+            restored.risk_assessment.favorable_probability
+            == original.risk_assessment.favorable_probability
+        )
+        assert (
+            restored.risk_assessment.unfavorable_probability
+            == original.risk_assessment.unfavorable_probability
+        )
+        assert (
+            restored.risk_assessment.confidence_level == original.risk_assessment.confidence_level
+        )
+        assert (
+            restored.legal_conclusion.primary_outcome == original.legal_conclusion.primary_outcome
+        )
+        assert len(restored.legal_conclusion.alternative_outcomes) == len(
+            original.legal_conclusion.alternative_outcomes
+        )

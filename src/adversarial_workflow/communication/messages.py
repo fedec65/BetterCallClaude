@@ -67,9 +67,7 @@ class MessageEnvelope:
 
         valid_agents = ["advocate", "adversary", "judge"]
         if self.sender not in valid_agents:
-            raise ValueError(
-                f"sender must be one of {valid_agents}, got '{self.sender}'"
-            )
+            raise ValueError(f"sender must be one of {valid_agents}, got '{self.sender}'")
 
         # Validate receiver
         if not self.receiver:
@@ -79,15 +77,11 @@ class MessageEnvelope:
             raise ValueError("receiver cannot be whitespace only")
 
         if self.receiver not in valid_agents:
-            raise ValueError(
-                f"receiver must be one of {valid_agents}, got '{self.receiver}'"
-            )
+            raise ValueError(f"receiver must be one of {valid_agents}, got '{self.receiver}'")
 
         # Validate timestamp
         if self.timestamp < 0:
-            raise ValueError(
-                f"timestamp must be non-negative, got {self.timestamp}"
-            )
+            raise ValueError(f"timestamp must be non-negative, got {self.timestamp}")
 
         # Validate correlation_id if provided
         if self.correlation_id is not None:

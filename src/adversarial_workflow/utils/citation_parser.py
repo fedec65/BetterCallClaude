@@ -36,11 +36,13 @@ class CitationType(Enum):
 
 class CitationParseError(Exception):
     """Base exception for citation parsing errors."""
+
     pass
 
 
 class InvalidCitationFormatError(CitationParseError):
     """Raised when citation format is invalid and parser is in strict mode."""
+
     pass
 
 
@@ -151,29 +153,29 @@ class CitationParser:
     # BGE patterns for all three languages
     BGE_PATTERNS = {
         "de": re.compile(
-            r'\b(BGE)\s+(\d+)\s+([IV]+)\s+(\d+)(?:\s+E\.\s+([\d.]+))?(?:\s+S\.\s+(\d+))?\b',
-            re.IGNORECASE
+            r"\b(BGE)\s+(\d+)\s+([IV]+)\s+(\d+)(?:\s+E\.\s+([\d.]+))?(?:\s+S\.\s+(\d+))?\b",
+            re.IGNORECASE,
         ),
         "fr": re.compile(
-            r'\b(ATF)\s+(\d+)\s+([IV]+)\s+(\d+)(?:\s+consid\.\s+([\d.]+))?(?:\s+p\.\s+(\d+))?\b',
-            re.IGNORECASE
+            r"\b(ATF)\s+(\d+)\s+([IV]+)\s+(\d+)(?:\s+consid\.\s+([\d.]+))?(?:\s+p\.\s+(\d+))?\b",
+            re.IGNORECASE,
         ),
         "it": re.compile(
-            r'\b(DTF)\s+(\d+)\s+([IV]+)\s+(\d+)(?:\s+consid\.\s+([\d.]+))?(?:\s+pag\.\s+(\d+))?\b',
-            re.IGNORECASE
+            r"\b(DTF)\s+(\d+)\s+([IV]+)\s+(\d+)(?:\s+consid\.\s+([\d.]+))?(?:\s+pag\.\s+(\d+))?\b",
+            re.IGNORECASE,
         ),
     }
 
     # Article patterns for all three languages
     ARTICLE_PATTERNS = {
         "de": re.compile(
-            r'\bArt\.\s+(\d+)(?:\s+Abs\.\s+(\d+))?(?:\s+lit\.\s+([a-z]))?\s+([A-Za-z]{2,5})\b'
+            r"\bArt\.\s+(\d+)(?:\s+Abs\.\s+(\d+))?(?:\s+lit\.\s+([a-z]))?\s+([A-Za-z]{2,5})\b"
         ),
         "fr": re.compile(
-            r'\bart\.\s+(\d+)(?:\s+al\.\s+(\d+))?(?:\s+let\.\s+([a-z]))?\s+([A-Za-z]{2,5})\b'
+            r"\bart\.\s+(\d+)(?:\s+al\.\s+(\d+))?(?:\s+let\.\s+([a-z]))?\s+([A-Za-z]{2,5})\b"
         ),
         "it": re.compile(
-            r'\bart\.\s+(\d+)(?:\s+cpv\.\s+(\d+))?(?:\s+lett\.\s+([a-z]))?\s+([A-Za-z]{2,5})\b'
+            r"\bart\.\s+(\d+)(?:\s+cpv\.\s+(\d+))?(?:\s+lett\.\s+([a-z]))?\s+([A-Za-z]{2,5})\b"
         ),
     }
 
@@ -181,18 +183,18 @@ class CitationParser:
     COURT_DECISION_PATTERNS = [
         # German courts
         re.compile(
-            r'(Obergericht\s+\w+|Kantonsgericht\s+\w+),\s+Urteil\s+vom\s+([\d.]+),\s+([\w\d/]+)',
-            re.IGNORECASE
+            r"(Obergericht\s+\w+|Kantonsgericht\s+\w+),\s+Urteil\s+vom\s+([\d.]+),\s+([\w\d/]+)",
+            re.IGNORECASE,
         ),
         # French courts
         re.compile(
-            r'(Cour\s+de\s+justice\s+de\s+\w+|Tribunal\s+[^,]+),\s+arrêt\s+du\s+([\d.]+),\s+([\w\d/]+)',
-            re.IGNORECASE
+            r"(Cour\s+de\s+justice\s+de\s+\w+|Tribunal\s+[^,]+),\s+arrêt\s+du\s+([\d.]+),\s+([\w\d/]+)",
+            re.IGNORECASE,
         ),
         # Italian courts
         re.compile(
             r"(Tribunale\s+d'appello\s+del\s+Canton\s+\w+|Tribunale\s+[^,]+),\s+sentenza\s+del\s+([\d.]+),\s+([\w\d./]+)",
-            re.IGNORECASE
+            re.IGNORECASE,
         ),
     ]
 
@@ -209,7 +211,7 @@ class CitationParser:
         self,
         text: str,
         citation_type: Optional[CitationType] = None,
-        language: Optional[str] = None
+        language: Optional[str] = None,
     ) -> List[Citation]:
         """
         Parse legal citations from text.
@@ -281,7 +283,9 @@ class CitationParser:
         citations = self.parse(text)
         return [citation.original_text for citation in citations]
 
-    def _parse_bge_citations(self, text: str, language_filter: Optional[str] = None) -> List[Citation]:
+    def _parse_bge_citations(
+        self, text: str, language_filter: Optional[str] = None
+    ) -> List[Citation]:
         """Parse BGE/ATF/DTF citations from text."""
         citations: List[Citation] = []
 
@@ -307,14 +311,16 @@ class CitationParser:
                     volume=volume,
                     section=section,
                     page=page,
-                    consideration=consideration
+                    consideration=consideration,
                 )
 
                 citations.append(citation)
 
         return citations
 
-    def _parse_article_citations(self, text: str, language_filter: Optional[str] = None) -> List[Citation]:
+    def _parse_article_citations(
+        self, text: str, language_filter: Optional[str] = None
+    ) -> List[Citation]:
         """Parse statutory article citations from text."""
         citations: List[Citation] = []
         matched_positions: set = set()  # Track (start, end) positions to avoid duplicates
@@ -323,7 +329,7 @@ class CitationParser:
         # This prevents Italian "cpv." from matching French pattern
         language_hints = {
             "de": r"\bAbs\.",  # German: Absatz
-            "fr": r"\bal\.",   # French: alinéa
+            "fr": r"\bal\.",  # French: alinéa
             "it": r"\bcpv\.",  # Italian: capoverso
         }
 
@@ -368,7 +374,7 @@ class CitationParser:
                     article_number=article_number,
                     statute=statute,
                     paragraph=paragraph,
-                    letter=letter
+                    letter=letter,
                 )
 
                 citations.append(citation)
@@ -390,9 +396,9 @@ class CitationParser:
 
                 # Detect language based on court keywords
                 lang = "de"  # default
-                if any(keyword in court.lower() for keyword in ['cour', 'tribunal', 'arrêt']):
+                if any(keyword in court.lower() for keyword in ["cour", "tribunal", "arrêt"]):
                     lang = "fr"
-                elif any(keyword in court.lower() for keyword in ['tribunale', 'sentenza']):
+                elif any(keyword in court.lower() for keyword in ["tribunale", "sentenza"]):
                     lang = "it"
 
                 citation = Citation(
@@ -401,7 +407,7 @@ class CitationParser:
                     original_text=original_text,
                     court=court,
                     date=date,
-                    reference=reference
+                    reference=reference,
                 )
 
                 citations.append(citation)

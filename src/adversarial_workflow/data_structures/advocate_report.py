@@ -61,15 +61,11 @@ class Argument:
             raise ValueError("reasoning cannot be whitespace only")
 
         if len(self.reasoning) < 20:
-            raise ValueError(
-                f"reasoning must be at least 20 characters, got {len(self.reasoning)}"
-            )
+            raise ValueError(f"reasoning must be at least 20 characters, got {len(self.reasoning)}")
 
         # Validate strength
         if not (0.0 <= self.strength <= 1.0):
-            raise ValueError(
-                f"strength must be between 0.0 and 1.0, got {self.strength}"
-            )
+            raise ValueError(f"strength must be between 0.0 and 1.0, got {self.strength}")
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert argument to dictionary for YAML serialization."""

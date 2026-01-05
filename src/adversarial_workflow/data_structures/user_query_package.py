@@ -95,9 +95,7 @@ class Language:
 
         # Confidence cannot exceed 100%
         if self.confidence > 1.0:
-            raise ValueError(
-                f"confidence must be between 0.95 and 1.0, got {self.confidence}"
-            )
+            raise ValueError(f"confidence must be between 0.95 and 1.0, got {self.confidence}")
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""

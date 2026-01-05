@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 
 class MessageBusError(Exception):
     """Base exception for message bus errors."""
+
     pass
 
 
@@ -31,9 +32,7 @@ class UnknownRecipientError(MessageBusError):
     def __init__(self, agent_id: str, message_id: str) -> None:
         self.agent_id = agent_id
         self.message_id = message_id
-        super().__init__(
-            f"Unknown recipient '{agent_id}' for message '{message_id}'"
-        )
+        super().__init__(f"Unknown recipient '{agent_id}' for message '{message_id}'")
 
 
 class DeliveryFailureError(MessageBusError):
@@ -43,9 +42,7 @@ class DeliveryFailureError(MessageBusError):
         self.agent_id = agent_id
         self.message_id = message_id
         self.reason = reason
-        super().__init__(
-            f"Failed to deliver message '{message_id}' to '{agent_id}': {reason}"
-        )
+        super().__init__(f"Failed to deliver message '{message_id}' to '{agent_id}': {reason}")
 
 
 class AgentAlreadyRegisteredError(MessageBusError):
@@ -100,9 +97,7 @@ class MessageBus:
         logger.info("MessageBus initialized")
 
     def register_agent(
-        self,
-        agent_id: str,
-        message_handler: Callable[[MessageEnvelope], None]
+        self, agent_id: str, message_handler: Callable[[MessageEnvelope], None]
     ) -> None:
         """
         Register an agent with the message bus.
@@ -123,9 +118,7 @@ class MessageBus:
 
         valid_agents = ["advocate", "adversary", "judge"]
         if agent_id not in valid_agents:
-            raise ValueError(
-                f"agent_id must be one of {valid_agents}, got '{agent_id}'"
-            )
+            raise ValueError(f"agent_id must be one of {valid_agents}, got '{agent_id}'")
 
         if agent_id in self._agents:
             raise AgentAlreadyRegisteredError(agent_id)
@@ -195,24 +188,16 @@ class MessageBus:
             handler = self._agents[message.receiver]
             handler(message)
             self._record_message(message, delivered=True)
-            logger.info(
-                f"Message '{message.message_id}' delivered to '{message.receiver}'"
-            )
+            logger.info(f"Message '{message.message_id}' delivered to '{message.receiver}'")
             return True
 
         except Exception as e:
             error_msg = f"{type(e).__name__}: {str(e)}"
             self._record_message(message, delivered=False, error=error_msg)
-            raise DeliveryFailureError(
-                message.receiver,
-                message.message_id,
-                error_msg
-            ) from e
+            raise DeliveryFailureError(message.receiver, message.message_id, error_msg) from e
 
     def get_message_history(
-        self,
-        agent_id: Optional[str] = None,
-        message_type: Optional[str] = None
+        self, agent_id: Optional[str] = None, message_type: Optional[str] = None
     ) -> List[MessageRecord]:
         """
         Retrieve message history with optional filtering.
@@ -228,16 +213,13 @@ class MessageBus:
 
         if agent_id is not None:
             history = [
-                record for record in history
-                if record.message.sender == agent_id
-                or record.message.receiver == agent_id
+                record
+                for record in history
+                if record.message.sender == agent_id or record.message.receiver == agent_id
             ]
 
         if message_type is not None:
-            history = [
-                record for record in history
-                if record.message.message_type == message_type
-            ]
+            history = [record for record in history if record.message.message_type == message_type]
 
         return history
 
@@ -256,10 +238,7 @@ class MessageBus:
         return len(self._message_history)
 
     def _record_message(
-        self,
-        message: MessageEnvelope,
-        delivered: bool,
-        error: Optional[str] = None
+        self, message: MessageEnvelope, delivered: bool, error: Optional[str] = None
     ) -> None:
         """
         Record message in history.
@@ -269,9 +248,5 @@ class MessageBus:
             delivered: Whether delivery was successful
             error: Optional error message if delivery failed
         """
-        record = MessageRecord(
-            message=message,
-            delivered=delivered,
-            delivery_error=error
-        )
+        record = MessageRecord(message=message, delivered=delivered, delivery_error=error)
         self._message_history.append(record)
