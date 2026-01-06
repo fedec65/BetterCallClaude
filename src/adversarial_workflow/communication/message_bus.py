@@ -11,11 +11,12 @@ Components:
 - Message tracking and history
 """
 
-from typing import Dict, Any, Optional, List, Callable
-from dataclasses import dataclass, field
 import logging
-from .messages import MessageEnvelope
+from collections.abc import Callable
+from dataclasses import dataclass
+from typing import Any
 
+from .messages import MessageEnvelope
 
 logger = logging.getLogger(__name__)
 
@@ -67,9 +68,9 @@ class MessageRecord:
 
     message: MessageEnvelope
     delivered: bool
-    delivery_error: Optional[str] = None
+    delivery_error: str | None = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert record to dictionary."""
         return {
             "message": self.message.to_dict(),
@@ -92,8 +93,8 @@ class MessageBus:
 
     def __init__(self) -> None:
         """Initialize message bus with empty agent registry and history."""
-        self._agents: Dict[str, Callable[[MessageEnvelope], None]] = {}
-        self._message_history: List[MessageRecord] = []
+        self._agents: dict[str, Callable[[MessageEnvelope], None]] = {}
+        self._message_history: list[MessageRecord] = []
         logger.info("MessageBus initialized")
 
     def register_agent(
@@ -154,7 +155,7 @@ class MessageBus:
         """
         return agent_id in self._agents
 
-    def get_registered_agents(self) -> List[str]:
+    def get_registered_agents(self) -> list[str]:
         """
         Get list of currently registered agent IDs.
 
@@ -197,8 +198,8 @@ class MessageBus:
             raise DeliveryFailureError(message.receiver, message.message_id, error_msg) from e
 
     def get_message_history(
-        self, agent_id: Optional[str] = None, message_type: Optional[str] = None
-    ) -> List[MessageRecord]:
+        self, agent_id: str | None = None, message_type: str | None = None
+    ) -> list[MessageRecord]:
         """
         Retrieve message history with optional filtering.
 
@@ -238,7 +239,7 @@ class MessageBus:
         return len(self._message_history)
 
     def _record_message(
-        self, message: MessageEnvelope, delivered: bool, error: Optional[str] = None
+        self, message: MessageEnvelope, delivered: bool, error: str | None = None
     ) -> None:
         """
         Record message in history.

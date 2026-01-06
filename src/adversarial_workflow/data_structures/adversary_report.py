@@ -24,7 +24,8 @@ The only structural difference is semantic - adversary reports typically use pos
 """
 
 from dataclasses import dataclass, field
-from typing import List, Dict, Any, Literal
+from typing import Any, Literal
+
 import yaml
 
 # Import shared classes from AdvocateReport
@@ -47,8 +48,8 @@ class AdversaryReport:
     """
 
     position: Literal["pro", "anti"]
-    arguments: List[Argument] = field(default_factory=list)
-    citations: List[Citation] = field(default_factory=list)
+    arguments: list[Argument] = field(default_factory=list)
+    citations: list[Citation] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         """Validate report after initialization."""
@@ -56,7 +57,7 @@ class AdversaryReport:
         if not self.arguments:
             raise ValueError("At least one argument is required")
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert report to dictionary for YAML serialization."""
         return {
             "position": self.position,
@@ -65,7 +66,7 @@ class AdversaryReport:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "AdversaryReport":
+    def from_dict(cls, data: dict[str, Any]) -> "AdversaryReport":
         """Create AdversaryReport from dictionary."""
         return cls(
             position=data["position"],

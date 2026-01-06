@@ -14,14 +14,13 @@ Test Coverage:
 - Confidence level constraints (0.0-1.0)
 """
 
-from typing import Any, Dict, List
 import pytest
-import yaml
+
 from adversarial_workflow.data_structures.judicial_report import (
     JudicialReport,
-    Synthesis,
-    RiskAssessment,
     LegalConclusion,
+    RiskAssessment,
+    Synthesis,
 )
 
 

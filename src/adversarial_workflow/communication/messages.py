@@ -19,10 +19,11 @@ YAML Schema:
     correlation_id: Optional[str] (for tracking request-response pairs)
 """
 
-from dataclasses import dataclass, field
-from typing import Dict, Any, Literal, Optional
 import time
 import uuid
+from dataclasses import dataclass
+from typing import Any, Literal
+
 import yaml
 
 
@@ -46,8 +47,8 @@ class MessageEnvelope:
     receiver: str
     message_type: Literal["request", "response", "event"]
     timestamp: float
-    payload: Dict[str, Any]
-    correlation_id: Optional[str] = None
+    payload: dict[str, Any]
+    correlation_id: str | None = None
 
     def __post_init__(self) -> None:
         """Validate message envelope after initialization."""
@@ -88,7 +89,7 @@ class MessageEnvelope:
             if not self.correlation_id.strip():
                 raise ValueError("correlation_id cannot be whitespace only")
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert message envelope to dictionary for YAML serialization."""
         return {
             "message_id": self.message_id,
@@ -101,7 +102,7 @@ class MessageEnvelope:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "MessageEnvelope":
+    def from_dict(cls, data: dict[str, Any]) -> "MessageEnvelope":
         """Create MessageEnvelope from dictionary."""
         return cls(
             message_id=data["message_id"],
@@ -127,7 +128,7 @@ class MessageEnvelope:
     def create_request(
         sender: str,
         receiver: str,
-        payload: Dict[str, Any],
+        payload: dict[str, Any],
     ) -> "MessageEnvelope":
         """
         Create a request message.
@@ -154,7 +155,7 @@ class MessageEnvelope:
     def create_response(
         sender: str,
         receiver: str,
-        payload: Dict[str, Any],
+        payload: dict[str, Any],
         correlation_id: str,
     ) -> "MessageEnvelope":
         """
@@ -183,7 +184,7 @@ class MessageEnvelope:
     def create_event(
         sender: str,
         receiver: str,
-        payload: Dict[str, Any],
+        payload: dict[str, Any],
     ) -> "MessageEnvelope":
         """
         Create an event message.

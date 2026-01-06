@@ -20,7 +20,8 @@ YAML Schema:
 """
 
 from dataclasses import dataclass, field
-from typing import List, Dict, Any
+from typing import Any
+
 import yaml
 
 
@@ -36,8 +37,8 @@ class Synthesis:
     """
 
     balanced_analysis: str
-    convergent_points: List[str] = field(default_factory=list)
-    divergent_points: List[str] = field(default_factory=list)
+    convergent_points: list[str] = field(default_factory=list)
+    divergent_points: list[str] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         """Validate synthesis after initialization."""
@@ -50,10 +51,11 @@ class Synthesis:
 
         if len(self.balanced_analysis) < 20:
             raise ValueError(
-                f"balanced_analysis must be at least 20 characters, got {len(self.balanced_analysis)}"
+                f"balanced_analysis must be at least 20 characters, "
+                f"got {len(self.balanced_analysis)}"
             )
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert synthesis to dictionary for YAML serialization."""
         return {
             "balanced_analysis": self.balanced_analysis,
@@ -62,7 +64,7 @@ class Synthesis:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "Synthesis":
+    def from_dict(cls, data: dict[str, Any]) -> "Synthesis":
         """Create Synthesis from dictionary."""
         return cls(
             balanced_analysis=data["balanced_analysis"],
@@ -91,13 +93,15 @@ class RiskAssessment:
         # Validate favorable_probability range
         if not (0.0 <= self.favorable_probability <= 1.0):
             raise ValueError(
-                f"favorable_probability must be between 0.0 and 1.0, got {self.favorable_probability}"
+                f"favorable_probability must be between 0.0 and 1.0, "
+                f"got {self.favorable_probability}"
             )
 
         # Validate unfavorable_probability range
         if not (0.0 <= self.unfavorable_probability <= 1.0):
             raise ValueError(
-                f"unfavorable_probability must be between 0.0 and 1.0, got {self.unfavorable_probability}"
+                f"unfavorable_probability must be between 0.0 and 1.0, "
+                f"got {self.unfavorable_probability}"
             )
 
         # Validate confidence_level range
@@ -110,10 +114,11 @@ class RiskAssessment:
         prob_sum = self.favorable_probability + self.unfavorable_probability
         if abs(prob_sum - 1.0) > 0.05:
             raise ValueError(
-                f"favorable_probability and unfavorable_probability must sum to 1.0 (±0.05 tolerance), got {prob_sum}"
+                f"favorable_probability and unfavorable_probability "
+                f"must sum to 1.0 (±0.05 tolerance), got {prob_sum}"
             )
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert risk assessment to dictionary for YAML serialization."""
         return {
             "favorable_probability": self.favorable_probability,
@@ -122,7 +127,7 @@ class RiskAssessment:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "RiskAssessment":
+    def from_dict(cls, data: dict[str, Any]) -> "RiskAssessment":
         """Create RiskAssessment from dictionary."""
         return cls(
             favorable_probability=data["favorable_probability"],
@@ -142,7 +147,7 @@ class LegalConclusion:
     """
 
     primary_outcome: str
-    alternative_outcomes: List[str] = field(default_factory=list)
+    alternative_outcomes: list[str] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         """Validate legal conclusion after initialization."""
@@ -158,7 +163,7 @@ class LegalConclusion:
                 f"primary_outcome must be at least 20 characters, got {len(self.primary_outcome)}"
             )
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert legal conclusion to dictionary for YAML serialization."""
         return {
             "primary_outcome": self.primary_outcome,
@@ -166,7 +171,7 @@ class LegalConclusion:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "LegalConclusion":
+    def from_dict(cls, data: dict[str, Any]) -> "LegalConclusion":
         """Create LegalConclusion from dictionary."""
         return cls(
             primary_outcome=data["primary_outcome"],
@@ -193,7 +198,7 @@ class JudicialReport:
     risk_assessment: RiskAssessment
     legal_conclusion: LegalConclusion
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert report to dictionary for YAML serialization."""
         return {
             "synthesis": self.synthesis.to_dict(),
@@ -202,7 +207,7 @@ class JudicialReport:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "JudicialReport":
+    def from_dict(cls, data: dict[str, Any]) -> "JudicialReport":
         """Create JudicialReport from dictionary."""
         return cls(
             synthesis=Synthesis.from_dict(data["synthesis"]),

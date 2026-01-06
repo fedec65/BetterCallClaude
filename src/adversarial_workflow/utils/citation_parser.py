@@ -20,10 +20,10 @@ Languages Supported:
 - Italian (it): DTF, art., cpv., lett., consid.
 """
 
-from typing import List, Optional, Dict, Any
-from dataclasses import dataclass, field
-from enum import Enum
 import re
+from dataclasses import dataclass
+from enum import Enum
+from typing import Any
 
 
 class CitationType(Enum):
@@ -79,23 +79,23 @@ class Citation:
     original_text: str
 
     # BGE fields
-    volume: Optional[str] = None
-    section: Optional[str] = None
-    page: Optional[str] = None
-    consideration: Optional[str] = None
+    volume: str | None = None
+    section: str | None = None
+    page: str | None = None
+    consideration: str | None = None
 
     # Article fields
-    article_number: Optional[str] = None
-    statute: Optional[str] = None
-    paragraph: Optional[str] = None
-    letter: Optional[str] = None
+    article_number: str | None = None
+    statute: str | None = None
+    paragraph: str | None = None
+    letter: str | None = None
 
     # Court decision fields
-    court: Optional[str] = None
-    date: Optional[str] = None
-    reference: Optional[str] = None
+    court: str | None = None
+    date: str | None = None
+    reference: str | None = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert citation to dictionary representation."""
         result = {
             "type": self.type.value,
@@ -210,9 +210,9 @@ class CitationParser:
     def parse(
         self,
         text: str,
-        citation_type: Optional[CitationType] = None,
-        language: Optional[str] = None,
-    ) -> List[Citation]:
+        citation_type: CitationType | None = None,
+        language: str | None = None,
+    ) -> list[Citation]:
         """
         Parse legal citations from text.
 
@@ -230,7 +230,7 @@ class CitationParser:
         if not text:
             return []
 
-        citations: List[Citation] = []
+        citations: list[Citation] = []
 
         # Parse BGE citations if not filtered out
         if citation_type is None or citation_type == CitationType.BGE:
@@ -270,7 +270,7 @@ class CitationParser:
         except CitationParseError:
             return False
 
-    def extract_references(self, text: str) -> List[str]:
+    def extract_references(self, text: str) -> list[str]:
         """
         Extract all citation reference strings from text.
 
@@ -283,11 +283,9 @@ class CitationParser:
         citations = self.parse(text)
         return [citation.original_text for citation in citations]
 
-    def _parse_bge_citations(
-        self, text: str, language_filter: Optional[str] = None
-    ) -> List[Citation]:
+    def _parse_bge_citations(self, text: str, language_filter: str | None = None) -> list[Citation]:
         """Parse BGE/ATF/DTF citations from text."""
-        citations: List[Citation] = []
+        citations: list[Citation] = []
 
         for lang, pattern in self.BGE_PATTERNS.items():
             # Skip if language filter specified and doesn't match
@@ -295,7 +293,7 @@ class CitationParser:
                 continue
 
             for match in pattern.finditer(text):
-                prefix = match.group(1)  # BGE/ATF/DTF
+                _ = match.group(1)  # BGE/ATF/DTF prefix (captured but not needed)
                 volume = match.group(2)
                 section = match.group(3)
                 page = match.group(4)
@@ -319,10 +317,10 @@ class CitationParser:
         return citations
 
     def _parse_article_citations(
-        self, text: str, language_filter: Optional[str] = None
-    ) -> List[Citation]:
+        self, text: str, language_filter: str | None = None
+    ) -> list[Citation]:
         """Parse statutory article citations from text."""
-        citations: List[Citation] = []
+        citations: list[Citation] = []
         matched_positions: set = set()  # Track (start, end) positions to avoid duplicates
 
         # Language-specific keyword detection for routing
@@ -381,9 +379,9 @@ class CitationParser:
 
         return citations
 
-    def _parse_court_decisions(self, text: str) -> List[Citation]:
+    def _parse_court_decisions(self, text: str) -> list[Citation]:
         """Parse court decision citations from text."""
-        citations: List[Citation] = []
+        citations: list[Citation] = []
 
         for pattern in self.COURT_DECISION_PATTERNS:
             for match in pattern.finditer(text):

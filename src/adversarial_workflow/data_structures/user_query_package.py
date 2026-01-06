@@ -7,11 +7,11 @@ This module implements the YAML-based schema for user legal queries with:
 - Metadata tracking (timestamp, session_id)
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, Any, Optional, Literal
-import yaml
+from typing import Any, Literal
 
+import yaml
 
 # Type aliases for clarity
 JurisdictionLevel = Literal["federal", "cantonal"]
@@ -29,7 +29,7 @@ class Jurisdiction:
     """
 
     level: JurisdictionLevel
-    canton_code: Optional[CantonCode] = None
+    canton_code: CantonCode | None = None
 
     def __post_init__(self) -> None:
         """Validate jurisdiction data after initialization."""
@@ -53,15 +53,15 @@ class Jurisdiction:
         if self.level == "federal" and self.canton_code is not None:
             raise ValueError("federal jurisdiction should not specify canton_code")
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
-        result: Dict[str, Any] = {"level": self.level}
+        result: dict[str, Any] = {"level": self.level}
         if self.canton_code is not None:
             result["canton_code"] = self.canton_code
         return result
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "Jurisdiction":
+    def from_dict(cls, data: dict[str, Any]) -> "Jurisdiction":
         """Create from dictionary."""
         return cls(level=data["level"], canton_code=data.get("canton_code"))
 
@@ -97,12 +97,12 @@ class Language:
         if self.confidence > 1.0:
             raise ValueError(f"confidence must be between 0.95 and 1.0, got {self.confidence}")
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {"detected": self.detected, "confidence": self.confidence}
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "Language":
+    def from_dict(cls, data: dict[str, Any]) -> "Language":
         """Create from dictionary."""
         return cls(detected=data["detected"], confidence=data["confidence"])
 
@@ -128,18 +128,18 @@ class Metadata:
             raise ValueError(
                 f"timestamp must be ISO 8601 format (e.g., '2024-01-05T10:30:00Z'), "
                 f"got '{self.timestamp}'"
-            )
+            ) from None
 
         # Validate session_id is non-empty
         if not self.session_id or not self.session_id.strip():
             raise ValueError("session_id cannot be empty")
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {"timestamp": self.timestamp, "session_id": self.session_id}
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "Metadata":
+    def from_dict(cls, data: dict[str, Any]) -> "Metadata":
         """Create from dictionary."""
         return cls(timestamp=data["timestamp"], session_id=data["session_id"])
 
@@ -193,7 +193,7 @@ class UserQueryPackage:
                 f"query_text must be at least 20 characters, got {len(self.query_text)}"
             )
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary representation.
 
         Returns:
@@ -207,7 +207,7 @@ class UserQueryPackage:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "UserQueryPackage":
+    def from_dict(cls, data: dict[str, Any]) -> "UserQueryPackage":
         """Create UserQueryPackage from dictionary.
 
         Args:
@@ -261,7 +261,7 @@ class UserQueryPackage:
         try:
             data = yaml.safe_load(yaml_str)
         except yaml.YAMLError as e:
-            raise ValueError(f"Invalid YAML format: {e}")
+            raise ValueError(f"Invalid YAML format: {e}") from e
 
         return cls.from_dict(data)
 

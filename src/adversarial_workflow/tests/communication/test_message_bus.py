@@ -12,15 +12,15 @@ Test Coverage:
 - Concurrent operations
 """
 
-from typing import List
 import pytest
+
 from adversarial_workflow.communication.message_bus import (
+    AgentAlreadyRegisteredError,
+    AgentNotRegisteredError,
+    DeliveryFailureError,
     MessageBus,
     MessageRecord,
     UnknownRecipientError,
-    DeliveryFailureError,
-    AgentAlreadyRegisteredError,
-    AgentNotRegisteredError,
 )
 from adversarial_workflow.communication.messages import MessageEnvelope
 
@@ -142,7 +142,7 @@ class TestMessageDelivery:
     def test_send_message_successful(self) -> None:
         """Test successful message delivery."""
         bus = MessageBus()
-        received_messages: List[MessageEnvelope] = []
+        received_messages: list[MessageEnvelope] = []
 
         def handler(msg: MessageEnvelope) -> None:
             received_messages.append(msg)
@@ -201,7 +201,7 @@ class TestMessageDelivery:
     def test_send_multiple_messages(self) -> None:
         """Test sending multiple messages to same recipient."""
         bus = MessageBus()
-        received_messages: List[MessageEnvelope] = []
+        received_messages: list[MessageEnvelope] = []
 
         def handler(msg: MessageEnvelope) -> None:
             received_messages.append(msg)
@@ -230,8 +230,8 @@ class TestMessageDelivery:
     def test_send_messages_to_different_recipients(self) -> None:
         """Test routing messages to different registered agents."""
         bus = MessageBus()
-        advocate_messages: List[MessageEnvelope] = []
-        judge_messages: List[MessageEnvelope] = []
+        advocate_messages: list[MessageEnvelope] = []
+        judge_messages: list[MessageEnvelope] = []
 
         def advocate_handler(msg: MessageEnvelope) -> None:
             advocate_messages.append(msg)

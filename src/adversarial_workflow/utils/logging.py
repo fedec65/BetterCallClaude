@@ -15,16 +15,16 @@ Features:
 - Export to multiple formats (JSON, CSV, console)
 """
 
-import logging
-import time
 import json
+import logging
 import sys
-from typing import Dict, Any, Optional, List, Callable
-from dataclasses import dataclass, field, asdict
+import time
+from contextlib import contextmanager
+from dataclasses import asdict, dataclass, field
+from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from datetime import datetime
-from contextlib import contextmanager
+from typing import Any
 
 
 class LogLevel(Enum):
@@ -65,11 +65,11 @@ class LogEntry:
     level: str
     message: str
     logger_name: str
-    agent_id: Optional[str] = None
-    correlation_id: Optional[str] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    agent_id: str | None = None
+    correlation_id: str | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert log entry to dictionary."""
         return asdict(self)
 
@@ -95,9 +95,9 @@ class Metric:
     type: MetricType
     value: float
     timestamp: str
-    tags: Dict[str, str] = field(default_factory=dict)
+    tags: dict[str, str] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert metric to dictionary."""
         data = asdict(self)
         data["type"] = self.type.value
@@ -116,7 +116,7 @@ class StructuredLogger:
         self,
         name: str,
         level: LogLevel = LogLevel.INFO,
-        output_file: Optional[Path] = None,
+        output_file: Path | None = None,
         console_output: bool = True,
     ) -> None:
         """
@@ -132,7 +132,7 @@ class StructuredLogger:
         self.level = level
         self.output_file = output_file
         self.console_output = console_output
-        self.log_entries: List[LogEntry] = []
+        self.log_entries: list[LogEntry] = []
 
         # Set up Python logging
         self._setup_python_logger()
@@ -161,8 +161,8 @@ class StructuredLogger:
         self,
         level: LogLevel,
         message: str,
-        agent_id: Optional[str] = None,
-        correlation_id: Optional[str] = None,
+        agent_id: str | None = None,
+        correlation_id: str | None = None,
         **metadata: Any,
     ) -> LogEntry:
         """Create a structured log entry."""
@@ -187,8 +187,8 @@ class StructuredLogger:
     def debug(
         self,
         message: str,
-        agent_id: Optional[str] = None,
-        correlation_id: Optional[str] = None,
+        agent_id: str | None = None,
+        correlation_id: str | None = None,
         **metadata: Any,
     ) -> None:
         """Log debug message."""
@@ -199,8 +199,8 @@ class StructuredLogger:
     def info(
         self,
         message: str,
-        agent_id: Optional[str] = None,
-        correlation_id: Optional[str] = None,
+        agent_id: str | None = None,
+        correlation_id: str | None = None,
         **metadata: Any,
     ) -> None:
         """Log info message."""
@@ -211,8 +211,8 @@ class StructuredLogger:
     def warning(
         self,
         message: str,
-        agent_id: Optional[str] = None,
-        correlation_id: Optional[str] = None,
+        agent_id: str | None = None,
+        correlation_id: str | None = None,
         **metadata: Any,
     ) -> None:
         """Log warning message."""
@@ -223,8 +223,8 @@ class StructuredLogger:
     def error(
         self,
         message: str,
-        agent_id: Optional[str] = None,
-        correlation_id: Optional[str] = None,
+        agent_id: str | None = None,
+        correlation_id: str | None = None,
         **metadata: Any,
     ) -> None:
         """Log error message."""
@@ -235,8 +235,8 @@ class StructuredLogger:
     def critical(
         self,
         message: str,
-        agent_id: Optional[str] = None,
-        correlation_id: Optional[str] = None,
+        agent_id: str | None = None,
+        correlation_id: str | None = None,
         **metadata: Any,
     ) -> None:
         """Log critical message."""
@@ -257,10 +257,10 @@ class StructuredLogger:
 
     def get_entries(
         self,
-        level: Optional[LogLevel] = None,
-        agent_id: Optional[str] = None,
-        correlation_id: Optional[str] = None,
-    ) -> List[LogEntry]:
+        level: LogLevel | None = None,
+        agent_id: str | None = None,
+        correlation_id: str | None = None,
+    ) -> list[LogEntry]:
         """
         Retrieve log entries with optional filtering.
 
@@ -298,10 +298,10 @@ class MetricsCollector:
 
     def __init__(self) -> None:
         """Initialize metrics collector."""
-        self.metrics: List[Metric] = []
-        self.counters: Dict[str, float] = {}
-        self.gauges: Dict[str, float] = {}
-        self.histograms: Dict[str, List[float]] = {}
+        self.metrics: list[Metric] = []
+        self.counters: dict[str, float] = {}
+        self.gauges: dict[str, float] = {}
+        self.histograms: dict[str, list[float]] = {}
 
     def increment_counter(self, name: str, value: float = 1.0, **tags: str) -> None:
         """
@@ -372,7 +372,7 @@ class MetricsCollector:
             duration = time.time() - start_time
             self.record_timer(name, duration, **tags)
 
-    def _make_key(self, name: str, tags: Dict[str, str]) -> str:
+    def _make_key(self, name: str, tags: dict[str, str]) -> str:
         """Create unique key from name and tags."""
         if not tags:
             return name
@@ -380,7 +380,7 @@ class MetricsCollector:
         return f"{name}[{tag_str}]"
 
     def _record_metric(
-        self, name: str, metric_type: MetricType, value: float, tags: Dict[str, str]
+        self, name: str, metric_type: MetricType, value: float, tags: dict[str, str]
     ) -> None:
         """Record a metric with timestamp."""
         metric = Metric(
@@ -393,8 +393,8 @@ class MetricsCollector:
         self.metrics.append(metric)
 
     def get_metrics(
-        self, name: Optional[str] = None, metric_type: Optional[MetricType] = None
-    ) -> List[Metric]:
+        self, name: str | None = None, metric_type: MetricType | None = None
+    ) -> list[Metric]:
         """
         Retrieve metrics with optional filtering.
 
@@ -414,7 +414,7 @@ class MetricsCollector:
 
         return metrics
 
-    def get_histogram_stats(self, name: str, **tags: str) -> Optional[Dict[str, float]]:
+    def get_histogram_stats(self, name: str, **tags: str) -> dict[str, float] | None:
         """
         Get statistical summary of histogram.
 
@@ -464,7 +464,7 @@ class TelemetrySystem:
         self,
         logger_name: str = "adversarial_workflow",
         log_level: LogLevel = LogLevel.INFO,
-        log_file: Optional[Path] = None,
+        log_file: Path | None = None,
     ) -> None:
         """
         Initialize telemetry system.
@@ -508,7 +508,7 @@ class TelemetrySystem:
         self.logger.info(f"Agent created: {agent_id}", agent_id=agent_id, agent_type=agent_type)
         self.metrics.increment_counter("agents_created", type=agent_type)
 
-    def log_error(self, message: str, error: Exception, agent_id: Optional[str] = None) -> None:
+    def log_error(self, message: str, error: Exception, agent_id: str | None = None) -> None:
         """Log error with exception details."""
         self.logger.error(
             message,
@@ -519,7 +519,7 @@ class TelemetrySystem:
         self.metrics.increment_counter("errors", error_type=type(error).__name__)
 
     @contextmanager
-    def trace_operation(self, operation_name: str, agent_id: Optional[str] = None):
+    def trace_operation(self, operation_name: str, agent_id: str | None = None):
         """
         Trace operation execution time and log start/end.
 
@@ -545,7 +545,7 @@ class TelemetrySystem:
             )
             self.metrics.record_timer(operation_name, duration, agent=agent_id or "system")
 
-    def get_summary(self) -> Dict[str, Any]:
+    def get_summary(self) -> dict[str, Any]:
         """
         Get telemetry summary.
 

@@ -302,7 +302,7 @@ class MCPClient:
 
             return response
 
-        except asyncio.TimeoutError as timeout_err:
+        except TimeoutError as timeout_err:
             raise MCPProtocolError(f"Request timeout after {self.timeout}s") from timeout_err
         except json.JSONDecodeError as json_err:
             raise MCPProtocolError(f"Invalid JSON response: {json_err}") from json_err

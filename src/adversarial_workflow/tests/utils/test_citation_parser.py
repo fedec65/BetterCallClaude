@@ -12,13 +12,12 @@ Test Coverage:
 - Edge cases and malformed citations
 """
 
-from typing import Dict, Any, List, Optional
 import pytest
+
 from adversarial_workflow.utils.citation_parser import (
-    CitationParser,
     Citation,
+    CitationParser,
     CitationType,
-    CitationParseError,
     InvalidCitationFormatError,
 )
 
@@ -452,15 +451,15 @@ class TestEdgeCases:
         parser = CitationParser(strict=False)
 
         # Missing section
-        citations = parser.parse("BGE 145 229")
-        # Should handle gracefully in lenient mode
+        _citations = parser.parse("BGE 145 229")
+        # Should handle gracefully in lenient mode (no assertion needed)
 
     def test_parse_article_without_statute(self) -> None:
         """Test parsing article reference without statute name."""
         parser = CitationParser(strict=False)
-        citations = parser.parse("Art. 97")
+        _citations = parser.parse("Art. 97")
 
-        # In lenient mode, should either parse or skip gracefully
+        # In lenient mode, should either parse or skip gracefully (no assertion needed)
         # Not all partial citations are invalid in context
 
     def test_whitespace_handling(self) -> None:

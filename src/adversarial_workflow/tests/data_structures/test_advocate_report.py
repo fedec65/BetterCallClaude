@@ -13,9 +13,8 @@ Test Coverage:
 - Strength value ranges
 """
 
-from typing import Any, Dict, List
 import pytest
-import yaml
+
 from adversarial_workflow.data_structures.advocate_report import (
     AdvocateReport,
     Argument,

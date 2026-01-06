@@ -21,7 +21,8 @@ YAML Schema:
 """
 
 from dataclasses import dataclass, field
-from typing import List, Dict, Any, Literal
+from typing import Any, Literal
+
 import yaml
 
 
@@ -39,8 +40,8 @@ class Argument:
     """
 
     argument_id: str
-    statutory_basis: List[str] = field(default_factory=list)
-    precedents: List[str] = field(default_factory=list)
+    statutory_basis: list[str] = field(default_factory=list)
+    precedents: list[str] = field(default_factory=list)
     reasoning: str = ""
     strength: float = 0.5
 
@@ -67,7 +68,7 @@ class Argument:
         if not (0.0 <= self.strength <= 1.0):
             raise ValueError(f"strength must be between 0.0 and 1.0, got {self.strength}")
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert argument to dictionary for YAML serialization."""
         return {
             "argument_id": self.argument_id,
@@ -78,7 +79,7 @@ class Argument:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "Argument":
+    def from_dict(cls, data: dict[str, Any]) -> "Argument":
         """Create Argument from dictionary."""
         return cls(
             argument_id=data["argument_id"],
@@ -122,7 +123,7 @@ class Citation:
         if not self.reference.strip():
             raise ValueError("reference cannot be whitespace only")
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert citation to dictionary for YAML serialization."""
         return {
             "citation_id": self.citation_id,
@@ -132,7 +133,7 @@ class Citation:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "Citation":
+    def from_dict(cls, data: dict[str, Any]) -> "Citation":
         """Create Citation from dictionary."""
         return cls(
             citation_id=data["citation_id"],
@@ -157,8 +158,8 @@ class AdvocateReport:
     """
 
     position: Literal["pro", "anti"]
-    arguments: List[Argument] = field(default_factory=list)
-    citations: List[Citation] = field(default_factory=list)
+    arguments: list[Argument] = field(default_factory=list)
+    citations: list[Citation] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         """Validate report after initialization."""
@@ -166,7 +167,7 @@ class AdvocateReport:
         if not self.arguments:
             raise ValueError("At least one argument is required")
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert report to dictionary for YAML serialization."""
         return {
             "position": self.position,
@@ -175,7 +176,7 @@ class AdvocateReport:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "AdvocateReport":
+    def from_dict(cls, data: dict[str, Any]) -> "AdvocateReport":
         """Create AdvocateReport from dictionary."""
         return cls(
             position=data["position"],

@@ -9,10 +9,10 @@ Structures:
 """
 
 from adversarial_workflow.data_structures.user_query_package import (
-    UserQueryPackage,
     Jurisdiction,
     Language,
     Metadata,
+    UserQueryPackage,
 )
 
 __all__ = [

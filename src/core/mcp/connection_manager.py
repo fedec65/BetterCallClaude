@@ -229,7 +229,7 @@ class MCPConnectionManager:
 
                 return result
 
-            except asyncio.TimeoutError as timeout_err:
+            except TimeoutError as timeout_err:
                 if attempt == config.max_retries:
                     logger.error(
                         f"Request to {server_id}.{method} timed out after "

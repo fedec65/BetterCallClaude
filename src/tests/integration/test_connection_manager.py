@@ -487,8 +487,8 @@ class TestConnectionManagerRetryLogic:
         with patch.object(manager, "_execute_request", new_callable=AsyncMock) as mock_execute:
             # First two calls timeout, third succeeds
             mock_execute.side_effect = [
-                asyncio.TimeoutError(),
-                asyncio.TimeoutError(),
+                TimeoutError(),
+                TimeoutError(),
                 {"success": True, "result": {}},
             ]
 
@@ -517,7 +517,7 @@ class TestConnectionManagerRetryLogic:
 
         with patch.object(manager, "_execute_request", new_callable=AsyncMock) as mock_execute:
             # All calls timeout
-            mock_execute.side_effect = asyncio.TimeoutError()
+            mock_execute.side_effect = TimeoutError()
 
             with patch("asyncio.sleep", new_callable=AsyncMock):
                 with pytest.raises(TimeoutError, match="timed out"):

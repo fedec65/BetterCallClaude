@@ -16,9 +16,8 @@ Note: AdversaryReport uses the same Argument and Citation classes as AdvocateRep
 The only structural difference is semantic - adversary reports typically use position="anti".
 """
 
-from typing import Any, Dict, List
 import pytest
-import yaml
+
 from adversarial_workflow.data_structures.adversary_report import (
     AdversaryReport,
     Argument,
