@@ -20,7 +20,28 @@ set -e
 # Configuration & Defaults
 # ============================================================================
 
-VERSION="2.0.1"
+# Extract version from pyproject.toml (source of truth)
+extract_version_from_pyproject() {
+    local pyproject_path="${1:-pyproject.toml}"
+    if [ ! -f "$pyproject_path" ]; then
+        echo "unknown"
+        return 1
+    fi
+    # Extract version line and remove quotes/whitespace
+    grep '^version = ' "$pyproject_path" | sed 's/^version = "\(.*\)"$/\1/' | tr -d ' '
+}
+
+# Determine pyproject.toml location
+if [ -n "$INSTALL_DIR" ] && [ -f "$INSTALL_DIR/pyproject.toml" ]; then
+    VERSION=$(extract_version_from_pyproject "$INSTALL_DIR/pyproject.toml")
+elif [ -f "$(dirname "$0")/pyproject.toml" ]; then
+    VERSION=$(extract_version_from_pyproject "$(dirname "$0")/pyproject.toml")
+elif [ -f "pyproject.toml" ]; then
+    VERSION=$(extract_version_from_pyproject "pyproject.toml")
+else
+    VERSION="unknown"
+fi
+
 REPO_URL="https://github.com/fedec65/BetterCallClaude.git"
 REPO_RAW_URL="https://raw.githubusercontent.com/fedec65/BetterCallClaude/main"
 SUPPORT_EMAIL="federico@cesconi.com"

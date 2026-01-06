@@ -80,6 +80,10 @@ mcp-servers/*/node_modules/
 mcp-servers/*/dist/
 mcp-servers/*/.env
 
+# Generated installation metadata (auto-created by install.sh)
+manifest.json
+version.txt
+
 # Development artifacts (not for distribution)
 claudedocs/
 .serena/
