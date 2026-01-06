@@ -24,7 +24,7 @@ from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any
+from typing import Any, Generator
 
 
 class LogLevel(Enum):
@@ -356,7 +356,7 @@ class MetricsCollector:
         self._record_metric(name, MetricType.TIMER, duration, tags)
 
     @contextmanager
-    def timer(self, name: str, **tags: str):
+    def timer(self, name: str, **tags: str) -> Generator[None, None, None]:
         """
         Context manager for timing code blocks.
 
@@ -519,7 +519,7 @@ class TelemetrySystem:
         self.metrics.increment_counter("errors", error_type=type(error).__name__)
 
     @contextmanager
-    def trace_operation(self, operation_name: str, agent_id: str | None = None):
+    def trace_operation(self, operation_name: str, agent_id: str | None = None) -> Generator[None, None, None]:
         """
         Trace operation execution time and log start/end.
 

@@ -9,7 +9,7 @@ This module implements the YAML-based schema for user legal queries with:
 
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 import yaml
 

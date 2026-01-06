@@ -24,7 +24,7 @@ The only structural difference is semantic - adversary reports typically use pos
 """
 
 from dataclasses import dataclass, field
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 import yaml
 

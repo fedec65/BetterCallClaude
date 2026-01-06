@@ -21,7 +21,7 @@ YAML Schema:
 """
 
 from dataclasses import dataclass, field
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 import yaml
 
