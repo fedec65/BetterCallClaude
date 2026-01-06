@@ -20,7 +20,7 @@ YAML Schema:
 """
 
 from dataclasses import dataclass, field
-from typing import Any, cast
+from typing import Any
 
 import yaml
 

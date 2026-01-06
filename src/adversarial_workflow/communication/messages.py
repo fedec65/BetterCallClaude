@@ -22,7 +22,7 @@ YAML Schema:
 import time
 import uuid
 from dataclasses import dataclass
-from typing import Any, Literal, cast
+from typing import Any, Literal
 
 import yaml
 

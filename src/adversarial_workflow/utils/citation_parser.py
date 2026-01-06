@@ -297,7 +297,9 @@ class CitationParser:
                 volume = match.group(2)
                 section = match.group(3)
                 page = match.group(4)
-                consideration = match.group(5) if match.lastindex is not None and match.lastindex >= 5 else None
+                consideration = (
+                    match.group(5) if match.lastindex is not None and match.lastindex >= 5 else None
+                )
 
                 # Extract original text from match
                 original_text = match.group(0)
@@ -358,9 +360,19 @@ class CitationParser:
                 matched_positions.add(position)
 
                 article_number = match.group(1)
-                paragraph = match.group(2) if match.lastindex is not None and match.lastindex >= 2 and match.group(2) else None
-                letter = match.group(3) if match.lastindex is not None and match.lastindex >= 3 and match.group(3) else None
-                statute = match.group(4) if match.lastindex is not None and match.lastindex >= 4 else None
+                paragraph = (
+                    match.group(2)
+                    if match.lastindex is not None and match.lastindex >= 2 and match.group(2)
+                    else None
+                )
+                letter = (
+                    match.group(3)
+                    if match.lastindex is not None and match.lastindex >= 3 and match.group(3)
+                    else None
+                )
+                statute = (
+                    match.group(4) if match.lastindex is not None and match.lastindex >= 4 else None
+                )
 
                 # Extract original text from match
                 original_text = match.group(0)
