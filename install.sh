@@ -383,13 +383,13 @@ check_prerequisites() {
         local py_ver=$(get_version "$python_cmd")
         local py_major=$(echo "$py_ver" | cut -d. -f1)
         local py_minor=$(echo "$py_ver" | cut -d. -f2)
-        if [ "$py_major" -ge 3 ] && [ "$py_minor" -ge 10 ] && [ "$py_minor" -le 12 ]; then
-            log_success "Python: $py_ver (3.10-3.12 supported)"
+        if [ "$py_major" -ge 3 ] && [ "$py_minor" -ge 10 ] && [ "$py_minor" -le 13 ]; then
+            log_success "Python: $py_ver (3.10-3.13 supported)"
             PYTHON_CMD="$python_cmd"
-        elif [ "$py_major" -ge 3 ] && [ "$py_minor" -ge 10 ]; then
-            log_warning "Python: $py_ver (3.13+ may have compatibility issues)"
-            log_warning "Some packages like lxml may fail to build from source."
-            log_warning "Recommended: Use Python 3.11 or 3.12 for best compatibility."
+        elif [ "$py_major" -ge 3 ] && [ "$py_minor" -ge 14 ]; then
+            log_warning "Python: $py_ver (3.14+ may have compatibility issues)"
+            log_warning "Some packages may fail to build from source."
+            log_warning "Recommended: Use Python 3.11-3.13 for best compatibility."
             PYTHON_CMD="$python_cmd"
             warnings=$((warnings + 1))
         else
@@ -1324,16 +1324,31 @@ EOFCLI
 
     chmod +x "$cli_script"
 
-    # Try to symlink to PATH
+    # Try to symlink to PATH with better fallback handling
     if [ -w "/usr/local/bin" ]; then
         ln -sf "$cli_script" "/usr/local/bin/bettercallclaude"
         log_success "CLI installed to /usr/local/bin/bettercallclaude"
-    elif [ -d "$HOME/.local/bin" ]; then
-        ln -sf "$cli_script" "$HOME/.local/bin/bettercallclaude"
-        log_success "CLI installed to ~/.local/bin/bettercallclaude"
     else
-        log_warning "Could not install CLI to PATH. Run manually:"
-        echo "  $cli_script"
+        # Create ~/.local/bin if it doesn't exist
+        mkdir -p "$HOME/.local/bin"
+
+        # Try to create symlink (redirect errors to suppress permission warnings)
+        if ln -sf "$cli_script" "$HOME/.local/bin/bettercallclaude" 2>/dev/null; then
+            log_success "CLI installed to ~/.local/bin/bettercallclaude"
+
+            # Check if ~/.local/bin is in PATH
+            if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+                log_info "Add to PATH in your shell profile (~/.zshrc or ~/.bashrc):"
+                echo "  export PATH=\"\$HOME/.local/bin:\$PATH\""
+            fi
+        else
+            # Fallback: provide clear instructions
+            log_warning "Could not install CLI to PATH automatically."
+            log_info "Option 1 - Run manually:"
+            echo "  $cli_script"
+            log_info "Option 2 - Add to PATH in your shell profile (~/.zshrc or ~/.bashrc):"
+            echo "  export PATH=\"$INSTALL_DIR/bin:\$PATH\""
+        fi
     fi
 }
 
