@@ -20,7 +20,11 @@ set -e
 # Configuration & Defaults
 # ============================================================================
 
-# Extract version from pyproject.toml (source of truth)
+# Fallback version for initial display (banner, early logs)
+# This will be updated after repository is cloned
+VERSION="2.1.0"
+
+# Extract version from pyproject.toml (source of truth after clone)
 extract_version_from_pyproject() {
     local pyproject_path="${1:-pyproject.toml}"
     if [ ! -f "$pyproject_path" ]; then
@@ -31,16 +35,18 @@ extract_version_from_pyproject() {
     grep '^version = ' "$pyproject_path" | sed 's/^version = "\(.*\)"$/\1/' | tr -d ' '
 }
 
-# Determine pyproject.toml location
-if [ -n "$INSTALL_DIR" ] && [ -f "$INSTALL_DIR/pyproject.toml" ]; then
-    VERSION=$(extract_version_from_pyproject "$INSTALL_DIR/pyproject.toml")
-elif [ -f "$(dirname "$0")/pyproject.toml" ]; then
-    VERSION=$(extract_version_from_pyproject "$(dirname "$0")/pyproject.toml")
-elif [ -f "pyproject.toml" ]; then
-    VERSION=$(extract_version_from_pyproject "pyproject.toml")
-else
-    VERSION="unknown"
-fi
+# Update VERSION from cloned repository's pyproject.toml
+# Call this after clone_repository() to get actual version
+update_version_from_repo() {
+    if [ -f "$INSTALL_DIR/pyproject.toml" ]; then
+        local extracted_version
+        extracted_version=$(extract_version_from_pyproject "$INSTALL_DIR/pyproject.toml")
+        if [ "$extracted_version" != "unknown" ] && [ -n "$extracted_version" ]; then
+            VERSION="$extracted_version"
+            log_step "Version extracted from pyproject.toml: $VERSION"
+        fi
+    fi
+}
 
 REPO_URL="https://github.com/fedec65/BetterCallClaude.git"
 REPO_RAW_URL="https://raw.githubusercontent.com/fedec65/BetterCallClaude/main"
@@ -1337,6 +1343,7 @@ perform_installation() {
     echo ""
 
     clone_repository
+    update_version_from_repo  # Extract actual version after clone
     setup_mcp_servers
     setup_python_env
     install_commands
@@ -1528,6 +1535,9 @@ do_update() {
         log_error "Failed to pull updates"
         exit 1
     }
+
+    # Extract updated version
+    update_version_from_repo
 
     # Rebuild MCP servers
     setup_mcp_servers
