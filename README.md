@@ -1,6 +1,6 @@
 # BetterCallClaude: Legal Intelligence Framework for Swiss Lawyers
 
-[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](https://github.com/fedec65/bettercallclaude)
+[![Version](https://img.shields.io/badge/version-2.2.0-blue.svg)](https://github.com/fedec65/bettercallclaude)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![Languages](https://img.shields.io/badge/languages-DE%20%7C%20FR%20%7C%20IT%20%7C%20EN-orange.svg)]()
 [![Claude Code](https://img.shields.io/badge/built%20with-Claude%20Code-purple.svg)](https://claude.ai/code)
@@ -46,6 +46,12 @@ BetterCallClaude is a comprehensive legal intelligence framework designed to pro
   * **Multi-jurisdictional expertise** across Federal law and all 26 Swiss cantons.
   * **Multi-lingual precision** in German, French, Italian, and English.
   * **Privacy-First Architecture** with local LLM support for attorney-client privilege (*Anwaltsgeheimnis*).
+
+### What's New in v2.2.0
+
+  * 🆕 **OnlineKommentar MCP Server**: Access Swiss legal commentaries via OnlineKommentar.ch API, completing the **Swiss Legal Research Trinity** (Law + Case Law + Doctrine).
+  * 🆕 **4 New MCP Tools**: `search_commentaries`, `get_commentary`, `get_commentary_for_article`, `list_legislative_acts` with full multilingual support (DE/FR/IT/EN).
+  * 🆕 **Legislative Act Mapping**: UUID mapping for major Swiss codes (OR, ZGB, StGB, ZPO, StPO, and more).
 
 ### What's New in v2.1.0
 
@@ -263,6 +269,7 @@ BetterCallClaude connects Claude to Swiss legal databases via the **Model Contex
   * **`bge-search`**: Direct access to the Federal Supreme Court database.
   * **`legal-citations`**: A logic server for verifying and formatting Swiss legal citations (e.g., converting "BGE 145 III 229" to "ATF 145 III 229" for French contexts).
   * **`fedlex-sparql`**: Queries Swiss federal legislation using the JOLUX ontology via SPARQL. Retrieves laws, ordinances, and consolidated legal texts with multilingual support (DE/FR/IT/RM).
+  * **`onlinekommentar`**: Access Swiss legal commentaries and doctrine via the OnlineKommentar.ch API. Search commentaries by law/article, retrieve full commentary content, and list available legislative acts.
   * **`shared`**: SQLite infrastructure for caching and connection pooling.
 
 ### Agent Workflow Diagram
