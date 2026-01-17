@@ -1127,6 +1127,10 @@ cmd_update() {
         if git pull origin main; then
             echo -e "${GREEN}Updated successfully!${NC}"
 
+            # Reset version.txt to ensure we get the pulled version
+            # (create_manifest may have modified it locally)
+            git checkout -- version.txt 2>/dev/null
+
             # Update VERSION from the newly pulled version.txt
             if [ -f "$INSTALL_DIR/version.txt" ]; then
                 VERSION=$(cat "$INSTALL_DIR/version.txt" | tr -d '[:space:]')
