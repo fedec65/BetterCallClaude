@@ -1130,10 +1130,26 @@ cmd_update() {
             # Update VERSION from the newly pulled version.txt
             if [ -f "$INSTALL_DIR/version.txt" ]; then
                 VERSION=$(cat "$INSTALL_DIR/version.txt" | tr -d '[:space:]')
-            fi
 
-            # Regenerate manifest with new version
-            create_manifest
+                # Update manifest.json with new version
+                if [ -f "$MANIFEST" ]; then
+                    # Use node if available for reliable JSON update
+                    if command -v node &> /dev/null; then
+                        node -e "
+                            const fs = require('fs');
+                            const manifest = JSON.parse(fs.readFileSync('$MANIFEST'));
+                            manifest.version = '$VERSION';
+                            manifest.updated_at = new Date().toISOString();
+                            fs.writeFileSync('$MANIFEST', JSON.stringify(manifest, null, 4));
+                        " 2>/dev/null && echo -e "${GREEN}Manifest updated to v${VERSION}${NC}"
+                    else
+                        # Fallback to sed for systems without node
+                        sed -i.bak 's/"version": "[^"]*"/"version": "'"$VERSION"'"/' "$MANIFEST" 2>/dev/null && \
+                        rm -f "${MANIFEST}.bak" && \
+                        echo -e "${GREEN}Manifest updated to v${VERSION}${NC}"
+                    fi
+                fi
+            fi
         else
             echo -e "${RED}Update failed!${NC}"
             echo -e "${YELLOW}This may be due to local changes. Try:${NC}"
