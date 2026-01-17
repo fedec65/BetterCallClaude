@@ -233,13 +233,13 @@ Use specific commands for audit trails or specific tasks.
 
 ```bash
 # Research
-/legal:research "Art. 97 OR contractual liability" --jurisdiction=federal
+/legal-research "Art. 97 OR contractual liability" --jurisdiction=federal
 
 # Strategy
-/legal:strategy "Breach of contract risk assessment" --risk-tolerance=low
+/legal-strategy "Breach of contract risk assessment" --risk-tolerance=low
 
 # Drafting
-/legal:draft "Service agreement under Swiss OR" --language=EN
+/legal-draft "Service agreement under Swiss OR" --language=EN
 ```
 
 -----
@@ -251,32 +251,32 @@ Use specific commands for audit trails or specific tasks.
 | Command | Description | Key Options |
 | :--- | :--- | :--- |
 | `/legal` | Smart entry point (Proxy) | `@agent`, `--workflow`, `--mode` |
-| `/legal:research` | Search legal sources | `--jurisdiction`, `--date-from`, `--limit` |
-| `/legal:strategy` | Case strategy analysis | `--risk-tolerance`, `--settlement-focus` |
-| `/legal:draft` | Document drafting | `--type`, `--language`, `--style` |
-| `/legal:cite` | Verify citations | `--format` (DE/FR/IT) |
+| `/legal-research` | Search legal sources | `--jurisdiction`, `--date-from`, `--limit` |
+| `/legal-strategy` | Case strategy analysis | `--risk-tolerance`, `--settlement-focus` |
+| `/legal-draft` | Document drafting | `--type`, `--language`, `--style` |
+| `/legal-cite` | Verify citations | `--format` (DE/FR/IT) |
 
 ### Agent Directives
 
-Access specific agents via `/agent:<name>` or the shorthand `@<name>` inside the `/legal` proxy.
+Access specific agents via `/agent-<name>` or the shorthand `@<name>` inside the `/legal` proxy.
 
 | Agent | CLI Command | Context Options |
 | :--- | :--- | :--- |
-| **Researcher** | `/agent:researcher` | `--depth`, `--focus`, `--canton` |
-| **Orchestrator** | `/agent:orchestrator` | `--pipeline`, `--mode`, `--parallel`, `--steps` |
-| **Specialists** | `/agent:compliance`, `/agent:risk`, etc. | *Domain specific* |
+| **Researcher** | `/agent-researcher` | `--depth`, `--focus`, `--canton` |
+| **Orchestrator** | `/agent-orchestrator` | `--pipeline`, `--mode`, `--parallel`, `--steps` |
+| **Specialists** | `/agent-compliance`, `/agent-risk`, etc. | *Domain specific* |
 
 #### Orchestrator v2.0 Examples
 
 ```bash
 # Full pipeline: Research → Strategy → Draft
-/agent:orchestrator --pipeline full "Contract breach under Art. 97 OR"
+/agent-orchestrator --pipeline full "Contract breach under Art. 97 OR"
 
 # Parallel analysis with synthesis
-/agent:orchestrator --parallel "risk_assessor,deadline_tracker,citation_validator" --then strategist
+/agent-orchestrator --parallel "risk_assessor,deadline_tracker,citation_validator" --then strategist
 
 # Custom multi-agent sequence
-/agent:orchestrator --steps "researcher,citation_validator,strategist,drafter" --task "Full verified analysis"
+/agent-orchestrator --steps "researcher,citation_validator,strategist,drafter" --task "Full verified analysis"
 ```
 
 -----

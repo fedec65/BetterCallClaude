@@ -133,7 +133,7 @@ Query: "Search BGE for Art. 97 OR contractual liability cases"
 ```
 
 ### Method 2: Explicit Commands (Professional Assurance)
-**How it works**: Use `/legal:` prefix commands to explicitly force framework activation
+**How it works**: Use `/legal-` prefix commands to explicitly force framework activation
 
 **Advantages**:
 - ✅ **Professional assurance** - Clear that BetterCallClaude framework is active
@@ -145,23 +145,23 @@ Query: "Search BGE for Art. 97 OR contractual liability cases"
 **Available Commands**:
 
 #### Persona Commands
-- `/legal:research` - Activate Legal Researcher for precedent analysis
-- `/legal:strategy` - Activate Case Strategist for litigation planning
-- `/legal:draft` - Activate Legal Drafter for document creation
+- `/legal-research` - Activate Legal Researcher for precedent analysis
+- `/legal-strategy` - Activate Case Strategist for litigation planning
+- `/legal-draft` - Activate Legal Drafter for document creation
 
 #### Mode Override Commands
-- `/legal:federal` - Force Federal Law Mode exclusively
-- `/legal:cantonal [ZH|BE|GE|BS|VD|TI]` - Force specific cantonal law
+- `/legal-federal` - Force Federal Law Mode exclusively
+- `/legal-cantonal [ZH|BE|GE|BS|VD|TI]` - Force specific cantonal law
 
 #### Help Command
-- `/legal:help` - Show complete command reference
+- `/legal-help` - Show complete command reference
 
 **Example**:
 ```
-Query: /legal:research Art. 97 OR contractual liability
+Query: /legal-research Art. 97 OR contractual liability
 → Explicitly activates Legal Researcher ✅
 → Shows activation confirmation in response:
-   "🎭 Persona: Legal Researcher (/legal:research activated)"
+   "🎭 Persona: Legal Researcher (/legal-research activated)"
 → Proceeds with BGE search with explicit framework indicator
 ```
 
@@ -173,7 +173,7 @@ Query: /legal:research Art. 97 OR contractual liability
 - Speed and efficiency are priority
 - In casual legal research sessions
 
-**Use Explicit Commands (/legal:)** when:
+**Use Explicit Commands (/legal-)** when:
 - Creating client deliverables or billable work
 - Need audit trail for professional file documentation
 - Working on high-stakes legal matters
@@ -187,16 +187,16 @@ You can combine persona commands with mode overrides:
 
 ```
 # Example 1: Federal research
-/legal:federal
-/legal:research BGE on Art. 97 OR
+/legal-federal
+/legal-research BGE on Art. 97 OR
 
 # Example 2: Zürich strategy
-/legal:cantonal ZH
-/legal:strategy Commercial litigation options
+/legal-cantonal ZH
+/legal-strategy Commercial litigation options
 
 # Example 3: Geneva drafting
-/legal:cantonal GE
-/legal:draft Complaint for Tribunal de première instance
+/legal-cantonal GE
+/legal-draft Complaint for Tribunal de première instance
 ```
 
 ### Activation Confirmation
@@ -204,8 +204,8 @@ You can combine persona commands with mode overrides:
 When using explicit commands, every response includes confirmation:
 
 ```
-🎭 Persona: Legal Researcher (/legal:research activated)
-📖 Mode: Federal Law (/legal:federal activated)
+🎭 Persona: Legal Researcher (/legal-research activated)
+📖 Mode: Federal Law (/legal-federal activated)
 🇨🇭 Jurisdiction: Swiss Federal Law
 ⚡ Activation: Explicit command override
 
@@ -215,9 +215,9 @@ When using explicit commands, every response includes confirmation:
 ### Command Documentation
 
 Complete command reference available:
-- Quick reference: Type `/legal:help` for command list
+- Quick reference: Type `/legal-help` for command list
 - Full documentation: `docs/workflows/` directory
-- Command files: `.claude/commands/legal:*.md`
+- Command files: `.claude/commands/legal-*.md`
 
 ---
 

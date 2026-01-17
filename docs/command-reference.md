@@ -1,6 +1,6 @@
 # BetterCallClaude Command Reference
 
-**Complete reference for all `/legal:` commands and hybrid activation system**
+**Complete reference for all `/legal-` commands and hybrid activation system**
 
 ---
 
@@ -24,7 +24,7 @@ BetterCallClaude supports **two activation methods** for maximum flexibility:
 | Method | Trigger | Use Case |
 |--------|---------|----------|
 | **Natural Language** | Legal keywords | Fast, intuitive, everyday use |
-| **Explicit Commands** | `/legal:` prefix | Professional assurance, audit trails |
+| **Explicit Commands** | `/legal-` prefix | Professional assurance, audit trails |
 
 **Both methods activate the same powerful framework** - choose based on your needs.
 
@@ -63,22 +63,22 @@ Result:
 
 ### Explicit Commands (Professional Assurance)
 
-**How it works**: Use `/legal:` prefix to explicitly force framework activation
+**How it works**: Use `/legal-` prefix to explicitly force framework activation
 
 **Available Commands**:
-- `/legal:research` - Legal Researcher persona
-- `/legal:strategy` - Case Strategist persona
-- `/legal:draft` - Legal Drafter persona
-- `/legal:federal` - Federal Law Mode
-- `/legal:cantonal [ZH|BE|GE|BS|VD|TI]` - Cantonal Law Mode
-- `/legal:help` - Command reference
+- `/legal-research` - Legal Researcher persona
+- `/legal-strategy` - Case Strategist persona
+- `/legal-draft` - Legal Drafter persona
+- `/legal-federal` - Federal Law Mode
+- `/legal-cantonal [ZH|BE|GE|BS|VD|TI]` - Cantonal Law Mode
+- `/legal-help` - Command reference
 
 **Example**:
 ```
-Query: /legal:research Art. 97 OR contractual liability
+Query: /legal-research Art. 97 OR contractual liability
 
 Result:
-🎭 Persona: Legal Researcher (/legal:research activated)
+🎭 Persona: Legal Researcher (/legal-research activated)
 📖 Mode: Federal Law
 🇨🇭 Jurisdiction: Swiss Federal Law
 ⚡ Activation: Explicit command override
@@ -97,7 +97,7 @@ Result:
 
 ## Persona Commands
 
-### `/legal:research` - Legal Researcher
+### `/legal-research` - Legal Researcher
 
 **Activates**: Legal Researcher persona for precedent research and statutory analysis
 
@@ -110,21 +110,21 @@ Result:
 **Usage**:
 ```bash
 # Basic research
-/legal:research Art. 97 OR contractual liability
+/legal-research Art. 97 OR contractual liability
 
 # BGE precedent search
-/legal:research BGE precedents on foreseeability under Art. 99 OR
+/legal-research BGE precedents on foreseeability under Art. 99 OR
 
 # Multi-lingual research
-/legal:research ATF sur la responsabilité contractuelle (art. 97 CO)
+/legal-research ATF sur la responsabilité contractuelle (art. 97 CO)
 
 # Cantonal research
-/legal:research Zürich court decisions on commercial disputes
+/legal-research Zürich court decisions on commercial disputes
 ```
 
 **Response Format**:
 ```
-🎭 Persona: Legal Researcher (/legal:research activated)
+🎭 Persona: Legal Researcher (/legal-research activated)
 📖 Mode: [Federal Law | Cantonal Law | Multi-Lingual]
 🇨🇭 Jurisdiction: [Swiss Federal | Canton Name]
 
@@ -140,7 +140,7 @@ Result:
 
 ---
 
-### `/legal:strategy` - Case Strategist
+### `/legal-strategy` - Case Strategist
 
 **Activates**: Case Strategist persona for litigation planning and risk assessment
 
@@ -154,21 +154,21 @@ Result:
 **Usage**:
 ```bash
 # Basic strategy analysis
-/legal:strategy Analyze breach of contract case, CHF 500,000 damages
+/legal-strategy Analyze breach of contract case, CHF 500,000 damages
 
 # Risk assessment
-/legal:strategy Assess chances of success: written contract, 3-month delay, force majeure defense
+/legal-strategy Assess chances of success: written contract, 3-month delay, force majeure defense
 
 # Procedural planning
-/legal:strategy What procedural options in Zürich Commercial Court, CHF 500,000 claim
+/legal-strategy What procedural options in Zürich Commercial Court, CHF 500,000 claim
 
 # Settlement calculation
-/legal:strategy Calculate settlement range: 65% success probability, CHF 75,000 litigation costs
+/legal-strategy Calculate settlement range: 65% success probability, CHF 75,000 litigation costs
 ```
 
 **Response Format**:
 ```
-🎭 Persona: Case Strategist (/legal:strategy activated)
+🎭 Persona: Case Strategist (/legal-strategy activated)
 📖 Mode: [Federal Law + Cantonal Law | Specific Canton]
 ⚖️ Analysis Type: [Strategic Assessment | Risk Analysis | Procedural Planning]
 
@@ -185,7 +185,7 @@ Result:
 
 ---
 
-### `/legal:draft` - Legal Drafter
+### `/legal-draft` - Legal Drafter
 
 **Activates**: Legal Drafter persona for Swiss-standard document creation
 
@@ -198,21 +198,21 @@ Result:
 **Usage**:
 ```bash
 # Contract drafting
-/legal:draft Service agreement under Swiss OR, 6 months, CHF 150,000, IP transfer
+/legal-draft Service agreement under Swiss OR, 6 months, CHF 150,000, IP transfer
 
 # Court submission
-/legal:draft Complaint for Zürich Commercial Court, breach of contract Art. 97 OR, CHF 500,000
+/legal-draft Complaint for Zürich Commercial Court, breach of contract Art. 97 OR, CHF 500,000
 
 # Legal opinion
-/legal:draft Legal opinion on liability under Art. 41 OR for product defect case
+/legal-draft Legal opinion on liability under Art. 41 OR for product defect case
 
 # Multi-lingual document
-/legal:draft Contrat de service en français selon CO suisse
+/legal-draft Contrat de service en français selon CO suisse
 ```
 
 **Response Format**:
 ```
-🎭 Persona: Legal Drafter (/legal:draft activated)
+🎭 Persona: Legal Drafter (/legal-draft activated)
 📖 Mode: [Federal Law | Cantonal Law | Multi-Lingual]
 📄 Document Type: [Contract | Court Submission | Legal Opinion]
 🇨🇭 Jurisdiction: [Swiss Federal | Canton Name]
@@ -231,7 +231,7 @@ Result:
 
 ## Mode Override Commands
 
-### `/legal:federal` - Force Federal Law Mode
+### `/legal-federal` - Force Federal Law Mode
 
 **Forces**: Swiss federal law analysis exclusively
 
@@ -244,19 +244,19 @@ Result:
 **Usage**:
 ```bash
 # Federal statute analysis
-/legal:federal
+/legal-federal
 Explain Art. 41 OR unlawful act requirements
 
 # BGE precedent research
-/legal:federal
+/legal-federal
 Search BGE for good faith principle (Art. 2 ZGB)
 
 # Constitutional question
-/legal:federal
+/legal-federal
 Analyze Art. 9 BV (good faith) in administrative context
 
 # Override mixed signals
-/legal:federal
+/legal-federal
 Art. 97 OR liability in Zürich commercial case
 (Forces federal OR analysis, ignores Zürich cantonal aspects)
 ```
@@ -264,20 +264,20 @@ Art. 97 OR liability in Zürich commercial case
 **Response Format**:
 ```
 🎭 Persona: [Auto-detected based on query]
-📖 Mode: Federal Law (/legal:federal activated)
+📖 Mode: Federal Law (/legal-federal activated)
 🇨🇭 Jurisdiction: Swiss Federal Law
 
 [Federal legal analysis with BGE precedents and federal statutes...]
 ```
 
 **Works With All Personas**:
-- Legal Researcher + `/legal:federal` = Federal precedent research
-- Case Strategist + `/legal:federal` = Federal law litigation strategy
-- Legal Drafter + `/legal:federal` = Federal law document drafting
+- Legal Researcher + `/legal-federal` = Federal precedent research
+- Case Strategist + `/legal-federal` = Federal law litigation strategy
+- Legal Drafter + `/legal-federal` = Federal law document drafting
 
 ---
 
-### `/legal:cantonal [CANTON]` - Force Cantonal Law Mode
+### `/legal-cantonal [CANTON]` - Force Cantonal Law Mode
 
 **Forces**: Specific cantonal law analysis
 
@@ -295,26 +295,26 @@ Art. 97 OR liability in Zürich commercial case
 **Usage**:
 ```bash
 # Zürich cantonal law
-/legal:cantonal ZH
+/legal-cantonal ZH
 Court fees for commercial litigation in Zürich
 
 # Geneva cantonal procedure (French)
-/legal:cantonal GE
+/legal-cantonal GE
 Procédure de référé au Tribunal de première instance de Genève
 
 # Ticino cantonal law (Italian)
-/legal:cantonal TI
+/legal-cantonal TI
 Procedura civile presso il Tribunale di Lugano
 
 # Bern bilingual analysis
-/legal:cantonal BE
+/legal-cantonal BE
 Gerichtsgebühren im Kanton Bern / Frais de justice dans le canton de Berne
 ```
 
 **Response Format**:
 ```
 🎭 Persona: [Auto-detected based on query]
-📖 Mode: Cantonal Law (/legal:cantonal [CANTON] activated)
+📖 Mode: Cantonal Law (/legal-cantonal [CANTON] activated)
 🏛️ Canton: [Canton Name]
 🌐 Language: [Primary canton language]
 
@@ -324,7 +324,7 @@ Gerichtsgebühren im Kanton Bern / Frais de justice dans le canton de Berne
 **Hybrid Analysis**:
 Federal substantive law + Cantonal procedure is supported:
 ```
-/legal:cantonal ZH
+/legal-cantonal ZH
 Art. 97 OR breach of contract litigation in Zürich Commercial Court
 
 Result: Federal OR law (Art. 97) + Zürich cantonal procedure (ZPO implementation)
@@ -340,16 +340,16 @@ Combine persona and mode commands for precise control:
 
 ```bash
 # Example 1: Federal Research
-/legal:federal
-/legal:research BGE on Art. 97 OR contractual liability
+/legal-federal
+/legal-research BGE on Art. 97 OR contractual liability
 
 # Example 2: Zürich Strategy
-/legal:cantonal ZH
-/legal:strategy Commercial litigation options in Handelsgericht
+/legal-cantonal ZH
+/legal-strategy Commercial litigation options in Handelsgericht
 
 # Example 3: Geneva Drafting (French)
-/legal:cantonal GE
-/legal:draft Complaint for Tribunal de première instance
+/legal-cantonal GE
+/legal-draft Complaint for Tribunal de première instance
 ```
 
 ### Mixed Workflows
@@ -358,7 +358,7 @@ Toggle between explicit commands and natural language:
 
 ```bash
 # Start with explicit command for audit trail
-/legal:research Art. 97 OR
+/legal-research Art. 97 OR
 
 [Receives BGE list...]
 
@@ -368,7 +368,7 @@ Toggle between explicit commands and natural language:
 [Natural language continues in same mode]
 
 # Use explicit command to switch modes
-/legal:cantonal ZH
+/legal-cantonal ZH
 How does this apply in Zürich jurisdiction?
 ```
 
@@ -380,30 +380,30 @@ All commands work seamlessly in **DE/FR/IT/EN**:
 
 ### German Commands
 ```bash
-/legal:research Art. 97 OR Vertragsverletzung
-/legal:strategy Breach of Contract Fall, CHF 500'000 Schadensersatz
-/legal:draft Dienstleistungsvertrag gemäss OR
+/legal-research Art. 97 OR Vertragsverletzung
+/legal-strategy Breach of Contract Fall, CHF 500'000 Schadensersatz
+/legal-draft Dienstleistungsvertrag gemäss OR
 ```
 
 ### French Commands
 ```bash
-/legal:research art. 97 CO violation de contrat
-/legal:strategy Analyse de stratégie pour violation de contrat, CHF 500'000
-/legal:draft Contrat de service selon CO suisse
+/legal-research art. 97 CO violation de contrat
+/legal-strategy Analyse de stratégie pour violation de contrat, CHF 500'000
+/legal-draft Contrat de service selon CO suisse
 ```
 
 ### Italian Commands
 ```bash
-/legal:research art. 97 CO violazione del contratto
-/legal:strategy Analisi strategica per violazione contrattuale, CHF 500'000
-/legal:draft Contratto di servizio secondo CO svizzero
+/legal-research art. 97 CO violazione del contratto
+/legal-strategy Analisi strategica per violazione contrattuale, CHF 500'000
+/legal-draft Contratto di servizio secondo CO svizzero
 ```
 
 ### English Commands
 ```bash
-/legal:research Art. 97 OR breach of contract
-/legal:strategy Analyze breach of contract case, CHF 500,000 damages
-/legal:draft Service agreement under Swiss OR
+/legal-research Art. 97 OR breach of contract
+/legal-strategy Analyze breach of contract case, CHF 500,000 damages
+/legal-draft Service agreement under Swiss OR
 ```
 
 **Citation Formats Adapt**:
@@ -420,10 +420,10 @@ All commands work seamlessly in **DE/FR/IT/EN**:
 
 ```bash
 # Step 1: Explicit research activation
-/legal:research Art. 97 OR contractual liability
+/legal-research Art. 97 OR contractual liability
 
 Response:
-🎭 Persona: Legal Researcher (/legal:research activated)
+🎭 Persona: Legal Researcher (/legal-research activated)
 📖 Mode: Federal Law
 BGE Precedents on Art. 97 OR:
 1. BGE 144 III 93 - Foreseeability requirement...
@@ -446,7 +446,7 @@ Response:
 
 ```bash
 # Step 1: Explicit strategy activation
-/legal:strategy Breach of contract case:
+/legal-strategy Breach of contract case:
 - Written contract, clear delivery deadlines
 - Defendant missed deadline by 3 months
 - Plaintiff documented CHF 300,000 losses
@@ -454,7 +454,7 @@ Response:
 - Defendant claims force majeure (COVID-19)
 
 Response:
-🎭 Persona: Case Strategist (/legal:strategy activated)
+🎭 Persona: Case Strategist (/legal-strategy activated)
 
 STRENGTHS & WEAKNESSES ANALYSIS:
 ✅ STRENGTHS:
@@ -494,7 +494,7 @@ Walk-Away Point: CHF 100,000 (33%)
 
 ```bash
 # Step 1: Explicit drafting activation
-/legal:draft Service agreement under Swiss OR:
+/legal-draft Service agreement under Swiss OR:
 - Scope: Custom CRM system development
 - Duration: 6 months with 2-month extension option
 - Compensation: CHF 150,000 milestone-based
@@ -503,7 +503,7 @@ Walk-Away Point: CHF 100,000 (33%)
 - Governing law: Swiss law, Zürich jurisdiction
 
 Response:
-🎭 Persona: Legal Drafter (/legal:draft activated)
+🎭 Persona: Legal Drafter (/legal-draft activated)
 📖 Mode: Federal Law
 📄 Document Type: Contract
 
@@ -550,17 +550,17 @@ Enforceability Assessment:
 **Issue**: Command doesn't activate framework
 
 **Solutions**:
-1. Check syntax: `/legal:research` not `/legal research` (no space after colon)
+1. Check syntax: `/legal-research` not `/legal research` (no space after colon)
 2. Verify canton code: Valid codes are ZH, BE, GE, BS, VD, TI
 3. Ensure command is on new line or at start of message
 
 **Example**:
 ```bash
 ❌ Wrong: /legal research Art. 97 OR
-✅ Right: /legal:research Art. 97 OR
+✅ Right: /legal-research Art. 97 OR
 
-❌ Wrong: /legal:cantonal ZU  # Invalid canton code
-✅ Right: /legal:cantonal ZH
+❌ Wrong: /legal-cantonal ZU  # Invalid canton code
+✅ Right: /legal-cantonal ZH
 ```
 
 ### Auto-Detection Not Activating
@@ -568,7 +568,7 @@ Enforceability Assessment:
 **Issue**: Natural language doesn't trigger persona
 
 **Solutions**:
-1. Use explicit command: `/legal:research` to force activation
+1. Use explicit command: `/legal-research` to force activation
 2. Include legal keywords: "BGE", "Art. X", "precedent", "contract"
 3. Be more specific with legal terminology
 
@@ -578,7 +578,7 @@ Enforceability Assessment:
 ✅ Specific: "Search BGE for Art. 97 OR contract liability cases"
 
 Or use explicit command:
-✅ /legal:research contracts
+✅ /legal-research contracts
 ```
 
 ### Wrong Persona Activated
@@ -586,13 +586,13 @@ Or use explicit command:
 **Issue**: Auto-detection activates wrong persona
 
 **Solutions**:
-1. Use explicit command to override: `/legal:strategy` instead of relying on auto-detection
-2. Combine with mode override if needed: `/legal:federal` then `/legal:research`
+1. Use explicit command to override: `/legal-strategy` instead of relying on auto-detection
+2. Combine with mode override if needed: `/legal-federal` then `/legal-research`
 
 **Example**:
 ```bash
 # If auto-detection unclear, be explicit:
-/legal:strategy Analyze litigation approach for...
+/legal-strategy Analyze litigation approach for...
 ```
 
 ### Mixed Language Issues
@@ -601,17 +601,17 @@ Or use explicit command:
 
 **Solutions**:
 1. Explicitly state preferred language in query
-2. Use cantonal command for language context: `/legal:cantonal GE` for French
+2. Use cantonal command for language context: `/legal-cantonal GE` for French
 3. Query in preferred language consistently
 
 **Example**:
 ```bash
 # Force French with Geneva canton
-/legal:cantonal GE
+/legal-cantonal GE
 Analyse juridique en français...
 
 # Or state explicitly
-/legal:research (in French) art. 97 CO
+/legal-research (in French) art. 97 CO
 ```
 
 ---
@@ -620,12 +620,12 @@ Analyse juridique en français...
 
 | Command | Activates | Use Case |
 |---------|-----------|----------|
-| `/legal:research` | Legal Researcher | BGE search, statutory analysis |
-| `/legal:strategy` | Case Strategist | Litigation planning, risk assessment |
-| `/legal:draft` | Legal Drafter | Contracts, court submissions |
-| `/legal:federal` | Federal Law Mode | Force federal law exclusively |
-| `/legal:cantonal [ZH\|BE\|GE\|BS\|VD\|TI]` | Cantonal Law Mode | Force specific canton law |
-| `/legal:help` | Help System | Show this reference |
+| `/legal-research` | Legal Researcher | BGE search, statutory analysis |
+| `/legal-strategy` | Case Strategist | Litigation planning, risk assessment |
+| `/legal-draft` | Legal Drafter | Contracts, court submissions |
+| `/legal-federal` | Federal Law Mode | Force federal law exclusively |
+| `/legal-cantonal [ZH\|BE\|GE\|BS\|VD\|TI]` | Cantonal Law Mode | Force specific canton law |
+| `/legal-help` | Help System | Show this reference |
 
 ---
 

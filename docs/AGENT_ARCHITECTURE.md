@@ -35,10 +35,10 @@ BetterCallClaude implements a **dual-interface architecture** combining granular
 │                                                                 │
 │  GRANULAR COMMANDS              DELEGATION AGENTS               │
 │  ─────────────────              ─────────────────               │
-│  /legal:search-bge              /agent:researcher               │
-│  /legal:cite-check              /agent:strategist               │
-│  /legal:translate               /agent:drafter                  │
-│  /legal:format                  /agent:litigator                │
+│  /legal-search-bge              /agent-researcher               │
+│  /legal-cite-check              /agent-strategist               │
+│  /legal-translate               /agent-drafter                  │
+│  /legal-format                  /agent-litigator                │
 │                                                                 │
 │  → Single action                → Multi-step workflow           │
 │  → Immediate result             → Progress updates              │
@@ -72,33 +72,33 @@ BetterCallClaude implements a **dual-interface architecture** combining granular
 
 | Agent | Purpose | Complexity | MCP Dependencies |
 |-------|---------|------------|------------------|
-| `/agent:researcher` | Deep legal research with multi-source synthesis | High | entscheidsuche, bge-search, cantonal-courts |
-| `/agent:strategist` | Case strategy and risk assessment | High | All research MCPs + legal-citations |
-| `/agent:drafter` | Swiss-compliant document generation | Medium-High | legal-citations, templates |
+| `/agent-researcher` | Deep legal research with multi-source synthesis | High | entscheidsuche, bge-search, cantonal-courts |
+| `/agent-strategist` | Case strategy and risk assessment | High | All research MCPs + legal-citations |
+| `/agent-drafter` | Swiss-compliant document generation | Medium-High | legal-citations, templates |
 
 ### Category B: Swiss Registry Agents
 
 | Agent | Purpose | Registry | Unique Value |
 |-------|---------|----------|--------------|
-| `/agent:handelsregister` | Commercial registry operations | Zefix/cantonal HR | Company searches, filing prep, change tracking |
-| `/agent:grundbuch` | Land registry transactions | Cantonal Grundbuch | Title searches, encumbrance checks, transfer prep |
-| `/agent:betreibung` | Debt collection (SchKG) | Betreibungsamt | Procedure tracking, form generation, deadline calc |
+| `/agent-handelsregister` | Commercial registry operations | Zefix/cantonal HR | Company searches, filing prep, change tracking |
+| `/agent-grundbuch` | Land registry transactions | Cantonal Grundbuch | Title searches, encumbrance checks, transfer prep |
+| `/agent-betreibung` | Debt collection (SchKG) | Betreibungsamt | Procedure tracking, form generation, deadline calc |
 
 ### Category C: Quality & Compliance
 
 | Agent | Purpose | Scope | Output |
 |-------|---------|-------|--------|
-| `/agent:citation-checker` | Citation verification & currency | All documents | Verification report, outdated alerts |
-| `/agent:compliance` | Regulatory compliance scanning | Multi-regulation | Compliance matrix, risk flags |
-| `/agent:conflict-checker` | Conflict of interest detection | Client database | Clearance memo, conflict map |
+| `/agent-citation-checker` | Citation verification & currency | All documents | Verification report, outdated alerts |
+| `/agent-compliance` | Regulatory compliance scanning | Multi-regulation | Compliance matrix, risk flags |
+| `/agent-conflict-checker` | Conflict of interest detection | Client database | Clearance memo, conflict map |
 
 ### Category D: Productivity
 
 | Agent | Purpose | Input | Output |
 |-------|---------|-------|--------|
-| `/agent:summarizer` | Document/case summarization | Any document | Executive summary, action items |
-| `/agent:translator` | Legal translation (DE/FR/IT/EN) | Any text | Translated text with terminology precision |
-| `/agent:deadline-tracker` | Procedural deadline management | Case file | Calendar, alerts, deadline report |
+| `/agent-summarizer` | Document/case summarization | Any document | Executive summary, action items |
+| `/agent-translator` | Legal translation (DE/FR/IT/EN) | Any text | Translated text with terminology precision |
+| `/agent-deadline-tracker` | Procedural deadline management | Case file | Calendar, alerts, deadline report |
 
 ---
 
@@ -139,13 +139,13 @@ BetterCallClaude implements a **dual-interface architecture** combining granular
 
 ```bash
 # High-stakes litigation - maximum control
-/agent:strategist --mode cautious "Müller vs. ABC AG"
+/agent-strategist --mode cautious "Müller vs. ABC AG"
 
 # Standard research - checkpoint confirmations
-/agent:researcher --mode balanced "BGE precedents on Werkvertrag"
+/agent-researcher --mode balanced "BGE precedents on Werkvertrag"
 
 # Routine deadline calculation - full delegation
-/agent:deadline-tracker --mode autonomous
+/agent-deadline-tracker --mode autonomous
 ```
 
 ### Autonomy Inheritance Rules
@@ -167,7 +167,7 @@ BetterCallClaude implements a **dual-interface architecture** combining granular
 │                    CASE CONTEXT FLOW                            │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│  /case:create "Müller vs. ABC AG" --type litigation             │
+│  /case-create "Müller vs. ABC AG" --type litigation             │
 │       │                                                         │
 │       ▼                                                         │
 │  ┌─────────────────────────────────────┐                        │
@@ -191,12 +191,12 @@ BetterCallClaude implements a **dual-interface architecture** combining granular
 
 | Command | Purpose |
 |---------|---------|
-| `/case:create` | Initialize new case with metadata |
-| `/case:open` | Load existing case context |
-| `/case:close` | Archive case, preserve history |
-| `/case:list` | Show all active cases |
-| `/case:summary` | Generate case status overview |
-| `/case:export` | Export case data for external use |
+| `/case-create` | Initialize new case with metadata |
+| `/case-open` | Load existing case context |
+| `/case-close` | Archive case, preserve history |
+| `/case-list` | Show all active cases |
+| `/case-summary` | Generate case status overview |
+| `/case-export` | Export case data for external use |
 
 ### Context Data Structure
 
@@ -271,7 +271,7 @@ interface CaseContext {
 │              ▼                                 ▼                │
 │  ┌─────────────────────┐         ┌─────────────────────┐        │
 │  │  SUB-AGENT          │         │  SUB-AGENT          │        │
-│  │  /agent:researcher  │         │  /agent:citation-   │        │
+│  │  /agent-researcher  │         │  /agent-citation-   │        │
 │  │                     │         │  checker            │        │
 │  └─────────────────────┘         └─────────────────────┘        │
 │              │                             │                    │
@@ -297,16 +297,16 @@ interface CaseContext {
 ### Example: Complex Workflow
 
 ```bash
-/agent:strategist --mode balanced "Prepare case strategy for Müller vs. ABC AG"
+/agent-strategist --mode balanced "Prepare case strategy for Müller vs. ABC AG"
 
 # Execution flow:
 # 1. strategist analyzes case facts
-# 2. strategist invokes → /agent:researcher (find relevant BGE)
+# 2. strategist invokes → /agent-researcher (find relevant BGE)
 # 3. researcher returns findings
-# 4. strategist invokes → /agent:citation-checker (verify sources)
+# 4. strategist invokes → /agent-citation-checker (verify sources)
 # 5. citation-checker returns verification
 # 6. strategist synthesizes strategy memo
-# 7. strategist invokes → /agent:deadline-tracker (procedural timeline)
+# 7. strategist invokes → /agent-deadline-tracker (procedural timeline)
 # 8. Final deliverable: Complete strategy package
 ```
 
@@ -443,7 +443,7 @@ Firms can create custom agents using YAML definitions without coding.
 # .bettercallclaude/agents/ip-specialist.yaml
 agent:
   name: "ip-specialist"
-  namespace: "firm"  # Results in /agent:firm:ip-specialist
+  namespace: "firm"  # Results in /agent-firm:ip-specialist
   version: "1.0.0"
 
   description: "Specialized agent for intellectual property matters"
@@ -500,18 +500,18 @@ agent:
 
 | Priority | Agent | Rationale | Effort |
 |----------|-------|-----------|--------|
-| **P0** | `/agent:researcher` | Core value prop, enables others | 3 weeks |
-| **P0** | `/agent:citation-checker` | Quality assurance, builds trust | 1 week |
-| **P1** | `/agent:summarizer` | Quick wins, broad use | 1 week |
-| **P1** | `/agent:strategist` | High value for litigation | 2 weeks |
-| **P1** | `/agent:drafter` | Productivity multiplier | 2 weeks |
-| **P2** | `/agent:handelsregister` | Swiss differentiation | 2 weeks |
-| **P2** | `/agent:betreibung` | Unique workflow | 2 weeks |
-| **P2** | `/agent:deadline-tracker` | Risk mitigation | 1 week |
-| **P3** | `/agent:grundbuch` | Specialized practice | 2 weeks |
-| **P3** | `/agent:translator` | Multilingual support | 1 week |
-| **P3** | `/agent:compliance` | Enterprise feature | 2 weeks |
-| **P3** | `/agent:conflict-checker` | Ethics requirement | 1 week |
+| **P0** | `/agent-researcher` | Core value prop, enables others | 3 weeks |
+| **P0** | `/agent-citation-checker` | Quality assurance, builds trust | 1 week |
+| **P1** | `/agent-summarizer` | Quick wins, broad use | 1 week |
+| **P1** | `/agent-strategist` | High value for litigation | 2 weeks |
+| **P1** | `/agent-drafter` | Productivity multiplier | 2 weeks |
+| **P2** | `/agent-handelsregister` | Swiss differentiation | 2 weeks |
+| **P2** | `/agent-betreibung` | Unique workflow | 2 weeks |
+| **P2** | `/agent-deadline-tracker` | Risk mitigation | 1 week |
+| **P3** | `/agent-grundbuch` | Specialized practice | 2 weeks |
+| **P3** | `/agent-translator` | Multilingual support | 1 week |
+| **P3** | `/agent-compliance` | Enterprise feature | 2 weeks |
+| **P3** | `/agent-conflict-checker` | Ethics requirement | 1 week |
 
 **Total: 12 agents | ~20 weeks development**
 
@@ -521,19 +521,19 @@ agent:
 - Agent base class implementation
 - Checkpoint system
 - Audit logging
-- `/agent:researcher` (P0)
-- `/agent:citation-checker` (P0)
+- `/agent-researcher` (P0)
+- `/agent-citation-checker` (P0)
 
 **Phase 2 (Weeks 5-8)**: Core Agents
-- `/agent:summarizer` (P1)
-- `/agent:strategist` (P1)
-- `/agent:drafter` (P1)
+- `/agent-summarizer` (P1)
+- `/agent-strategist` (P1)
+- `/agent-drafter` (P1)
 - Case context system
 
 **Phase 3 (Weeks 9-14)**: Swiss Specialists
-- `/agent:handelsregister` (P2)
-- `/agent:betreibung` (P2)
-- `/agent:deadline-tracker` (P2)
+- `/agent-handelsregister` (P2)
+- `/agent-betreibung` (P2)
+- `/agent-deadline-tracker` (P2)
 - Custom agent framework
 
 **Phase 4 (Weeks 15-20)**: Extended Catalog

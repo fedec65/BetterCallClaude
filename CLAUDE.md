@@ -34,39 +34,36 @@ case = case_manager.get_or_create_case(title="Client Matter")
 
 | Command | Purpose | Example |
 |---------|---------|---------|
-| `/legal:research` | Search precedents/statutes | `/legal:research "rental law" --jurisdiction=ZH` |
-| `/legal:draft` | Generate legal documents | `/legal:draft "service agreement" --case_facts @facts.txt` |
-| `/legal:strategy` | Develop case strategy | `/legal:strategy @case_brief.md` |
-| `/legal:validate` | Validate citation | `/legal:validate "BGE 147 IV 73"` |
-| `/legal:format` | Format citation by language | `/legal:format "BGE 147 IV 73" --lang fr` |
-| `/legal:convert` | Convert citation between languages | `/legal:convert "Art. 97 OR" --lang fr` |
-| `/legal:parse` | Extract citation components | `/legal:parse "Art. 97 Abs. 1 lit. a OR"` |
-| `/legal:federal` | Federal law search | `/legal:federal "data protection act"` |
-| `/legal:case` | Case management | `/legal:case create --name "New Case"` |
-| `/legal:version` | Framework version | `/legal:version` |
-| `/legal:help` | Command help | `/legal:help --category=research` |
-| `/doc:analyze` | Document analysis | `/doc:analyze @contract.docx` |
-| `/swiss:federal` | Alias for federal search | `/swiss:federal "FADP"` |
-| `/swiss:precedent` | Precedent search | `/swiss:precedent "Mängelhaftung"` |
+| `/legal-research` | Search precedents/statutes | `/legal-research "rental law" --jurisdiction=ZH` |
+| `/legal-draft` | Generate legal documents | `/legal-draft "service agreement" --case_facts @facts.txt` |
+| `/legal-strategy` | Develop case strategy | `/legal-strategy @case_brief.md` |
+| `/legal-cite` | Validate/format citations | `/legal-cite "BGE 147 IV 73"` |
+| `/legal-federal` | Federal law search | `/legal-federal "data protection act"` |
+| `/legal-cantonal` | Cantonal law search | `/legal-cantonal --canton=ZH "building regulations"` |
+| `/legal-version` | Framework version | `/legal-version` |
+| `/legal-help` | Command help | `/legal-help --category=research` |
+| `/doc-analyze` | Document analysis | `/doc-analyze @contract.docx` |
+| `/swiss-federal` | Alias for federal search | `/swiss-federal "FADP"` |
+| `/swiss-precedent` | Precedent search | `/swiss-precedent "Mängelhaftung"` |
 
 ## Specialized Agents
 
 | Agent | Purpose | Invocation |
 |-------|---------|------------|
-| `researcher` | Deep legal research & precedent analysis | `/legal --agent=researcher "liability defective products"` |
-| `strategist` | Litigation strategy & risk assessment | `/legal --agent=strategist @case_brief.md` |
-| `drafter` | Document generation (Swiss standards) | `/legal --agent=drafter "employment contract"` |
-| `citation` | Citation verification & formatting | `/legal --agent=citation "BGE 147 IV 73"` |
-| `compliance` | FINMA, AML/KYC checks | `/agent:compliance assess @ops.pdf --frameworks "FINMA"` |
-| `data-protection` | GDPR & Swiss FADP/nDSG compliance | `/agent:data-protection review @contract.docx` |
-| `risk-analyst` | Case outcome scoring & settlement ranges | `/agent:risk-analyst @case.md --dispute_amount 200000` |
-| `procedure` | ZPO/StPO procedural rules & deadlines | `/agent:procedure query "deadline appeal" --code=ZPO` |
-| `fiscal-expert` | Tax law & double-taxation treaties | `/agent:fiscal-expert "corporate tax" --jurisdiction=ZG` |
-| `corporate` | M&A, contracts, corporate governance | `/agent:corporate review-m&a @deal_room/` |
-| `real-estate` | Property transactions & documents | `/agent:real-estate draft-agreement --canton=GE` |
-| `translator` | Legal translation (DE/FR/IT/EN) | `/agent:translator "..." --source_lang=de --target_lang=en` |
-| `cantonal-law` | 26 Swiss cantonal law specialist | `/agent:cantonal-law --canton=BE "building regulations"` |
-| `orchestrator` | Multi-agent workflow coordination | `/legal --agent=orchestrator --workflow "Due Diligence"` |
+| `researcher` | Deep legal research & precedent analysis | `/agent-researcher "liability defective products"` |
+| `strategist` | Litigation strategy & risk assessment | `/agent-strategist @case_brief.md` |
+| `drafter` | Document generation (Swiss standards) | `/agent-drafter "employment contract"` |
+| `citation` | Citation verification & formatting | `/agent-citation "BGE 147 IV 73"` |
+| `compliance` | FINMA, AML/KYC checks | `/agent-compliance assess @ops.pdf --frameworks "FINMA"` |
+| `data-protection` | GDPR & Swiss FADP/nDSG compliance | `/agent-data-protection review @contract.docx` |
+| `risk` | Case outcome scoring & settlement ranges | `/agent-risk @case.md --dispute_amount 200000` |
+| `procedure` | ZPO/StPO procedural rules & deadlines | `/agent-procedure query "deadline appeal" --code=ZPO` |
+| `fiscal` | Tax law & double-taxation treaties | `/agent-fiscal "corporate tax" --jurisdiction=ZG` |
+| `corporate` | M&A, contracts, corporate governance | `/agent-corporate review-m&a @deal_room/` |
+| `realestate` | Property transactions & documents | `/agent-realestate draft-agreement --canton=GE` |
+| `translator` | Legal translation (DE/FR/IT/EN) | `/agent-translator "..." --source_lang=de --target_lang=en` |
+| `cantonal` | 26 Swiss cantonal law specialist | `/agent-cantonal --canton=BE "building regulations"` |
+| `orchestrator` | Multi-agent workflow coordination | `/agent-orchestrator --workflow "Due Diligence"` |
 
 ## Workflows
 

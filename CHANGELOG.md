@@ -7,6 +7,89 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.2.1] - 2026-01-17
+
+### 🪟 Windows Compatibility: Command Syntax Migration
+
+This release fixes Windows filesystem compatibility by migrating all slash command filenames from colon (`:`) to hyphen (`-`) format.
+
+### ⚠️ BREAKING CHANGE: Command Syntax
+
+**All slash commands now use hyphens instead of colons:**
+
+| Old Syntax (v2.2.0) | New Syntax (v2.2.1) |
+|---------------------|---------------------|
+| `/legal:research` | `/legal-research` |
+| `/legal:strategy` | `/legal-strategy` |
+| `/legal:draft` | `/legal-draft` |
+| `/legal:federal` | `/legal-federal` |
+| `/legal:cantonal` | `/legal-cantonal` |
+| `/legal:cite` | `/legal-cite` |
+| `/legal:help` | `/legal-help` |
+| `/legal:version` | `/legal-version` |
+| `/legal:routing` | `/legal-routing` |
+| `/agent:researcher` | `/agent-researcher` |
+| `/agent:strategist` | `/agent-strategist` |
+| `/agent:drafter` | `/agent-drafter` |
+| `/agent:orchestrator` | `/agent-orchestrator` |
+| `/agent:compliance` | `/agent-compliance` |
+| `/agent:risk` | `/agent-risk` |
+| `/agent:procedure` | `/agent-procedure` |
+| `/agent:fiscal` | `/agent-fiscal` |
+| `/agent:corporate` | `/agent-corporate` |
+| `/agent:realestate` | `/agent-realestate` |
+| `/agent:translator` | `/agent-translator` |
+| `/agent:cantonal` | `/agent-cantonal` |
+| `/agent:citation` | `/agent-citation` |
+| `/agent:data-protection` | `/agent-data-protection` |
+| `/doc:analyze` | `/doc-analyze` |
+| `/swiss:federal` | `/swiss-federal` |
+| `/swiss:precedent` | `/swiss-precedent` |
+
+### Why This Change?
+
+**Windows Filesystem Restriction**: Windows reserves the colon (`:`) character for drive letter designations (e.g., `C:`). Files containing colons cannot be created or checked out on Windows systems.
+
+**CI/CD Impact**: GitHub Actions Windows runners (`windows-2022`) failed with Git exit code 128:
+```
+error: invalid path '.claude/commands/agent:cantonal.md'
+```
+
+### Changed
+
+- **26 Command Files Renamed**: All `.claude/commands/*.md` files migrated from colon to hyphen format
+- **Documentation Updated**: CLAUDE.md, README.md, BETTERASK.md, command-reference.md, AGENT_ARCHITECTURE.md
+- **Windows CI Restored**: PowerShell installer tests now pass on Windows
+
+### Migration Guide
+
+**Update your workflows and scripts:**
+
+```bash
+# Old (v2.2.0)
+/legal:research "Art. 97 OR"
+/agent:researcher @case.md
+
+# New (v2.2.1)
+/legal-research "Art. 97 OR"
+/agent-researcher @case.md
+```
+
+**Search and replace in your code:**
+- Replace `/legal:` with `/legal-`
+- Replace `/agent:` with `/agent-`
+- Replace `/doc:` with `/doc-`
+- Replace `/swiss:` with `/swiss-`
+- Replace `/case:` with `/case-`
+
+### Backward Compatibility
+
+⚠️ **Not Backward Compatible**: Old colon-based commands will not work after this update.
+
+Users must update their workflows, scripts, and muscle memory to use the new hyphen-based syntax.
+
+---
+
 ## [2.0.1] - 2025-12-28
 
 ### 🏛️ New MCP Server: Fedlex SPARQL
