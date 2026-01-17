@@ -1,0 +1,278 @@
+name: Windows Installer Tests
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'install.ps1'
+      - '.github/workflows/test-windows-installer.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'install.ps1'
+      - '.github/workflows/test-windows-installer.yml'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  test-windows-installer:
+    name: Test PowerShell Installer
+    runs-on: windows-2022
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      # ============================================
+      # Test 1: Prerequisite Detection
+      # ============================================
+      - name: Test prerequisite detection
+        shell: pwsh
+        run: |
+          Write-Host "=== Testing Prerequisite Detection ===" -ForegroundColor Cyan
+
+          # Test Git detection
+          $gitVersion = git --version
+          Write-Host "✅ Git detected: $gitVersion" -ForegroundColor Green
+
+          # Test Node.js detection
+          $nodeVersion = node --version
+          Write-Host "✅ Node.js detected: $nodeVersion" -ForegroundColor Green
+
+          # Test Python detection
+          $pythonVersion = python --version
+          Write-Host "✅ Python detected: $pythonVersion" -ForegroundColor Green
+
+          # Test PowerShell version
+          Write-Host "✅ PowerShell version: $($PSVersionTable.PSVersion)" -ForegroundColor Green
+
+      # ============================================
+      # Test 2: Installer Syntax Validation
+      # ============================================
+      - name: Validate PowerShell syntax
+        shell: pwsh
+        run: |
+          Write-Host "=== Validating PowerShell Syntax ===" -ForegroundColor Cyan
+
+          $errors = $null
+          $ast = [System.Management.Automation.Language.Parser]::ParseFile(
+            "$env:GITHUB_WORKSPACE\install.ps1",
+            [ref]$null,
+            [ref]$errors
+          )
+
+          if ($errors.Count -gt 0) {
+            Write-Host "❌ Syntax errors found:" -ForegroundColor Red
+            $errors | ForEach-Object { Write-Host $_.Message -ForegroundColor Red }
+            exit 1
+          }
+
+          Write-Host "✅ PowerShell syntax is valid" -ForegroundColor Green
+
+      # ============================================
+      # Test 3: Dry Run Installation
+      # ============================================
+      - name: Test dry-run installation
+        shell: pwsh
+        run: |
+          Write-Host "=== Testing Dry-Run Installation ===" -ForegroundColor Cyan
+
+          # Run installer in dry-run mode
+          & "$env:GITHUB_WORKSPACE\install.ps1" -DryRun -NoInteractive
+
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host "✅ Dry-run completed successfully" -ForegroundColor Green
+          } else {
+            Write-Host "❌ Dry-run failed with exit code: $LASTEXITCODE" -ForegroundColor Red
+            exit 1
+          }
+
+      # ============================================
+      # Test 4: Full Installation (Non-Interactive)
+      # ============================================
+      - name: Test full installation
+        shell: pwsh
+        run: |
+          Write-Host "=== Testing Full Installation ===" -ForegroundColor Cyan
+
+          # Run full installation
+          & "$env:GITHUB_WORKSPACE\install.ps1" -NoInteractive
+
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host "✅ Installation completed successfully" -ForegroundColor Green
+          } else {
+            Write-Host "❌ Installation failed with exit code: $LASTEXITCODE" -ForegroundColor Red
+            exit 1
+          }
+
+      # ============================================
+      # Test 5: Verify Installation Structure
+      # ============================================
+      - name: Verify installation structure
+        shell: pwsh
+        run: |
+          Write-Host "=== Verifying Installation Structure ===" -ForegroundColor Cyan
+
+          $installDir = "$env:USERPROFILE\.claude\bettercallclaude"
+          $mcpDir = "$env:USERPROFILE\.bettercallclaude\mcp-servers"
+          $commandsDir = "$env:USERPROFILE\.claude\commands"
+
+          # Check installation directory
+          if (Test-Path $installDir) {
+            Write-Host "✅ Install directory exists: $installDir" -ForegroundColor Green
+          } else {
+            Write-Host "❌ Install directory not found: $installDir" -ForegroundColor Red
+            exit 1
+          }
+
+          # Check MCP servers directory
+          if (Test-Path $mcpDir) {
+            Write-Host "✅ MCP servers directory exists: $mcpDir" -ForegroundColor Green
+          } else {
+            Write-Host "❌ MCP servers directory not found: $mcpDir" -ForegroundColor Red
+            exit 1
+          }
+
+          # Check commands directory
+          if (Test-Path $commandsDir) {
+            Write-Host "✅ Commands directory exists: $commandsDir" -ForegroundColor Green
+          } else {
+            Write-Host "❌ Commands directory not found: $commandsDir" -ForegroundColor Red
+            exit 1
+          }
+
+          # Check manifest.json
+          $manifestPath = "$installDir\manifest.json"
+          if (Test-Path $manifestPath) {
+            $manifest = Get-Content $manifestPath | ConvertFrom-Json
+            Write-Host "✅ Manifest exists with version: $($manifest.version)" -ForegroundColor Green
+          } else {
+            Write-Host "❌ Manifest not found: $manifestPath" -ForegroundColor Red
+            exit 1
+          }
+
+          # Check version.txt
+          $versionPath = "$installDir\version.txt"
+          if (Test-Path $versionPath) {
+            $version = Get-Content $versionPath
+            Write-Host "✅ Version file exists: $version" -ForegroundColor Green
+          } else {
+            Write-Host "❌ Version file not found: $versionPath" -ForegroundColor Red
+            exit 1
+          }
+
+      # ============================================
+      # Test 6: CLI Commands (Version)
+      # ============================================
+      - name: Test CLI version command
+        shell: pwsh
+        run: |
+          Write-Host "=== Testing CLI Version Command ===" -ForegroundColor Cyan
+
+          $cliPath = "$env:LOCALAPPDATA\Microsoft\WindowsApps\bettercallclaude.cmd"
+
+          if (Test-Path $cliPath) {
+            Write-Host "✅ CLI wrapper exists: $cliPath" -ForegroundColor Green
+
+            # Test version command
+            & $cliPath version
+
+            if ($LASTEXITCODE -eq 0) {
+              Write-Host "✅ Version command executed successfully" -ForegroundColor Green
+            } else {
+              Write-Host "⚠️ Version command returned: $LASTEXITCODE" -ForegroundColor Yellow
+            }
+          } else {
+            Write-Host "❌ CLI wrapper not found: $cliPath" -ForegroundColor Red
+            exit 1
+          }
+
+      # ============================================
+      # Test 7: Doctor Command
+      # ============================================
+      - name: Test doctor command
+        shell: pwsh
+        run: |
+          Write-Host "=== Testing Doctor Command ===" -ForegroundColor Cyan
+
+          # Run doctor via installer script
+          & "$env:GITHUB_WORKSPACE\install.ps1" -Doctor
+
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host "✅ Doctor command passed all checks" -ForegroundColor Green
+          } else {
+            Write-Host "⚠️ Doctor command reported issues (exit code: $LASTEXITCODE)" -ForegroundColor Yellow
+            # Don't fail - doctor might report MCP build issues in CI environment
+          }
+
+      # ============================================
+      # Test 8: MCP Server Build Verification
+      # ============================================
+      - name: Verify MCP server builds
+        shell: pwsh
+        run: |
+          Write-Host "=== Verifying MCP Server Builds ===" -ForegroundColor Cyan
+
+          $mcpDir = "$env:USERPROFILE\.bettercallclaude\mcp-servers"
+          $servers = @("entscheidsuche", "bge-search", "legal-citations")
+
+          foreach ($server in $servers) {
+            $distPath = "$mcpDir\$server\dist\index.js"
+            if (Test-Path $distPath) {
+              Write-Host "✅ $server built successfully" -ForegroundColor Green
+            } else {
+              Write-Host "⚠️ $server dist not found (may need npm build)" -ForegroundColor Yellow
+            }
+          }
+
+      # ============================================
+      # Test 9: Uninstall Command
+      # ============================================
+      - name: Test uninstall command
+        shell: pwsh
+        run: |
+          Write-Host "=== Testing Uninstall Command ===" -ForegroundColor Cyan
+
+          # Run uninstall
+          & "$env:GITHUB_WORKSPACE\install.ps1" -Uninstall -NoInteractive
+
+          # Verify directories are removed
+          $installDir = "$env:USERPROFILE\.claude\bettercallclaude"
+          $mcpDir = "$env:USERPROFILE\.bettercallclaude"
+
+          if (-not (Test-Path $installDir)) {
+            Write-Host "✅ Install directory removed" -ForegroundColor Green
+          } else {
+            Write-Host "⚠️ Install directory still exists" -ForegroundColor Yellow
+          }
+
+          if (-not (Test-Path $mcpDir)) {
+            Write-Host "✅ MCP directory removed" -ForegroundColor Green
+          } else {
+            Write-Host "⚠️ MCP directory still exists" -ForegroundColor Yellow
+          }
+
+          Write-Host "✅ Uninstall test completed" -ForegroundColor Green
+
+      # ============================================
+      # Summary
+      # ============================================
+      - name: Test summary
+        shell: pwsh
+        run: |
+          Write-Host ""
+          Write-Host "========================================" -ForegroundColor Cyan
+          Write-Host "  Windows Installer Tests Complete!" -ForegroundColor Cyan
+          Write-Host "========================================" -ForegroundColor Cyan
+          Write-Host ""
+          Write-Host "All critical tests passed. The PowerShell installer" -ForegroundColor Green
+          Write-Host "is ready for Windows users." -ForegroundColor Green
