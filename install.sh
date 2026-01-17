@@ -22,7 +22,7 @@ set -e
 
 # Fallback version for initial display (banner, early logs)
 # This will be updated after repository is cloned
-VERSION="2.2.0"
+VERSION="2.2.1"
 
 # Extract version from pyproject.toml (source of truth after clone)
 extract_version_from_pyproject() {

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "adversarial-workflow"
-version = "2.2.0"
+version = "2.2.1"
 description = "Adversarial workflow for legal document analysis with multi-agent communication"
 readme = "README.md"
 requires-python = ">=3.11"

@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-**BetterCallClaude v2.1.0** - Swiss Legal Intelligence Framework
+**BetterCallClaude v2.2.1** - Swiss Legal Intelligence Framework
 
 ## Core Identity
 
@@ -160,5 +160,5 @@ Location: `~/.betterask/config.yaml`
 
 ---
 
-**Version**: 2.1.0 | **License**: AGPL-3.0 | **Maintainer**: Federico Cesconi
+**Version**: 2.2.1 | **License**: AGPL-3.0 | **Maintainer**: Federico Cesconi
 **GitHub**: https://github.com/fedec65/BetterCallClaude

@@ -1,6 +1,6 @@
 # BetterCallClaude: Legal Intelligence Framework for Swiss Lawyers
 
-[![Version](https://img.shields.io/badge/version-2.2.0-blue.svg)](https://github.com/fedec65/bettercallclaude)
+[![Version](https://img.shields.io/badge/version-2.2.1-blue.svg)](https://github.com/fedec65/bettercallclaude)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![Languages](https://img.shields.io/badge/languages-DE%20%7C%20FR%20%7C%20IT%20%7C%20EN-orange.svg)]()
 [![Claude Code](https://img.shields.io/badge/built%20with-Claude%20Code-purple.svg)](https://claude.ai/code)
