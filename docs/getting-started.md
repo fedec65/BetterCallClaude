@@ -53,12 +53,14 @@ Before you begin, ensure you have:
 
 | Component | Required | Recommended |
 |-----------|----------|-------------|
-| **OS** | macOS, Linux, Windows (WSL2) | macOS or Linux |
+| **OS** | macOS, Linux, Windows 10+ | macOS or Linux |
 | **Claude Code** | Latest version | Latest version |
 | **Node.js** | v18.0.0+ | v20.0.0+ |
 | **Python** | 3.10+ | 3.11+ |
 | **RAM** | 8GB | 16GB |
 | **Disk Space** | 500MB | 1GB |
+
+> **Windows Users**: Native Windows is now supported! See [Windows Installation Guide](windows-installation.md) for PowerShell-based installation, or use WSL2 with the standard bash installer.
 
 ### Optional API Keys
 - **Tavily API Key**: For enhanced web research at [app.tavily.com](https://app.tavily.com/)
@@ -70,7 +72,7 @@ Before you begin, ensure you have:
 
 ## Installation
 
-### Quick Install (Recommended)
+### Quick Install - macOS / Linux (Recommended)
 
 The easiest way to install BetterCallClaude is with the interactive installer:
 
@@ -84,8 +86,19 @@ The installer will guide you through:
 3. **Python environment**: Virtual environment, system Python, or skip
 4. **Backup options**: Automatic backup of existing configurations
 
+### Quick Install - Windows (Native)
+
+Open PowerShell as Administrator and run:
+
+```powershell
+irm https://raw.githubusercontent.com/fedec65/BetterCallClaude/main/install.ps1 | iex
+```
+
+> **Note**: For detailed Windows instructions, see the [Windows Installation Guide](windows-installation.md).
+
 ### Installation Options
 
+**macOS / Linux:**
 ```bash
 # Preview what will be installed (no changes made)
 curl -fsSL https://raw.githubusercontent.com/fedec65/bettercallclaude/main/install.sh | bash -s -- --dry-run
@@ -97,14 +110,34 @@ curl -fsSL https://raw.githubusercontent.com/fedec65/bettercallclaude/main/insta
 curl -fsSL https://raw.githubusercontent.com/fedec65/bettercallclaude/main/install.sh | bash -s -- --force
 ```
 
+**Windows:**
+```powershell
+# Preview what will be installed (no changes made)
+.\install.ps1 -DryRun
+
+# Non-interactive installation with defaults
+.\install.ps1 -NoInteractive
+
+# Force reinstall
+.\install.ps1 -Force
+```
+
 ### Developer Installation
 
 For development or contributing:
 
 ```bash
+# macOS / Linux
 git clone https://github.com/fedec65/bettercallclaude.git
 cd bettercallclaude
 ./install.sh
+```
+
+```powershell
+# Windows
+git clone https://github.com/fedec65/bettercallclaude.git
+cd bettercallclaude
+.\install.ps1
 ```
 
 ### Post-Installation
@@ -112,10 +145,16 @@ cd bettercallclaude
 After installation, verify everything is working:
 
 ```bash
-# Check installation status
+# macOS / Linux
 ./install.sh doctor
-
 # Or if installed globally
+bettercallclaude doctor
+```
+
+```powershell
+# Windows
+.\install.ps1 -Doctor
+# Or from any location
 bettercallclaude doctor
 ```
 

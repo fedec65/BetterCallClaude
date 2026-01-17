@@ -15,17 +15,31 @@
 
 **Works with both Claude Code CLI and Claude Desktop.**
 
+### macOS / Linux / WSL
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/fedec65/BetterCallClaude/main/install.sh | bash
-````
+```
 
-The installer automatically detects your environment, configures MCP servers, creates symlinks, and backs up existing settings.
+### Windows (Native PowerShell)
+
+```powershell
+irm https://raw.githubusercontent.com/fedec65/BetterCallClaude/main/install.ps1 | iex
+```
+
+> **Note**: Run PowerShell as Administrator. For detailed Windows instructions, see the [Windows Installation Guide](docs/windows-installation.md).
+
+The installer automatically detects your environment, configures MCP servers, creates symlinks (or CLI wrappers on Windows), and backs up existing settings.
 
 ### Upgrading
 
 To upgrade to the latest version:
 
 ```bash
+# macOS / Linux / WSL
+bettercallclaude update
+
+# Windows PowerShell
 bettercallclaude update
 ```
 
@@ -33,6 +47,14 @@ This will pull the latest changes from GitHub and update your installation. You 
 
 ```bash
 bettercallclaude version
+```
+
+### Health Check
+
+Verify your installation is working correctly:
+
+```bash
+bettercallclaude doctor
 ```
 
 -----
