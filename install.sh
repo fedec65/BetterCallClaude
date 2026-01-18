@@ -1280,6 +1280,62 @@ cmd_uninstall() {
     echo "Note: CLAUDE.md imports not removed (manual cleanup if desired)"
 }
 
+cmd_repair() {
+    echo ""
+    echo -e "${CYAN}BetterCallClaude Repair${NC}"
+    echo "======================="
+    echo ""
+
+    local fixed=0
+    local commands_dir="$HOME/.claude/commands"
+    local source_dir="$INSTALL_DIR/.claude/commands"
+
+    # Remove broken symlinks
+    echo "Checking for broken symlinks..."
+    for link in "$commands_dir"/*.md; do
+        if [ -L "$link" ] && [ ! -e "$link" ]; then
+            local filename=$(basename "$link")
+            echo -e "  ${YELLOW}Removing broken symlink:${NC} $filename"
+            rm -f "$link"
+            fixed=$((fixed + 1))
+        fi
+    done
+
+    if [ "$fixed" -gt 0 ]; then
+        echo -e "${GREEN}Removed $fixed broken symlink(s)${NC}"
+    else
+        echo -e "${GREEN}No broken symlinks found${NC}"
+    fi
+
+    # Reinstall commands from source
+    echo ""
+    echo "Reinstalling commands..."
+    local installed=0
+    if [ -d "$source_dir" ]; then
+        for cmd_file in "$source_dir"/*.md; do
+            if [ -f "$cmd_file" ]; then
+                local filename=$(basename "$cmd_file")
+                local target="$commands_dir/$filename"
+
+                # Create/update symlink
+                rm -f "$target" 2>/dev/null
+                ln -s "$cmd_file" "$target"
+                installed=$((installed + 1))
+            fi
+        done
+        echo -e "${GREEN}Installed $installed command(s)${NC}"
+    else
+        echo -e "${YELLOW}Source directory not found: $source_dir${NC}"
+    fi
+
+    echo ""
+    echo -e "${GREEN}Repair complete!${NC}"
+    echo ""
+
+    # Run doctor to verify
+    cmd_doctor
+}
+
 cmd_list() {
     echo ""
     echo -e "${CYAN}Installed BetterCallClaude Commands${NC}"
@@ -1311,6 +1367,7 @@ cmd_help() {
     echo "  update      Update to latest version"
     echo "  uninstall   Remove BetterCallClaude"
     echo "  doctor      Check installation health"
+    echo "  repair      Fix broken symlinks and reinstall commands"
     echo "  list        List installed commands"
     echo "  version     Show version"
     echo "  help        Show this help"
@@ -1335,6 +1392,9 @@ case "${1:-help}" in
         ;;
     version|--version|-v)
         cmd_version
+        ;;
+    repair|fix)
+        cmd_repair
         ;;
     help|--help|-h|*)
         cmd_help
