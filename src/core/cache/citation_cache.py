@@ -58,8 +58,7 @@ class CitationCache:
     def _init_database(self) -> None:
         """Create cache table if it doesn't exist"""
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute(
-                """
+            conn.execute("""
                 CREATE TABLE IF NOT EXISTS citation_cache (
                     cache_key TEXT PRIMARY KEY,
                     query TEXT NOT NULL,
@@ -69,15 +68,12 @@ class CitationCache:
                     hit_count INTEGER DEFAULT 0,
                     last_accessed TEXT
                 )
-                """
-            )
+                """)
             # Create index on expiration for faster cleanup
-            conn.execute(
-                """
+            conn.execute("""
                 CREATE INDEX IF NOT EXISTS idx_expires_at
                 ON citation_cache(expires_at)
-                """
-            )
+                """)
             conn.commit()
 
     def _generate_cache_key(self, query: str, filters: dict | None = None) -> str:

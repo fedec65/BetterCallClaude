@@ -56,8 +56,7 @@ def temp_commands_dir(tmp_path: Path) -> Path:
 
     for filename, description in test_agents:
         agent_file = commands_dir / filename
-        agent_file.write_text(
-            f"""# {filename.replace('.md', '')}
+        agent_file.write_text(f"""# {filename.replace('.md', '')}
 
 {description}
 
@@ -71,8 +70,7 @@ def temp_commands_dir(tmp_path: Path) -> Path:
 
 ## Output
 Returns processed results.
-"""
-        )
+""")
 
     return tmp_path
 
